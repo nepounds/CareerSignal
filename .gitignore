@@ -1,0 +1,24 @@
+# Python virtual environment
+.venv/
+
+# Secret environment variables
+.env
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# Local data and logs
+data/*
+logs/*
+
+# Keep placeholder files
+!data/.gitkeep
+!logs/.gitkeep
+
+# VS Code settings
+.vscode/
+
+# Windows/macOS junk files
+Thumbs.db
+.DS_Store
