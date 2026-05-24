@@ -21,6 +21,7 @@ import requests
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = PROJECT_ROOT / "config" / "company_config.csv"
+OUTPUT_PATH = PROJECT_ROOT / "data" / "greenhouse_jobs.csv"
 
 
 @dataclass
@@ -214,6 +215,36 @@ def collect_greenhouse_jobs(companies: list[CompanyConfig]) -> list[JobPosting]:
 
     return matching_jobs
 
+def save_jobs_to_csv(jobs: list[JobPosting], output_path: Path) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    fieldnames = [
+        "company",
+        "title",
+        "location",
+        "job_url",
+        "external_job_id",
+        "ats_type",
+    ]
+
+    with output_path.open("w", encoding="utf-8", newline="") as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer.writeheader()
+
+        for job in jobs:
+            writer.writerow(
+                {
+                    "company": job.company,
+                    "title": job.title,
+                    "location": job.location,
+                    "job_url": job.job_url,
+                    "external_job_id": job.external_job_id,
+                    "ats_type": job.ats_type,
+                }
+            )
+
+    print(f"Saved {len(jobs)} jobs to {output_path}")
+
 
 def shorten(value: str, max_length: int) -> str:
     if len(value) <= max_length:
@@ -269,6 +300,7 @@ def main() -> None:
     companies = load_company_config(CONFIG_PATH)
     jobs = collect_greenhouse_jobs(companies)
     print_jobs_table(jobs)
+    save_jobs_to_csv(jobs, OUTPUT_PATH)
 
 
 if __name__ == "__main__":
