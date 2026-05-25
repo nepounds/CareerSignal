@@ -13,6 +13,9 @@ __pycache__/
 data/*
 logs/*
 
+# Generated exports
+exports/*.xlsx
+
 # Keep placeholder files
 !data/.gitkeep
 !logs/.gitkeep
