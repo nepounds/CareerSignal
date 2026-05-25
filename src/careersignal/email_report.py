@@ -99,8 +99,14 @@ def build_email_body(
     else:
         for source in failed_sources:
             company_name = source.get("company_name", "Unknown Company")
-            reason = source.get("reason", "No reason provided")
-            lines.append(f"- {company_name}: {reason}")
+            source_ats = source.get("source_ats", "unknown")
+            reason = (
+                source.get("reason")
+                or source.get("error")
+                or "No reason provided"
+            )
+
+            lines.append(f"- {company_name} ({source_ats}): {reason}")
 
     lines.append("")
     lines.append("End of report.")

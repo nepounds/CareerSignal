@@ -18,6 +18,9 @@ from __future__ import annotations
 
 import argparse
 import csv
+import logging
+import time
+import traceback
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -30,6 +33,7 @@ from careersignal.database import (
     insert_or_update_jobs,
 )
 from careersignal.email_report import build_and_send_daily_report
+from careersignal.logging_config import setup_logging
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -134,6 +138,51 @@ def get_greenhouse_board_token(career_url: str) -> str:
     return path_parts[0]
 
 
+def get_with_retries(
+    url: str,
+    timeout: int = 20,
+    max_retries: int = 3,
+    retry_delay: int = 2,
+) -> requests.Response:
+    """
+    Makes a GET request with timeout and retry handling.
+
+    This helps with temporary failures like:
+    - slow websites
+    - temporary network issues
+    - temporary 500/502/503/504 errors
+    """
+
+    logger = logging.getLogger("careersignal")
+    last_error: Exception | None = None
+
+    for attempt in range(1, max_retries + 1):
+        try:
+            logger.info(f"Request attempt {attempt}/{max_retries}: {url}")
+
+            response = requests.get(url, timeout=timeout)
+
+            if response.status_code in {500, 502, 503, 504}:
+                raise requests.exceptions.HTTPError(
+                    f"Temporary server error: {response.status_code}"
+                )
+
+            response.raise_for_status()
+            return response
+
+        except requests.exceptions.RequestException as error:
+            last_error = error
+
+            logger.warning(
+                f"Request failed on attempt {attempt}/{max_retries}: {url} | {error}"
+            )
+
+            if attempt < max_retries:
+                time.sleep(retry_delay)
+
+    raise last_error
+
+
 def fetch_greenhouse_jobs(company_config: CompanyConfig) -> list[JobPosting]:
     """
     Pulls jobs from the Greenhouse public job board API.
@@ -142,8 +191,7 @@ def fetch_greenhouse_jobs(company_config: CompanyConfig) -> list[JobPosting]:
     board_token = get_greenhouse_board_token(company_config.career_url)
     api_url = f"https://boards-api.greenhouse.io/v1/boards/{board_token}/jobs"
 
-    response = requests.get(api_url, timeout=20)
-    response.raise_for_status()
+    response = get_with_retries(api_url)
 
     data = response.json()
     raw_jobs = data.get("jobs", [])
@@ -213,6 +261,8 @@ def collect_greenhouse_jobs(
         failed_sources: List of failed company/source dictionaries for reporting.
     """
 
+    logger = logging.getLogger("careersignal")
+
     matching_jobs: list[JobPosting] = []
     failed_sources: list[dict] = []
 
@@ -224,6 +274,7 @@ def collect_greenhouse_jobs(
             continue
 
         print(f"Collecting Greenhouse jobs for {company_config.company}...")
+        logger.info(f"Collecting Greenhouse jobs for {company_config.company}")
 
         try:
             all_jobs = fetch_greenhouse_jobs(company_config)
@@ -239,6 +290,11 @@ def collect_greenhouse_jobs(
             print(f"Found {len(all_jobs)} total jobs.")
             print(f"Kept {len(filtered_jobs)} matching jobs.")
 
+            logger.info(
+                f"{company_config.company}: found {len(all_jobs)} total jobs, "
+                f"kept {len(filtered_jobs)} matching jobs"
+            )
+
             if all_jobs:
                 print()
                 print("Sample jobs before filtering:")
@@ -248,36 +304,83 @@ def collect_greenhouse_jobs(
 
         except requests.HTTPError as error:
             reason = f"HTTP error: {error}"
+
             print(f"{reason} for {company_config.company}")
+            print("Continuing to next company...")
+
+            logger.error(f"{reason} for {company_config.company}")
+            logger.error(traceback.format_exc())
 
             failed_sources.append(
                 {
                     "company_name": company_config.company,
+                    "source_ats": company_config.ats_type,
                     "reason": reason,
+                    "error": reason,
                 }
             )
+
+            continue
 
         except requests.RequestException as error:
             reason = f"Request error: {error}"
+
             print(f"{reason} for {company_config.company}")
+            print("Continuing to next company...")
+
+            logger.error(f"{reason} for {company_config.company}")
+            logger.error(traceback.format_exc())
 
             failed_sources.append(
                 {
                     "company_name": company_config.company,
+                    "source_ats": company_config.ats_type,
                     "reason": reason,
+                    "error": reason,
                 }
             )
+
+            continue
 
         except ValueError as error:
             reason = f"Setup error: {error}"
+
             print(f"{reason} for {company_config.company}")
+            print("Continuing to next company...")
+
+            logger.error(f"{reason} for {company_config.company}")
+            logger.error(traceback.format_exc())
 
             failed_sources.append(
                 {
                     "company_name": company_config.company,
+                    "source_ats": company_config.ats_type,
                     "reason": reason,
+                    "error": reason,
                 }
             )
+
+            continue
+
+        except Exception as error:
+            reason = f"Unexpected error: {error}"
+
+            print(f"{reason} for {company_config.company}")
+            print("Continuing to next company...")
+
+            logger.error(f"{reason} for {company_config.company}")
+            logger.error(traceback.format_exc())
+
+            failed_sources.append(
+                {
+                    "company_name": company_config.company,
+                    "source_ats": company_config.ats_type,
+                    "reason": reason,
+                    "error": reason,
+                }
+            )
+
+            continue
 
     return matching_jobs, failed_sources
 
@@ -444,9 +547,21 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
+    logger = setup_logging()
+
     args = parse_args()
 
-    companies = load_company_config(CONFIG_PATH)
+    logger.info("=" * 80)
+    logger.info("CareerSignal Greenhouse run started")
+    logger.info(f"Mode: {'preview' if args.preview else 'send'}")
+
+    try:
+        companies = load_company_config(CONFIG_PATH)
+    except Exception:
+        logger.error("Failed to load company config.")
+        logger.error(traceback.format_exc())
+        print("ERROR: Could not load company config. Check logs/careersignal.log")
+        return
 
     jobs, failed_sources = collect_greenhouse_jobs(companies)
 
@@ -455,9 +570,21 @@ def main() -> None:
 
     normalized_jobs = normalize_job_postings(jobs)
 
-    summary = insert_or_update_jobs(normalized_jobs)
+    try:
+        summary = insert_or_update_jobs(normalized_jobs)
+    except Exception:
+        logger.error("Database insert/update failed.")
+        logger.error(traceback.format_exc())
+        print("ERROR: Database insert/update failed. Check logs/careersignal.log")
+        return
 
-    new_jobs = get_jobs_first_seen_in_last_24_hours()
+    try:
+        new_jobs = get_jobs_first_seen_in_last_24_hours()
+    except Exception:
+        logger.error("Failed to get new jobs from database.")
+        logger.error(traceback.format_exc())
+        print("WARNING: Could not retrieve new jobs. Continuing with empty new_jobs list.")
+        new_jobs = []
 
     email_summary = {
         "companies_checked": count_active_greenhouse_companies(companies),
@@ -465,14 +592,48 @@ def main() -> None:
         "jobs_inserted": summary["jobs_inserted"],
         "jobs_updated": summary["jobs_updated"],
         "new_jobs": len(new_jobs),
+        "failed_sources": len(failed_sources),
     }
 
-    build_and_send_daily_report(
-        summary=email_summary,
-        new_jobs=new_jobs,
-        failed_sources=failed_sources,
-        test_mode=args.preview,
-    )
+    try:
+        build_and_send_daily_report(
+            summary=email_summary,
+            new_jobs=new_jobs,
+            failed_sources=failed_sources,
+            test_mode=args.preview,
+        )
+    except Exception:
+        logger.error("Failed to build/send daily email report.")
+        logger.error(traceback.format_exc())
+        print("WARNING: Run completed, but email report failed.")
+
+    logger.info("CareerSignal Greenhouse run finished")
+    logger.info(f"Email summary: {email_summary}")
+    logger.info(f"Failed sources: {failed_sources}")
+
+    print()
+    print("CareerSignal run complete.")
+    print("-" * 40)
+    print(f"Mode: {'Preview' if args.preview else 'Send'}")
+    print(f"Companies checked: {email_summary['companies_checked']}")
+    print(f"Jobs found: {email_summary['jobs_found']}")
+    print(f"Jobs inserted: {email_summary['jobs_inserted']}")
+    print(f"Jobs updated: {email_summary['jobs_updated']}")
+    print(f"New jobs in last 24 hours: {email_summary['new_jobs']}")
+    print(f"Failed sources: {email_summary['failed_sources']}")
+
+    if failed_sources:
+        print()
+        print("Failed sources:")
+        for failed_source in failed_sources:
+            print(
+                f"- {failed_source['company_name']} "
+                f"({failed_source['source_ats']}): "
+                f"{failed_source['reason']}"
+            )
+
+    print()
+    print("Log file: logs/careersignal.log")
 
 
 if __name__ == "__main__":
