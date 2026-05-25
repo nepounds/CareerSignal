@@ -1,19 +1,28 @@
 # CareerSignal
 
-CareerSignal is a Python portfolio project that tracks job postings from target companies and sends alerts when new matching jobs appear.
+CareerSignal is a Python portfolio project that tracks job postings from target companies, scores jobs against target criteria, stores results in SQLite, exports clean Excel reports, sends daily email summaries, and powers a Power BI dashboard.
+
+The project is designed to show practical automation, data handling, reporting, and business dashboard skills in one end-to-end workflow.
 
 ## Project Goal
 
-The goal of this project is to help job seekers monitor companies they care about instead of manually checking each career page every day.
+CareerSignal helps job seekers monitor companies they care about instead of manually checking each career page every day.
 
-## Planned Features
+The pipeline collects job postings, normalizes the data, stores jobs in a database, detects newly discovered jobs, scores each job for relevance, exports the results to Excel, and visualizes the output in Power BI.
 
-- Store a list of target companies
-- Check company career pages for new job postings
-- Filter jobs by location, title, and keywords
-- Save discovered jobs in a local SQLite database
-- Avoid sending duplicate alerts
-- Send email alerts when new matching jobs are found
+## Current Features
+
+- Company configuration stored in `config/company_config.csv`
+- Greenhouse job collector
+- Normalized job data format
+- SQLite database storage
+- Duplicate prevention using company, ATS source, and external job ID
+- New job detection using first-seen and last-seen dates
+- Match scoring system for job relevance
+- Daily email report support
+- Error handling and logging
+- Excel export for reporting and dashboard use
+- Power BI dashboard built from the Excel export
 
 ## Power BI Dashboard
 
@@ -26,8 +35,10 @@ CareerSignal includes a Power BI dashboard built from the Excel export generated
 - Python
 - SQLite
 - Requests
-- BeautifulSoup
 - python-dotenv
+- openpyxl
+- Power BI
+- Excel
 - GitHub
 
 ## Project Structure
@@ -36,21 +47,41 @@ CareerSignal includes a Power BI dashboard built from the Excel export generated
 CareerSignal/
 ├── config/
 │   └── company_config.csv
+├── data/
+│   └── careersignal.db
+├── docs/
+│   ├── CareerSignal_Project_State.md
+│   └── screenshots/
+│       └── powerbi_overview_dashboard.png
+├── exports/
+│   └── careersignal_export.xlsx
+├── logs/
+│   └── careersignal.log
+├── reports/
+│   └── careersignal_dashboard.pbix
 ├── scripts/
-│   └── test_config_loader.py
+│   ├── collect_greenhouse_jobs.py
+│   ├── export_to_excel.py
+│   ├── test_config_loader.py
+│   ├── test_database.py
+│   ├── test_email_report.py
+│   └── test_match_scoring.py
 ├── src/
 │   └── careersignal/
 │       ├── __init__.py
 │       ├── config_loader.py
-│       └── main.py
-├── data/
-├── logs/
+│       ├── database.py
+│       ├── email_report.py
+│       ├── logging_config.py
+│       └── match_scoring.py
 ├── tests/
 ├── .env.example
 ├── .gitignore
 ├── README.md
 └── requirements.txt
 ```
+
+Some local output files may not appear in GitHub if they are intentionally ignored, such as logs, environment files, or generated data files.
 
 ## Setup Instructions
 
@@ -78,21 +109,13 @@ Windows Command Prompt:
 pip install -r requirements.txt
 ```
 
-### 3. Run the project
+### 3. Configure environment variables
+
+Copy `.env.example` to `.env` and fill in the required values.
 
 ```bash
-python src/careersignal/main.py
+cp .env.example .env
 ```
-
-Expected output:
-
-```text
-CareerSignal is running.
-```
-
-## Environment Variables
-
-Copy `.env.example` to `.env` and fill in your real settings.
 
 Do not commit `.env` to GitHub.
 
@@ -123,23 +146,170 @@ The config loader is located here:
 src/careersignal/config_loader.py
 ```
 
-To test the config loader in PowerShell:
+To test the config loader:
+
+```bash
+PYTHONPATH=src python scripts/test_config_loader.py
+```
+
+Windows PowerShell:
 
 ```powershell
 $env:PYTHONPATH="src"
 python scripts/test_config_loader.py
 ```
 
-The test should print all companies marked as active in `company_config.csv`.
+The test should print companies marked as active in `company_config.csv`.
+
+## Running CareerSignal
+
+### Preview run
+
+Use preview mode to collect jobs and print/report results without sending the real daily email.
+
+```bash
+python scripts/collect_greenhouse_jobs.py --preview
+```
+
+### Send daily report
+
+Use send mode when you want to run the collector and send the real email report.
+
+```bash
+python scripts/collect_greenhouse_jobs.py --send
+```
+
+## Excel Export
+
+CareerSignal exports job data to an Excel workbook for review and Power BI reporting.
+
+Export file:
+
+```text
+exports/careersignal_export.xlsx
+```
+
+Run the export script:
+
+```bash
+python scripts/export_to_excel.py
+```
+
+The Excel export is used as the data source for the Power BI dashboard.
+
+## Power BI Report
+
+Power BI report file:
+
+```text
+reports/careersignal_dashboard.pbix
+```
+
+Dashboard data source:
+
+```text
+exports/careersignal_export.xlsx
+```
+
+After generating a fresh Excel export, open the Power BI report and click:
+
+```text
+Home > Refresh
+```
+
+This updates the dashboard with the latest exported job data.
+
+## Database
+
+CareerSignal uses SQLite for local job storage.
+
+Database path:
+
+```text
+data/careersignal.db
+```
+
+The database stores job records, first-seen dates, last-seen dates, and run log data.
+
+## Main Modules
+
+### Database
+
+```text
+src/careersignal/database.py
+```
+
+Official database functions:
+
+- `initialize_database()`
+- `insert_or_update_jobs(jobs)`
+- `get_all_jobs()`
+- `get_jobs_first_seen_in_last_24_hours()`
+- `insert_run_log(...)`
+
+### Match Scoring
+
+```text
+src/careersignal/match_scoring.py
+```
+
+Official scoring function:
+
+- `score_job(job)`
+
+### Email Report
+
+```text
+src/careersignal/email_report.py
+```
+
+Official email report function:
+
+- `build_and_send_daily_report(summary, new_jobs, failed_sources, test_mode=True)`
+
+## Testing and Validation
+
+Useful test commands:
+
+```bash
+PYTHONPATH=src python scripts/test_config_loader.py
+PYTHONPATH=src python scripts/test_database.py
+PYTHONPATH=src python scripts/test_match_scoring.py
+PYTHONPATH=src python scripts/test_email_report.py
+```
+
+Windows PowerShell:
+
+```powershell
+$env:PYTHONPATH="src"
+python scripts/test_config_loader.py
+python scripts/test_database.py
+python scripts/test_match_scoring.py
+python scripts/test_email_report.py
+```
 
 ## Current Status
 
-Step 2 complete: company configuration file added, with a Python loader that reads active companies from the CSV.
+CareerSignal currently has a working end-to-end pipeline:
+
+1. Load active target companies from CSV
+2. Collect jobs from Greenhouse
+3. Normalize job records
+4. Store jobs in SQLite
+5. Detect newly discovered jobs
+6. Score jobs for match quality
+7. Log successful and failed runs
+8. Export results to Excel
+9. Send daily email reports
+10. Display results in Power BI
 
 ## Future Improvements
 
-- Add scraper for one test company
-- Add SQLite database setup
-- Add duplicate job detection
-- Add email alerts
-- Add scheduled runs
+- Add support for more ATS platforms
+- Add scheduled automated runs
+- Improve source health reporting
+- Add more dashboard pages
+- Add trend tracking over time
+- Add richer match scoring rules
+- Add more robust automated tests
+- Package the project for easier setup
