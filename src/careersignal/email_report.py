@@ -16,6 +16,18 @@ def build_email_subject(new_jobs_count: int) -> str:
     return f"CareerSignal Daily Briefing — {new_jobs_count} New Jobs"
 
 
+def shorten_match_notes(match_notes: str | None, max_parts: int = 4) -> str:
+    """
+    Keep match notes short enough for the daily email preview.
+    """
+
+    if not match_notes:
+        return "No match notes available."
+
+    parts = match_notes.split("; ")
+    return "; ".join(parts[:max_parts])
+
+
 def build_email_body(
     summary: dict[str, Any],
     new_jobs: list[dict[str, Any]],
@@ -67,10 +79,14 @@ def build_email_body(
             title = job.get("title", "Unknown Title")
             location = job.get("location", "Unknown Location")
             job_url = job.get("job_url", "No URL available")
+            match_score = job.get("match_score", 0)
+            match_notes = shorten_match_notes(job.get("match_notes"))
 
             lines.append(f"{index}. {company_name}")
+            lines.append(f"   Match Score: {match_score}/100")
             lines.append(f"   Title: {title}")
             lines.append(f"   Location: {location}")
+            lines.append(f"   Why this matched: {match_notes}")
             lines.append(f"   URL: {job_url}")
             lines.append("")
 

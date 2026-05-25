@@ -2,6 +2,8 @@ import sqlite3
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+from careersignal.match_scoring import score_job
+
 
 DATABASE_PATH = Path("data/careersignal.db")
 
@@ -11,17 +13,57 @@ def get_connection(db_path=DATABASE_PATH):
     Opens a connection to the SQLite database.
     """
     db_path.parent.mkdir(parents=True, exist_ok=True)
-    return sqlite3.connect(db_path)
+
+    connection = sqlite3.connect(db_path)
+    connection.row_factory = sqlite3.Row
+
+    return connection
+
+
+def get_current_timestamp():
+    """
+    Returns the current UTC timestamp as a clean ISO string.
+    """
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+
+
+def column_exists(cursor, table_name, column_name):
+    """
+    Checks whether a column already exists in a SQLite table.
+    """
+    cursor.execute(f"PRAGMA table_info({table_name})")
+    columns = cursor.fetchall()
+
+    for column in columns:
+        if column["name"] == column_name:
+            return True
+
+    return False
+
+
+def add_column_if_missing(cursor, table_name, column_name, column_definition):
+    """
+    Adds a column only if it does not already exist.
+    """
+    if not column_exists(cursor, table_name, column_name):
+        cursor.execute(
+            f"ALTER TABLE {table_name} ADD COLUMN {column_name} {column_definition}"
+        )
 
 
 def initialize_database(db_path=DATABASE_PATH):
     """
-    Creates the jobs table if it does not already exist.
-    Also makes sure we have the columns needed for new job detection.
+    Creates the database tables and required columns.
+
+    Supports:
+    - job storage
+    - new job detection
+    - match scoring
+    - run logging
     """
 
-    with get_connection(db_path) as conn:
-        cursor = conn.cursor()
+    with get_connection(db_path) as connection:
+        cursor = connection.cursor()
 
         cursor.execute(
             """
@@ -37,7 +79,9 @@ def initialize_database(db_path=DATABASE_PATH):
                 posted_date TEXT,
                 first_seen_date TEXT NOT NULL,
                 last_seen_date TEXT NOT NULL,
-                date_collected TEXT
+                date_collected TEXT,
+                match_score INTEGER DEFAULT 0,
+                match_notes TEXT
             );
             """
         )
@@ -49,17 +93,27 @@ def initialize_database(db_path=DATABASE_PATH):
             """
         )
 
-        conn.commit()
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS run_log (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                run_timestamp TEXT NOT NULL,
+                source_ats TEXT,
+                company_name TEXT,
+                jobs_found INTEGER DEFAULT 0,
+                jobs_inserted INTEGER DEFAULT 0,
+                jobs_updated INTEGER DEFAULT 0,
+                run_status TEXT,
+                notes TEXT
+            );
+            """
+        )
 
+        # Keeps older databases compatible after Step 8.
+        add_column_if_missing(cursor, "jobs", "match_score", "INTEGER DEFAULT 0")
+        add_column_if_missing(cursor, "jobs", "match_notes", "TEXT")
 
-def get_current_timestamp():
-    """
-    Returns the current UTC timestamp as a clean ISO string.
-
-    Example:
-    2026-05-24T18:42:11+00:00
-    """
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+        connection.commit()
 
 
 def insert_or_update_jobs(jobs, db_path=DATABASE_PATH):
@@ -67,13 +121,16 @@ def insert_or_update_jobs(jobs, db_path=DATABASE_PATH):
     Inserts new jobs and updates existing jobs.
 
     Existing jobs:
-    - last_seen_date gets updated
+    - refreshed title/location/department/job_url/posted_date/date_collected
+    - updated last_seen_date
+    - updated match_score
+    - updated match_notes
 
     New jobs:
-    - first_seen_date gets set
-    - last_seen_date gets set
-
-    Returns a summary dictionary.
+    - inserted with first_seen_date
+    - inserted with last_seen_date
+    - inserted with match_score
+    - inserted with match_notes
     """
 
     initialize_database(db_path)
@@ -85,10 +142,15 @@ def insert_or_update_jobs(jobs, db_path=DATABASE_PATH):
     jobs_updated = 0
     new_jobs = []
 
-    with get_connection(db_path) as conn:
-        cursor = conn.cursor()
+    with get_connection(db_path) as connection:
+        cursor = connection.cursor()
 
         for job in jobs:
+            score_result = score_job(job)
+
+            job["match_score"] = score_result["match_score"]
+            job["match_notes"] = score_result["match_notes"]
+
             company_name = job["company_name"]
             source_ats = job["source_ats"]
             external_job_id = job["external_job_id"]
@@ -110,13 +172,16 @@ def insert_or_update_jobs(jobs, db_path=DATABASE_PATH):
                 cursor.execute(
                     """
                     UPDATE jobs
-                    SET title = ?,
+                    SET
+                        title = ?,
                         location = ?,
                         department = ?,
                         job_url = ?,
                         posted_date = ?,
                         last_seen_date = ?,
-                        date_collected = ?
+                        date_collected = ?,
+                        match_score = ?,
+                        match_notes = ?
                     WHERE company_name = ?
                       AND source_ats = ?
                       AND external_job_id = ?;
@@ -129,6 +194,8 @@ def insert_or_update_jobs(jobs, db_path=DATABASE_PATH):
                         job.get("posted_date"),
                         now,
                         job.get("date_collected"),
+                        job.get("match_score"),
+                        job.get("match_notes"),
                         company_name,
                         source_ats,
                         external_job_id,
@@ -151,9 +218,11 @@ def insert_or_update_jobs(jobs, db_path=DATABASE_PATH):
                         posted_date,
                         first_seen_date,
                         last_seen_date,
-                        date_collected
+                        date_collected,
+                        match_score,
+                        match_notes
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
                     """,
                     (
                         company_name,
@@ -167,25 +236,90 @@ def insert_or_update_jobs(jobs, db_path=DATABASE_PATH):
                         now,
                         now,
                         job.get("date_collected"),
+                        job.get("match_score"),
+                        job.get("match_notes"),
                     ),
                 )
 
                 jobs_inserted += 1
                 new_jobs.append(job)
 
-        conn.commit()
+        connection.commit()
 
-    return {
+    summary = {
         "jobs_found": jobs_found,
         "jobs_inserted": jobs_inserted,
         "jobs_updated": jobs_updated,
         "new_jobs": new_jobs,
     }
 
+    insert_run_log(
+        source_ats="mixed",
+        company_name="mixed",
+        jobs_found=jobs_found,
+        jobs_inserted=jobs_inserted,
+        jobs_updated=jobs_updated,
+        run_status="success",
+        db_path=db_path,
+    )
+
+    return summary
+
+
+def insert_run_log(
+    source_ats=None,
+    company_name=None,
+    jobs_found=0,
+    jobs_inserted=0,
+    jobs_updated=0,
+    run_status="success",
+    notes=None,
+    db_path=DATABASE_PATH,
+):
+    """
+    Inserts a run log row.
+    """
+
+    initialize_database(db_path)
+
+    run_timestamp = get_current_timestamp()
+
+    with get_connection(db_path) as connection:
+        cursor = connection.cursor()
+
+        cursor.execute(
+            """
+            INSERT INTO run_log (
+                run_timestamp,
+                source_ats,
+                company_name,
+                jobs_found,
+                jobs_inserted,
+                jobs_updated,
+                run_status,
+                notes
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+            """,
+            (
+                run_timestamp,
+                source_ats,
+                company_name,
+                jobs_found,
+                jobs_inserted,
+                jobs_updated,
+                run_status,
+                notes,
+            ),
+        )
+
+        connection.commit()
+
 
 def get_jobs_first_seen_in_last_24_hours(db_path=DATABASE_PATH):
     """
     Returns jobs where first_seen_date is within the last 24 hours.
+    Results are sorted by match score first.
     """
 
     initialize_database(db_path)
@@ -193,29 +327,72 @@ def get_jobs_first_seen_in_last_24_hours(db_path=DATABASE_PATH):
     cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
     cutoff_string = cutoff.replace(microsecond=0).isoformat()
 
-    with get_connection(db_path) as conn:
-        cursor = conn.cursor()
+    with get_connection(db_path) as connection:
+        cursor = connection.cursor()
 
         cursor.execute(
             """
             SELECT
                 company_name,
+                source_ats,
+                external_job_id,
                 title,
                 location,
                 department,
                 job_url,
+                posted_date,
                 first_seen_date,
-                last_seen_date
+                last_seen_date,
+                date_collected,
+                match_score,
+                match_notes
             FROM jobs
             WHERE first_seen_date >= ?
-            ORDER BY first_seen_date DESC;
+            ORDER BY match_score DESC, first_seen_date DESC;
             """,
             (cutoff_string,),
         )
 
         rows = cursor.fetchall()
 
-    return rows
+    return [dict(row) for row in rows]
+
+
+def get_all_jobs(db_path=DATABASE_PATH):
+    """
+    Returns all stored jobs, sorted by match score.
+    Useful for testing and DB checks.
+    """
+
+    initialize_database(db_path)
+
+    with get_connection(db_path) as connection:
+        cursor = connection.cursor()
+
+        cursor.execute(
+            """
+            SELECT
+                company_name,
+                source_ats,
+                external_job_id,
+                title,
+                location,
+                department,
+                job_url,
+                posted_date,
+                first_seen_date,
+                last_seen_date,
+                date_collected,
+                match_score,
+                match_notes
+            FROM jobs
+            ORDER BY match_score DESC, last_seen_date DESC;
+            """
+        )
+
+        rows = cursor.fetchall()
+
+    return [dict(row) for row in rows]
 
 
 def print_job_summary(summary):
@@ -237,7 +414,13 @@ def print_job_summary(summary):
         print("---------------")
 
         for job in summary["new_jobs"]:
-            print(f"- {job['company_name']} | {job['title']} | {job.get('location', 'No location')}")
+            print(
+                f"- {job['company_name']} | "
+                f"{job['title']} | "
+                f"{job.get('location', 'No location')} | "
+                f"{job.get('match_score', 0)}/100"
+            )
+            print(f"  Why: {job.get('match_notes', 'No match notes')}")
             print(f"  {job.get('job_url', 'No URL')}")
     else:
         print()

@@ -1,26 +1,27 @@
-from careersignal.database import get_connection, fetch_all_jobs
+from careersignal.database import get_all_jobs
 
 
 def main():
-    with get_connection() as connection:
-        jobs = fetch_all_jobs(connection)
+    jobs = get_all_jobs()
 
-        if not jobs:
-            print("No jobs found in the database yet.")
-            return
+    print("Stored jobs:")
+    print("------------")
 
-        print(f"Found {len(jobs)} jobs:")
+    for job in jobs:
+        print(
+            f"- {job['company_name']} | "
+            f"{job['title']} | "
+            f"{job['location']} | "
+            f"{job.get('match_score', 0)}/100 | "
+            f"{job['job_url']}"
+        )
+
+        match_notes = job.get("match_notes")
+
+        if match_notes:
+            print(f"  Why: {match_notes}")
+
         print()
-
-        for job in jobs:
-            print(f"Company: {job['company_name']}")
-            print(f"Title: {job['title']}")
-            print(f"Location: {job['location']}")
-            print(f"Department: {job['department']}")
-            print(f"URL: {job['job_url']}")
-            print(f"First seen: {job['first_seen_date']}")
-            print(f"Last seen: {job['last_seen_date']}")
-            print("-" * 50)
 
 
 if __name__ == "__main__":

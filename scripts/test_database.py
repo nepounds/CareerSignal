@@ -1,9 +1,7 @@
 from careersignal.database import (
-    get_connection,
-    create_tables,
-    insert_normalized_jobs,
-    insert_run_log,
-    fetch_all_jobs,
+    initialize_database,
+    insert_or_update_jobs,
+    get_all_jobs,
 )
 
 
@@ -34,35 +32,27 @@ sample_jobs = [
 
 
 def main():
-    with get_connection() as connection:
-        create_tables(connection)
+    initialize_database()
 
-        summary = insert_normalized_jobs(connection, sample_jobs)
+    summary = insert_or_update_jobs(sample_jobs)
 
-        insert_run_log(
-            connection=connection,
-            source_ats="greenhouse",
-            company_name="Example Company",
-            jobs_found=summary["jobs_found"],
-            jobs_inserted=summary["jobs_inserted"],
-            jobs_updated=summary["jobs_updated"],
-            run_status="success",
+    jobs = get_all_jobs()
+
+    print("Database test complete.")
+    print()
+    print("Insert summary:")
+    print(summary)
+    print()
+    print("Stored jobs:")
+
+    for job in jobs:
+        print(
+            f"- {job['company_name']} | "
+            f"{job['title']} | "
+            f"{job['location']} | "
+            f"{job['match_score']}/100 | "
+            f"{job['job_url']}"
         )
-
-        jobs = fetch_all_jobs(connection)
-
-        print("Database test complete.")
-        print()
-        print("Insert summary:")
-        print(summary)
-        print()
-        print("Stored jobs:")
-
-        for job in jobs:
-            print(
-                f"- {job['company_name']} | {job['title']} | "
-                f"{job['location']} | {job['job_url']}"
-            )
 
 
 if __name__ == "__main__":

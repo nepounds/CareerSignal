@@ -44,12 +44,16 @@ def main() -> None:
             "title": "Accounting Intern",
             "location": "Remote, United States",
             "job_url": "https://example.com/jobs/12345",
+            "match_score": 95,
+            "match_notes": "+35: Base score; +18: Title matched 'accounting'; +12: Work style matched 'remote'; Strong match",
         },
         {
             "company_name": "Another Company",
             "title": "Financial Analyst",
             "location": "Raleigh, NC",
             "job_url": "https://example.com/jobs/67890",
+            "match_score": 95,
+            "match_notes": "+35: Base score; +18: Title matched 'accounting'; +12: Work style matched 'remote'; Strong match",
         },
     ]
 
