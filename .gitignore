@@ -23,3 +23,9 @@ logs/*
 # Windows/macOS junk files
 Thumbs.db
 .DS_Store
+
+# SQLite database output
+data/*.db
+data/*.db-journal
+data/*.sqlite
+data/*.sqlite3
