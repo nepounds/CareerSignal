@@ -32,3 +32,7 @@ data/*.db
 data/*.db-journal
 data/*.sqlite
 data/*.sqlite3
+
+# Backup files
+config/*backup*.csv
+config/*_backup_*.csv
