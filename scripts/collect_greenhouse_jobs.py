@@ -459,7 +459,7 @@ def collect_workday_jobs(
                 company_name=company_config.company,
                 job_url_base=company_config.job_url_base or company_config.career_url,
                 search_text="",
-                limit=50,
+                limit=20,
                 offset=0,
             )
 
