@@ -1,0 +1,402 @@
+{
+  "version": "step_14_filtering_strategy_v1",
+  "strategy_note": "Broad first-pass filtering rules. Step 15 can convert these buckets into numeric match scoring weights.",
+  "title_rules": {
+    "strong_keywords": [
+      "accountant",
+      "staff accountant",
+      "junior accountant",
+      "accounting analyst",
+      "accounting associate",
+      "audit associate",
+      "tax associate",
+      "assurance associate",
+      "accounts payable",
+      "accounts receivable",
+      "financial analyst",
+      "finance analyst",
+      "fp&a analyst",
+      "budget analyst",
+      "pricing analyst",
+      "revenue analyst",
+      "business analyst",
+      "operations analyst",
+      "compliance analyst",
+      "reporting analyst",
+      "data analyst",
+      "process analyst",
+      "program analyst",
+      "plant supervisor",
+      "operations supervisor",
+      "production supervisor",
+      "water treatment supervisor",
+      "wastewater supervisor",
+      "utility supervisor",
+      "quality analyst",
+      "risk analyst",
+      "internal controls analyst"
+    ],
+    "maybe_keywords": [
+      "associate",
+      "analyst",
+      "specialist",
+      "coordinator",
+      "assistant",
+      "staff",
+      "finance associate",
+      "accounting specialist",
+      "billing specialist",
+      "payroll specialist",
+      "operations specialist",
+      "business specialist",
+      "compliance specialist",
+      "regulatory specialist",
+      "reporting specialist",
+      "data specialist",
+      "project coordinator",
+      "program coordinator",
+      "procurement analyst",
+      "purchasing analyst",
+      "contract analyst",
+      "claims analyst",
+      "underwriting assistant",
+      "quality specialist",
+      "implementation analyst"
+    ],
+    "weak_stretch_keywords": [
+      "customer operations",
+      "client operations",
+      "business support",
+      "administrative analyst",
+      "case analyst",
+      "grant analyst",
+      "records analyst",
+      "documentation specialist",
+      "facilities coordinator",
+      "environmental technician",
+      "field operations specialist",
+      "scheduler",
+      "dispatcher",
+      "team lead",
+      "shift lead"
+    ],
+    "exclude_or_penalize_keywords": [
+      "director",
+      "senior director",
+      "vice president",
+      "vp",
+      "chief financial officer",
+      "chief accounting officer",
+      "chief operating officer",
+      "executive",
+      "partner",
+      "principal",
+      "senior manager",
+      "software engineer",
+      "software developer",
+      "data engineer",
+      "machine learning engineer",
+      "data scientist",
+      "registered nurse",
+      "rn",
+      "physician",
+      "therapist",
+      "pharmacist",
+      "teacher",
+      "professor",
+      "driver",
+      "warehouse associate",
+      "retail associate",
+      "food service",
+      "security officer"
+    ]
+  },
+  "location_rules": {
+    "strong_locations": [
+      "north carolina",
+      "nc",
+      "raleigh",
+      "durham",
+      "chapel hill",
+      "research triangle",
+      "triangle",
+      "cary",
+      "morrisville",
+      "apex",
+      "garner",
+      "clayton",
+      "smithfield",
+      "selma",
+      "benson",
+      "goldsboro",
+      "wilson",
+      "kinston",
+      "frankinton",
+      "clinton",
+      "greenville",
+      "rocky mount",
+      "fayetteville",
+      "wake county",
+      "johnston county",
+      "wayne county"
+    ],
+    "acceptable_locations": [
+      "charlotte",
+      "greensboro",
+      "winston-salem",
+      "high point",
+      "burlington",
+      "wilmington",
+      "new bern",
+      "jacksonville",
+      "remote - north carolina",
+      "remote, nc",
+      "hybrid - nc",
+      "remote - united states",
+      "united states remote",
+      "hybrid"
+    ],
+    "remote_positive_keywords": [
+      "remote",
+      "hybrid",
+      "work from home",
+      "telework",
+      "remote - united states",
+      "remote - north carolina"
+    ],
+    "exclude_unless_remote_locations": [
+      "california",
+      "new york",
+      "new jersey",
+      "massachusetts",
+      "washington",
+      "oregon",
+      "colorado",
+      "texas",
+      "florida",
+      "illinois",
+      "georgia",
+      "virginia",
+      "maryland",
+      "pennsylvania",
+      "ohio",
+      "arizona"
+    ]
+  },
+  "seniority_rules": {
+    "high_fit": [
+      "entry level",
+      "junior",
+      "trainee",
+      "associate",
+      "assistant",
+      "coordinator",
+      "staff",
+      "analyst",
+      "specialist"
+    ],
+    "medium_fit": [
+      "senior analyst",
+      "senior accountant",
+      "experienced associate",
+      "supervisor",
+      "lead"
+    ],
+    "low_fit": [
+      "manager",
+      "senior specialist",
+      "senior supervisor"
+    ],
+    "exclude_or_penalize": [
+      "senior manager",
+      "director",
+      "senior director",
+      "vice president",
+      "vp",
+      "chief",
+      "executive",
+      "partner",
+      "principal"
+    ]
+  },
+  "experience_rules": {
+    "strong_experience_phrases": [
+      "0-2 years",
+      "0 to 2 years",
+      "1-2 years",
+      "1 to 2 years",
+      "1-3 years",
+      "1 to 3 years",
+      "2-4 years",
+      "2 to 4 years",
+      "entry level",
+      "recent graduate"
+    ],
+    "medium_experience_phrases": [
+      "3-5 years",
+      "3 to 5 years",
+      "2-5 years",
+      "2 to 5 years"
+    ],
+    "penalty_experience_phrases": [
+      "5+ years",
+      "5 or more years",
+      "7+ years",
+      "10+ years",
+      "manager experience required",
+      "supervisory experience required"
+    ],
+    "credential_positive": [
+      "bachelor",
+      "accounting degree",
+      "finance degree",
+      "business degree",
+      "related field"
+    ],
+    "credential_penalty": [
+      "cpa required",
+      "mba required",
+      "master's required",
+      "big 4 required"
+    ],
+    "credential_neutral_or_mild_positive": [
+      "cpa preferred",
+      "mba preferred",
+      "public accounting preferred"
+    ],
+    "background_positive": [
+      "manufacturing experience",
+      "plant experience",
+      "water operations",
+      "wastewater",
+      "utility operations",
+      "public sector",
+      "government",
+      "compliance",
+      "quality control",
+      "reporting",
+      "excel",
+      "sql",
+      "power bi"
+    ]
+  },
+  "sector_rules": {
+    "public_accounting": {
+      "positive_titles": [
+        "audit associate",
+        "tax associate",
+        "assurance associate",
+        "advisory associate",
+        "risk advisory associate",
+        "client accounting services associate"
+      ],
+      "penalty_titles": [
+        "manager",
+        "senior manager",
+        "director",
+        "partner",
+        "principal"
+      ]
+    },
+    "corporate_accounting_finance": {
+      "positive_titles": [
+        "staff accountant",
+        "accounting analyst",
+        "financial analyst",
+        "finance analyst",
+        "cost accountant",
+        "budget analyst",
+        "billing analyst",
+        "revenue analyst"
+      ]
+    },
+    "healthcare_insurance": {
+      "positive_titles": [
+        "claims analyst",
+        "compliance analyst",
+        "finance analyst",
+        "business analyst",
+        "reporting analyst",
+        "reimbursement analyst",
+        "provider data analyst",
+        "operations analyst",
+        "quality analyst"
+      ],
+      "penalty_titles": [
+        "nurse",
+        "rn",
+        "physician",
+        "therapist",
+        "pharmacist",
+        "clinical director"
+      ]
+    },
+    "government_public_sector": {
+      "positive_titles": [
+        "budget analyst",
+        "accountant",
+        "finance officer",
+        "program analyst",
+        "administrative analyst",
+        "compliance analyst",
+        "utility analyst",
+        "public works analyst",
+        "procurement analyst",
+        "grant analyst"
+      ]
+    },
+    "utilities_water_operations": {
+      "positive_titles": [
+        "water plant operator",
+        "wastewater plant operator",
+        "utility supervisor",
+        "water treatment supervisor",
+        "environmental compliance specialist",
+        "public works analyst",
+        "utility billing analyst",
+        "operations supervisor",
+        "plant supervisor",
+        "chief operator"
+      ]
+    },
+    "manufacturing_plant_operations": {
+      "positive_titles": [
+        "production supervisor",
+        "plant supervisor",
+        "operations supervisor",
+        "quality analyst",
+        "inventory analyst",
+        "supply chain analyst",
+        "manufacturing analyst",
+        "cost accountant",
+        "production planner",
+        "materials analyst"
+      ],
+      "penalty_titles": [
+        "plant manager",
+        "general manager",
+        "maintenance mechanic",
+        "machine operator",
+        "forklift operator",
+        "warehouse associate"
+      ]
+    },
+    "consulting_advisory": {
+      "positive_titles": [
+        "associate consultant",
+        "business analyst",
+        "risk advisory associate",
+        "technology risk associate",
+        "accounting advisory associate",
+        "operations consultant",
+        "implementation analyst"
+      ],
+      "penalty_phrases": [
+        "mba required",
+        "travel 80%",
+        "manager",
+        "senior manager"
+      ]
+    }
+  }
+}
