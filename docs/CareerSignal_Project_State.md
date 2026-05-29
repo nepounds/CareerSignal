@@ -675,9 +675,6 @@ Step 15 should support multiple lanes, not just accounting and finance.
 
 ## Current Roadmap
 
-### Step 15: Match Scoring Refinement
-
-Turn filtering strategy into better scoring weights and possibly editable config.
 
 ### Step 16: Daily Automation
 
@@ -708,10 +705,6 @@ Nice-to-have, not required.
 Must-do path:
 
 ```text
-12C: Integrate Workday Connector
-13: ATS Coverage Audit
-14: Filtering Strategy
-15: Match Scoring Refinement
 16: Daily Automation
 18: GitHub + Portfolio Polish
 ```
