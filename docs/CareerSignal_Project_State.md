@@ -247,14 +247,16 @@ config/company_config.csv
 Current or expected config fields:
 
 ```text
-company_name
+company
 ats_type
 career_url
-target_locations
+workday_api_url
+job_url_base
+target_location
 keywords
 job_title_keywords
 excluded_keywords
-active
+is_active
 ```
 
 Supported `ats_type` values currently:

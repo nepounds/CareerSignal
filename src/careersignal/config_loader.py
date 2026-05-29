@@ -51,14 +51,16 @@ def load_companies(config_path="config/company_config.csv"):
 
         for row in reader:
             company = {
-                "company_name": row["company_name"].strip(),
-                "ats_type": row["ats_type"].strip().lower(),
+                "company_name": row["company"].strip(),
+                "ats_type": row["ats_type"].strip(),
                 "career_url": row["career_url"].strip(),
-                "target_locations": parse_list_field(row["target_locations"]),
+                "workday_api_url": row.get("workday_api_url", "").strip(),
+                "job_url_base": row.get("job_url_base", "").strip(),
+                "target_locations": parse_list_field(row["target_location"]),
                 "keywords": parse_list_field(row["keywords"]),
                 "job_title_keywords": parse_list_field(row["job_title_keywords"]),
                 "excluded_keywords": parse_list_field(row["excluded_keywords"]),
-                "active": parse_active(row["active"]),
+                "active": parse_active(row["is_active"]),
             }
 
             companies.append(company)
