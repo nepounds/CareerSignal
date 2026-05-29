@@ -39,12 +39,12 @@ Completed steps:
 9. Error handling and logging
 10. Excel export
 11. Power BI dashboard
-    12A. Workday proof of concept
-    12B. Workday normalization
-    12C. Workday integration into the main pipeline
-12. ATS Coverage Audit started, with unresolved follow-up items
-13. Filtering Strategy completed
-14. Match Scoring Refinement is in progress or next, depending on current chat status
+12A. Workday proof of concept
+12B. Workday normalization
+12C. Workday integration into the main pipeline
+13. ATS Coverage Audit started, with unresolved follow-up items
+14. Filtering Strategy completed
+15. Match Scoring Refinement completed
 
 The main product loop exists:
 
@@ -632,7 +632,7 @@ Match scoring refinement is implementation.
 
 ## Step 15 Match Scoring Refinement Status
 
-Step 15 should use the Step 14 filtering strategy.
+Step 15 is complete and used the Step 14 filtering strategy.
 
 Important distinction:
 
