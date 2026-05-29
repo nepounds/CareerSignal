@@ -1,146 +1,197 @@
 # CareerSignal Project State
 
-## Purpose of This Document
+This file is the source of truth for CareerSignal coding help.
 
-This document is the internal source of truth for the CareerSignal project.
+Before suggesting code changes, read this file and preserve the existing project structure, file names, function names, database path, and completed work.
 
-Use this file to preserve official file names, function names, folder structure, database paths, workflow decisions, and project status.
+Do not recreate files that already exist unless explicitly instructed.
 
-This is not meant to replace the README.
+Do not rename working functions unless absolutely necessary.
 
-- `README.md` is the public-facing project explanation.
-- `docs/CareerSignal_Project_State.md` is the internal development map.
+Do not add compatibility wrappers or aliases unless explicitly approved.
 
-The main reason this file exists is to prevent accidental backtracking, duplicate names, broken imports, old database paths, and inconsistent project structure.
-
----
-
-# 1. Project Overview
-
-CareerSignal is a Python portfolio project that tracks job postings from target companies and helps identify relevant accounting, finance, analyst, and business roles.
-
-The project is designed to:
-
-- Load target companies from a config file.
-- Collect jobs from supported ATS platforms.
-- Normalize job data into one official shape.
-- Store jobs in SQLite.
-- Detect newly discovered jobs.
-- Score jobs based on match quality.
-- Send daily email reports.
-- Export job data to Excel.
-- Support a Power BI dashboard.
-- Eventually support multiple ATS sources, including Greenhouse and Workday.
+Prefer updating dependent scripts to use the current official names.
 
 ---
 
-# 2. Current Project Phase
+## Project Name
 
-The project is currently in:
+`CareerSignal`
+
+CareerSignal is a Python portfolio project that monitors target company career pages, collects job postings, stores results in SQLite, scores jobs against target criteria, exports Excel reports, sends email summaries, and powers a Power BI dashboard.
+
+---
+
+## Current Project Status
+
+CareerSignal currently has a working end-to-end pipeline.
+
+Completed steps:
+
+1. Project setup and GitHub structure
+2. Company config file
+3. First ATS collector
+4. Standard normalized job format
+5. SQLite database
+6. New job detection
+7. Daily email report
+8. Match scoring
+9. Error handling and logging
+10. Excel export
+11. Power BI dashboard
+    12A. Workday proof of concept
+    12B. Workday normalization
+    12C. Workday integration into the main pipeline
+12. ATS Coverage Audit started, with unresolved follow-up items
+13. Filtering Strategy completed
+14. Match Scoring Refinement is in progress or next, depending on current chat status
+
+The main product loop exists:
 
 ```text
-Step 12: Workday Connector
-```
-
-Step 12 is split into three separate parts:
-
-```text
-Step 12A: Workday Proof of Concept
-Step 12B: Workday Normalization
-Step 12C: Integrate Workday Connector
-```
-
-Current active step:
-
-```text
-Step 12B: Workday Normalization
+company_config.csv
+→ supported ATS collector
+→ normalized job dictionaries
+→ SQLite database
+→ new job detection
+→ match scoring
+→ daily email report
+→ Excel export
+→ Power BI dashboard
 ```
 
 ---
 
-# 3. Official Project Structure
+## Current Database Path
 
-Use this structure unless there is a strong reason to change it.
+Use:
+
+```text
+data/careersignal.db
+```
+
+Do not use:
+
+```text
+data/jobs.db
+```
+
+Search check:
+
+```bash
+grep -RIn "data/jobs.db" .
+```
+
+PowerShell equivalent:
+
+```powershell
+Select-String -Path .\* -Pattern "data/jobs.db" -Recurse
+```
+
+---
+
+## Existing Project Structure
+
+Preserve this structure.
 
 ```text
 CareerSignal/
 ├── config/
-│   └── company_config.csv
-│
+│   ├── company_config.csv
+│   ├── company_ats_audit.csv
+│   └── match_rules.json or match_rules.csv if created during Step 15
 ├── data/
 │   └── careersignal.db
-│
 ├── docs/
-│   └── CareerSignal_Project_State.md
-│
+│   ├── CareerSignal_Project_State.md
+│   ├── filtering_strategy.md
+│   ├── ATS_Coverage_Audit.md or related Step 13 notes if created
+│   └── screenshots/
+│       └── powerbi_overview_dashboard.png
 ├── exports/
 │   └── careersignal_export.xlsx
-│
 ├── logs/
 │   └── careersignal.log
-│
 ├── reports/
 │   └── careersignal_dashboard.pbix
-│
 ├── scripts/
 │   ├── collect_greenhouse_jobs.py
 │   ├── export_to_excel.py
 │   ├── preview_workday_jobs.py
-│   └── preview_workday_normalized_jobs.py
-│
+│   ├── test_config_loader.py
+│   ├── test_database.py
+│   ├── test_email_report.py
+│   ├── test_match_scoring.py
+│   └── other preview/test scripts created during Workday or scoring steps
 ├── src/
 │   └── careersignal/
 │       ├── __init__.py
 │       ├── config_loader.py
 │       ├── database.py
 │       ├── email_report.py
+│       ├── logging_config.py
 │       ├── match_scoring.py
 │       └── collectors/
 │           ├── __init__.py
+│           ├── greenhouse.py
 │           └── workday.py
-│
 ├── tests/
-│
+├── .env.example
 ├── .gitignore
 ├── README.md
 └── requirements.txt
 ```
 
-Notes:
-
-- `scripts/` contains runnable scripts.
-- `src/careersignal/` contains reusable project modules.
-- `src/careersignal/collectors/` contains ATS-specific collector modules.
-- `data/` contains the SQLite database.
-- `config/` contains company settings.
-- `logs/` contains log files.
-- `exports/` contains Excel exports.
-- `reports/` contains Power BI files.
-- `docs/` contains internal project documentation.
+Some generated files may be ignored by Git, including `.env`, logs, generated database files, and generated exports.
 
 ---
 
-# 4. Official Database Path
+## Existing Files That Should Not Be Recreated Blindly
 
-The official SQLite database path is:
+These files already exist or have already been worked on.
+
+Do not tell the user to create them from scratch unless the user says they are missing.
 
 ```text
+README.md
+requirements.txt
+.env.example
+.gitignore
+config/company_config.csv
 data/careersignal.db
+docs/CareerSignal_Project_State.md
+docs/filtering_strategy.md
+exports/careersignal_export.xlsx
+logs/careersignal.log
+reports/careersignal_dashboard.pbix
+scripts/collect_greenhouse_jobs.py
+scripts/export_to_excel.py
+scripts/preview_workday_jobs.py
+scripts/test_config_loader.py
+scripts/test_database.py
+scripts/test_email_report.py
+scripts/test_match_scoring.py
+src/careersignal/config_loader.py
+src/careersignal/database.py
+src/careersignal/email_report.py
+src/careersignal/logging_config.py
+src/careersignal/match_scoring.py
+src/careersignal/collectors/greenhouse.py
+src/careersignal/collectors/workday.py
 ```
 
-Do not use:
+If a future step needs to modify one of these files, explain:
 
-```text
-data/jobs.db
-```
-
-If `data/jobs.db` appears anywhere, it is an old name and should be corrected.
+1. Why the file needs to change
+2. What depends on it
+3. What exact code is being changed
+4. How to test that nothing broke
 
 ---
 
-# 5. Official Normalized Job Shape
+## Official Normalized Job Shape
 
-Every job from every ATS must eventually become this exact normalized job dictionary shape:
+Every collector must return job dictionaries with this exact structure:
 
 ```python
 {
@@ -156,40 +207,78 @@ Every job from every ATS must eventually become this exact normalized job dictio
 }
 ```
 
-Official field names:
-
-```text
-company_name
-source_ats
-external_job_id
-title
-location
-department
-job_url
-posted_date
-date_collected
-```
-
-Rules:
-
-- Do not rename these fields.
-- Do not add extra fields to the normalized job object unless the database, Excel export, email report, and Power BI are intentionally updated together.
-- Missing text fields should safely become empty strings.
-- Missing dates may be `None` when appropriate.
-- `date_collected` should represent when CareerSignal collected the job.
-- `posted_date` should represent when the job was posted, if the ATS provides that information.
+Do not change this shape without explicitly discussing the database, scoring, email, Excel, and Power BI impacts.
 
 ---
 
-# 6. Official Database Functions
+## Supported ATS Types
 
-Official database file:
+Currently supported:
+
+```text
+greenhouse
+workday
+```
+
+Future possible connectors, based on ATS audit needs:
+
+```text
+lever
+ashby
+smartrecruiters
+icims
+generic_html
+```
+
+Only build future connectors if the master company list shows enough need.
+
+Do not build random ATS connectors just because they exist.
+
+---
+
+## Company Config
+
+Primary company config file:
+
+```text
+config/company_config.csv
+```
+
+Current or expected config fields:
+
+```text
+company_name
+ats_type
+career_url
+target_locations
+keywords
+job_title_keywords
+excluded_keywords
+active
+```
+
+Supported `ats_type` values currently:
+
+```text
+greenhouse
+workday
+```
+
+If a new ATS connector is added later, it should use a clean `ats_type` value in this same config file.
+
+---
+
+## Official Function Names
+
+### Database
+
+File:
 
 ```text
 src/careersignal/database.py
 ```
 
-Official database functions:
+Use:
 
 ```python
 initialize_database()
@@ -199,1256 +288,541 @@ get_jobs_first_seen_in_last_24_hours()
 insert_run_log(...)
 ```
 
-Rules:
+Do not use old names:
 
-- Preserve these function names.
-- Do not rename working database functions unless absolutely necessary.
-- Do not create duplicate versions with similar names.
-- Do not create a new database path.
-- Do not insert Workday jobs into SQLite during Step 12B.
-- Workday database insertion begins in Step 12C.
+```python
+create_tables()
+insert_normalized_jobs()
+fetch_all_jobs()
+```
+
+Search checks:
+
+```bash
+grep -RIn "create_tables" .
+grep -RIn "insert_normalized_jobs" .
+grep -RIn "fetch_all_jobs" .
+```
 
 ---
 
-# 7. Official Match Scoring Function
+### Match Scoring
 
-Official match scoring file:
+File:
 
 ```text
 src/careersignal/match_scoring.py
 ```
 
-Official function:
+Official scoring function:
 
 ```python
 score_job(job)
 ```
 
-Rules:
+Do not rename this function.
 
-- Preserve this function name.
-- Match scoring should operate on normalized job dictionaries.
-- Do not change match scoring during Step 12B.
-- Workday jobs should eventually be scoreable because they will match the official normalized job shape.
+Step 15 may refine the internals of match scoring, add match reasons, or move editable scoring rules into config, but it should preserve `score_job(job)` unless explicitly approved.
 
 ---
 
-# 8. Official Email Report Function
+### Email Report
 
-Official email report file:
+File:
 
 ```text
 src/careersignal/email_report.py
 ```
 
-Official function:
+Official email report function:
 
 ```python
 build_and_send_daily_report(summary, new_jobs, failed_sources, test_mode=True)
 ```
 
-Rules:
+Do not rename this function.
 
-- Preserve this function name and signature.
-- Do not change email reporting during Step 12B.
-- Workday jobs should not be included in daily email reports until Step 12C.
+Email reporting should continue to support preview/test mode and send mode.
 
 ---
 
-# 9. Official Greenhouse Runner
+### Logging
 
-Official Greenhouse runner file:
-
-```text
-scripts/collect_greenhouse_jobs.py
-```
-
-Official commands:
-
-```bash
-python scripts/collect_greenhouse_jobs.py --preview
-python scripts/collect_greenhouse_jobs.py --send
-```
-
-Rules:
-
-- Preserve these commands.
-- Do not break Greenhouse while adding Workday.
-- Greenhouse is the currently working main ATS pipeline.
-- Workday should stay isolated during Step 12B.
-
----
-
-# 10. Official Excel Export
-
-Official Excel export file:
+File:
 
 ```text
-scripts/export_to_excel.py
+src/careersignal/logging_config.py
 ```
 
-Official Excel output:
-
-```text
-exports/careersignal_export.xlsx
-```
-
-Rules:
-
-- Do not change Excel export during Step 12B.
-- Excel export should continue reading from the official SQLite database.
-- Workday data should not appear in Excel until Step 12C integration is complete.
-
----
-
-# 11. Official Power BI Dashboard
-
-Official Power BI file:
-
-```text
-reports/careersignal_dashboard.pbix
-```
-
-Official Power BI data source:
-
-```text
-exports/careersignal_export.xlsx
-```
-
-Rules:
-
-- Do not change Power BI during Step 12B.
-- Power BI should continue using the Excel export.
-- Workday data should not flow into Power BI until Step 12C.
-
----
-
-# 12. Official Company Config
-
-Official company config file:
-
-```text
-config/company_config.csv
-```
-
-Purpose:
-
-The config file stores target company information used by collectors.
-
-Rules:
-
-- Do not add Workday configuration during Step 12B unless explicitly starting Step 12C.
-- Greenhouse config should keep working.
-- Workday integration into config happens during Step 12C.
-
----
-
-# 13. Completed Steps
-
-## Step 1: Project Setup
-
-Completed.
-
-The project has:
-
-- Basic folder structure.
-- Git tracking.
-- GitHub repository.
-- `.gitignore`.
-- Project files organized into folders.
-
-Important folders:
-
-```text
-scripts/
-src/careersignal/
-data/
-config/
-logs/
-exports/
-reports/
-docs/
-```
-
----
-
-## Step 2: Company Config Loader
-
-Completed.
-
-Official config file:
-
-```text
-config/company_config.csv
-```
-
-Official reusable module:
-
-```text
-src/careersignal/config_loader.py
-```
-
-Purpose:
-
-- Load company information from CSV.
-- Keep company data separate from code.
-- Allow the project to support multiple companies.
-
-Rules:
-
-- Do not hardcode long-term company lists inside runnable scripts.
-- Use config loading when integrating collectors into the main pipeline.
-
----
-
-## Step 3: Greenhouse ATS Collector
-
-Completed.
-
-Official runner:
-
-```text
-scripts/collect_greenhouse_jobs.py
-```
-
-Official commands:
-
-```bash
-python scripts/collect_greenhouse_jobs.py --preview
-python scripts/collect_greenhouse_jobs.py --send
-```
-
-Purpose:
-
-- Fetch jobs from Greenhouse-supported companies.
-- Normalize jobs.
-- Support preview and send modes.
-- Feed the existing main pipeline.
-
-Rules:
-
-- Do not break this runner while adding Workday.
-- Preserve preview/send behavior.
-
----
-
-## Step 4: Job Data Normalization
-
-Completed.
-
-CareerSignal uses one official normalized job shape.
-
-Official normalized job shape:
-
-```python
-{
-    "company_name": str,
-    "source_ats": str,
-    "external_job_id": str,
-    "title": str,
-    "location": str,
-    "department": str,
-    "job_url": str,
-    "posted_date": str,
-    "date_collected": str,
-}
-```
-
-Purpose:
-
-- Make every ATS output look the same.
-- Let database, scoring, email, Excel, and Power BI work with one standard format.
-
-Rules:
-
-- Every ATS connector must return this shape.
-- Greenhouse and Workday should both normalize to this same format.
-
----
-
-## Step 5: SQLite Database
-
-Completed.
-
-Official file:
-
-```text
-src/careersignal/database.py
-```
-
-Official database path:
-
-```text
-data/careersignal.db
-```
-
-Official database functions:
-
-```python
-initialize_database()
-insert_or_update_jobs(jobs)
-get_all_jobs()
-get_jobs_first_seen_in_last_24_hours()
-insert_run_log(...)
-```
-
-Purpose:
-
-- Store discovered jobs.
-- Avoid duplicate job records.
-- Track first seen and last seen dates.
-- Support new job detection.
-- Support exports and reports.
-
-Rules:
-
-- Do not use `data/jobs.db`.
-- Do not create a second SQLite database.
-- Do not insert Workday jobs during Step 12B.
-
----
-
-## Step 6: New Job Detection
-
-Completed.
-
-Purpose:
-
-- Existing jobs update their `last_seen_date`.
-- New jobs are inserted with `first_seen_date` and `last_seen_date`.
-- The project can identify jobs first seen in the last 24 hours.
-- Duplicate job records should be avoided.
-
-Official function:
-
-```python
-get_jobs_first_seen_in_last_24_hours()
-```
-
-Rules:
-
-- New job detection should continue working for Greenhouse.
-- Workday should not be added to new job detection until Step 12C.
-
----
-
-## Step 7: Daily Email Report
-
-Completed.
-
-Official file:
-
-```text
-src/careersignal/email_report.py
-```
-
-Official function:
-
-```python
-build_and_send_daily_report(summary, new_jobs, failed_sources, test_mode=True)
-```
-
-Purpose:
-
-- Build daily email reports.
-- Include summary information.
-- Include new jobs.
-- Include failed sources.
-- Support test mode.
-
-Rules:
-
-- Do not change this during Step 12B.
-- Workday email reporting starts during Step 12C.
-
----
-
-## Step 8: Error Handling and Logging
-
-Completed.
-
-Official logs folder:
-
-```text
-logs/
-```
-
-Typical log file:
+Logs should go to:
 
 ```text
 logs/careersignal.log
 ```
 
-Purpose:
+A failed company source should not crash the whole run.
 
-- Record successful runs.
-- Record failed sources.
-- Avoid full pipeline crashes when one source fails.
-- Make debugging easier.
-
-Rules:
-
-- Keep logging consistent.
-- Do not create random log folders.
-- New collectors should eventually use the same logging pattern when integrated.
+Failed sources should be tracked and included in the daily email report where possible.
 
 ---
 
-## Step 9: Excel Export
+### Greenhouse Collector
 
-Completed.
-
-Official file:
+Likely file:
 
 ```text
-scripts/export_to_excel.py
+src/careersignal/collectors/greenhouse.py
 ```
 
-Official output:
-
-```text
-exports/careersignal_export.xlsx
-```
-
-Purpose:
-
-- Export SQLite job data to Excel.
-- Create a clean file for review.
-- Feed the Power BI dashboard.
-
-Rules:
-
-- Keep the output path stable.
-- Do not change Excel export during Step 12B.
-- Workday data should only appear here after database integration in Step 12C.
-
----
-
-## Step 10: Power BI Dashboard
-
-Completed.
-
-Official Power BI file:
-
-```text
-reports/careersignal_dashboard.pbix
-```
-
-Official data source:
-
-```text
-exports/careersignal_export.xlsx
-```
-
-Purpose:
-
-- Visualize job data.
-- Show match quality.
-- Show role/company/location patterns.
-- Turn the project into something visually useful for a portfolio.
-
-Rules:
-
-- Power BI should read from Excel export.
-- Do not change dashboard source paths unnecessarily.
-- Do not change Power BI during Step 12B.
-
----
-
-## Step 11: Power BI Polish / Dashboard Update
-
-Completed.
-
-Purpose:
-
-- Improve dashboard presentation.
-- Make the project more portfolio-friendly.
-- Improve visuals, layout, and usefulness.
-
-Rules:
-
-- Keep Power BI connected to:
-
-```text
-exports/careersignal_export.xlsx
-```
-
-- Do not update Power BI again during Step 12B unless there is a specific reason.
-
----
-
-## Step 12A: Workday Proof of Concept
-
-Completed.
-
-Current proof-of-concept script:
-
-```text
-scripts/preview_workday_jobs.py
-```
-
-Purpose:
-
-- Fetch jobs from one Workday career site.
-- Preview raw Workday job results.
-- Learn Workday’s response shape.
-- Keep Workday completely separate from the main pipeline.
-
-Rules:
-
-- This step was only about proving that Workday jobs can be fetched.
-- This script should not insert jobs into SQLite.
-- This script should not send emails.
-- This script should not export to Excel.
-- This script should not modify Power BI.
-
----
-
-# 14. Current Step: Step 12B Workday Normalization
-
-Current active step:
-
-```text
-Step 12B: Workday Normalization
-```
-
-Goal:
-
-Convert raw Workday job results into CareerSignal’s official normalized job shape.
-
-Planned reusable module:
-
-```text
-src/careersignal/collectors/workday.py
-```
-
-Planned preview script:
-
-```text
-scripts/preview_workday_normalized_jobs.py
-```
-
-Step 12B should:
-
-- Fetch raw Workday jobs.
-- Convert raw Workday jobs into official normalized job dictionaries.
-- Set `source_ats` to `"workday"`.
-- Extract a stable `external_job_id` if possible.
-- Extract title.
-- Extract location.
-- Extract department if available.
-- Extract posted date if available.
-- Build a clean job URL.
-- Add `date_collected`.
-- Validate that every normalized Workday job has the exact official fields.
-- Stay isolated from the main pipeline.
-
-Step 12B should not:
-
-- Insert Workday jobs into SQLite.
-- Change `config/company_config.csv`.
-- Change daily email reporting.
-- Change match scoring.
-- Change Excel export.
-- Change Power BI.
-- Break the Greenhouse collector.
-- Replace the existing main runner.
-
-Success criteria:
-
-```text
-Raw Workday jobs can be fetched.
-Raw Workday jobs can be normalized.
-Every normalized Workday job has the official CareerSignal fields.
-No Workday jobs are inserted into SQLite yet.
-The Greenhouse preview command still works.
-```
-
----
-
-# 15. Future Step: Step 12C Workday Integration
-
-Future step:
-
-```text
-Step 12C: Integrate Workday Connector
-```
-
-Goal:
-
-Connect Workday to the full CareerSignal pipeline.
-
-Step 12C will eventually connect Workday to:
-
-```text
-config/company_config.csv
-data/careersignal.db
-src/careersignal/database.py
-src/careersignal/match_scoring.py
-src/careersignal/email_report.py
-scripts/export_to_excel.py
-exports/careersignal_export.xlsx
-reports/careersignal_dashboard.pbix
-```
-
-Step 12C will likely involve:
-
-- Adding Workday companies to `company_config.csv`.
-- Updating the runner logic to choose collectors by ATS.
-- Calling the Workday collector from the main pipeline.
-- Inserting normalized Workday jobs into SQLite.
-- Scoring Workday jobs.
-- Including Workday jobs in daily email reports.
-- Including Workday jobs in Excel exports.
-- Refreshing Power BI with Workday data.
-
-Rules:
-
-- Do not do Step 12C work during Step 12B.
-- Only integrate after normalized Workday jobs are proven stable.
-
----
-
-# 16. Workday Connector Plan
-
-## Step 12A
-
-Status:
-
-```text
-Done
-```
-
-Purpose:
-
-- Fetch raw Workday jobs.
-- Preview the raw response.
-- Avoid touching the main CareerSignal pipeline.
-
-Official script:
-
-```text
-scripts/preview_workday_jobs.py
-```
-
----
-
-## Step 12B
-
-Status:
-
-```text
-Current
-```
-
-Purpose:
-
-- Normalize Workday jobs into CareerSignal’s official format.
-
-Planned module:
-
-```text
-src/careersignal/collectors/workday.py
-```
-
-Planned preview script:
-
-```text
-scripts/preview_workday_normalized_jobs.py
-```
-
-Expected main reusable function:
-
-```python
-fetch_and_normalize_workday_jobs(...)
-```
-
-Expected helper functions may include:
-
-```python
-fetch_workday_raw_jobs(...)
-normalize_workday_job(...)
-normalize_workday_jobs(...)
-extract_workday_external_job_id(...)
-extract_workday_title(...)
-extract_workday_location(...)
-extract_workday_department(...)
-extract_workday_posted_date(...)
-build_workday_job_url(...)
-validate_normalized_job_shape(...)
-```
-
-Rules:
-
-- These functions may be adjusted if needed.
-- Keep the function names plain and consistent.
-- Do not rename working project-wide functions.
-
----
-
-## Step 12C
-
-Status:
-
-```text
-Later
-```
-
-Purpose:
-
-- Integrate Workday into the main CareerSignal pipeline.
-
-Rules:
-
-- This is when Workday touches SQLite, email, Excel, and Power BI.
-- Do not do it during Step 12B.
-
----
-
-# 17. Important Commands
-
-## Check Project State
-
-```bash
-cat docs/CareerSignal_Project_State.md
-```
-
-## Greenhouse Preview
+Existing runner command:
 
 ```bash
 python scripts/collect_greenhouse_jobs.py --preview
 ```
 
-## Greenhouse Send
+Send real email:
 
 ```bash
 python scripts/collect_greenhouse_jobs.py --send
 ```
 
-## Excel Export
+Important:
 
-```bash
-python scripts/export_to_excel.py
-```
-
-## Workday Raw Preview
-
-```bash
-python scripts/preview_workday_jobs.py
-```
-
-## Workday Normalized Preview
-
-Command shape:
-
-```bash
-python scripts/preview_workday_normalized_jobs.py \
-  --api-url "PASTE_WORKDAY_API_URL_HERE" \
-  --company-name "Example Company" \
-  --job-url-base "PASTE_PUBLIC_WORKDAY_CAREER_BASE_URL_HERE" \
-  --limit 10
-```
-
-PowerShell shape:
-
-```powershell
-python scripts/preview_workday_normalized_jobs.py `
-  --api-url "PASTE_WORKDAY_API_URL_HERE" `
-  --company-name "Example Company" `
-  --job-url-base "PASTE_PUBLIC_WORKDAY_CAREER_BASE_URL_HERE" `
-  --limit 10
-```
+The script name still says `collect_greenhouse_jobs.py`, but after Workday integration it may function as the main collector runner. Do not rename this script unless intentionally doing a cleanup/refactor step.
 
 ---
 
-# 18. Important Grep Checks
+### Workday Collector
 
-Use these checks to catch old names, broken imports, or accidental integration.
-
-## Check for old database path
-
-```bash
-grep -RIn "data/jobs.db" .
-```
-
-Expected:
+Likely file:
 
 ```text
-No results
+src/careersignal/collectors/workday.py
 ```
 
-## Check for official database path
-
-```bash
-grep -RIn "data/careersignal.db" .
-```
-
-Expected:
-
-Relevant files may mention this.
-
-## Check for database insertion calls
-
-```bash
-grep -RIn "insert_or_update_jobs" .
-```
-
-During Step 12B:
-
-- Existing pipeline files may contain this.
-- New Workday normalization files should not call it.
-
-## Check for old or duplicate function names
-
-```bash
-grep -RIn "get_new_jobs\|send_daily_report\|jobs.db" .
-```
-
-If old names appear, review them carefully.
-
-## Check Workday isolation during Step 12B
-
-```bash
-grep -RIn "insert_or_update_jobs\|build_and_send_daily_report\|score_job\|export_to_excel" src/careersignal/collectors scripts/preview_workday_normalized_jobs.py
-```
-
-Expected during Step 12B:
+Workday was split into three parts:
 
 ```text
-No results
+12A: Workday Proof of Concept
+12B: Workday Normalization
+12C: Integrate Workday Connector
 ```
 
-Or no concerning results.
+All three are considered complete if the current branch has Workday jobs flowing through the same pipeline as Greenhouse.
 
-## Check Greenhouse still works
-
-```bash
-python scripts/collect_greenhouse_jobs.py --preview
-```
-
-Expected:
-
-Greenhouse preview still runs.
-
----
-
-# 19. Git Workflow
-
-Before changes:
-
-```bash
-git status
-```
-
-Review changes:
-
-```bash
-git diff
-```
-
-Stage specific files:
-
-```bash
-git add path/to/file
-```
-
-Commit:
-
-```bash
-git commit -m "Clear commit message"
-```
-
-Push:
-
-```bash
-git push
-```
-
-After commit:
-
-```bash
-git status
-```
-
-Expected clean result:
-
-```text
-nothing to commit, working tree clean
-```
-
-Rules:
-
-- Commit each logical step separately.
-- Do not mix unrelated changes in one commit.
-- Do not commit temporary files.
-- Do not commit the SQLite database unless intentionally deciding to track it.
-- Do not commit local secrets, API keys, passwords, or `.env` files.
-
----
-
-# 20. Git Commit History Guidance
-
-Use commit messages like:
-
-```text
-Add company config loader
-Add Greenhouse job collector
-Normalize job data
-Add SQLite job storage
-Add new job detection
-Add daily email report
-Add logging and error handling
-Add Excel export
-Update Power BI dashboard
-Add Workday proof of concept
-Add Workday job normalization
-Integrate Workday collector
-```
-
-For Step 12B, preferred commit message:
-
-```text
-Add Workday job normalization
-```
-
----
-
-# 21. Naming Rules
-
-Preserve these official names.
-
-## Database
+Workday jobs should use:
 
 ```python
-initialize_database()
-insert_or_update_jobs(jobs)
-get_all_jobs()
-get_jobs_first_seen_in_last_24_hours()
-insert_run_log(...)
+"source_ats": "workday"
 ```
 
-## Match Scoring
+Workday jobs must use the official normalized job shape.
+
+---
+
+### Excel Export
+
+File:
+
+```text
+scripts/export_to_excel.py
+```
+
+Export output:
+
+```text
+exports/careersignal_export.xlsx
+```
+
+The Excel export feeds the Power BI dashboard.
+
+Do not break this output path without updating the README and Power BI notes.
+
+---
+
+### Power BI
+
+Power BI report:
+
+```text
+reports/careersignal_dashboard.pbix
+```
+
+Power BI data source:
+
+```text
+exports/careersignal_export.xlsx
+```
+
+After generating a fresh Excel export, refresh Power BI manually:
+
+```text
+Home > Refresh
+```
+
+Current dashboard exists and should not be treated as unstarted.
+
+Step 11 was completed, though dashboard polish may still be improved later.
+
+---
+
+## Current README Status
+
+README has been updated after Step 14 or should be updated to reflect:
+
+* Greenhouse support
+* Workday support
+* SQLite database
+* new job detection
+* match scoring
+* email report
+* logging
+* Excel export
+* Power BI dashboard
+* ATS coverage audit
+* filtering strategy beyond accounting/finance
+
+README polish is still planned for Step 18.
+
+Do not treat README as final portfolio polish yet.
+
+---
+
+## Step 13 ATS Coverage Audit Status
+
+Step 13 is started but not fully resolved.
+
+Step 13 was an audit/planning step, not a clean coding step.
+
+The purpose was to use the master list of target companies to identify:
+
+1. Each company’s career URL
+2. Which ATS or career platform each company uses
+3. Whether CareerSignal already supports that ATS
+4. Whether a new connector is needed
+5. Connector priority
+6. Notes or unresolved issues
+
+### Step 13 Follow-Up Items
+
+These need to be revisited later:
+
+1. Recheck companies with unclear or unreliable career URLs.
+2. Confirm ATS type manually for companies marked unknown.
+3. Identify which companies are truly Workday or Greenhouse and can be added now.
+4. Identify which unsupported ATSs appear often enough to justify new connectors.
+5. Do not build connectors for one-off systems unless they are high-value companies.
+6. Review companies where search/Gemini produced bad or incorrect career pages.
+7. Review companies with redirects, proprietary systems, or confusing career portals.
+8. Decide whether `generic_html` is worth building for smaller firms or custom pages.
+9. Decide whether Lever, Ashby, SmartRecruiters, or iCIMS should be the next connector based on actual company count.
+10. Keep low-priority or unclear companies in an audit file rather than forcing them into `company_config.csv`.
+
+### Step 13 Decision Rule
+
+Only build a new connector if:
+
+```text
+- Multiple target companies use the ATS, or
+- One very high-priority company uses it, and
+- The site appears technically feasible to collect from
+```
+
+### Step 13 Buckets
+
+Use these buckets in the audit:
+
+```text
+Ready now:
+- workday
+- greenhouse
+
+Likely future connector:
+- lever
+- ashby
+- smartrecruiters
+- icims
+- generic_html
+
+Unclear / revisit:
+- proprietary portals
+- bad career URLs
+- redirects
+- unknown ATS
+- custom career pages
+
+Probably skip for now:
+- one-off systems
+- broken pages
+- companies with no realistic target roles
+- companies that require manual searching only
+```
+
+### Suggested Step 13 Audit File
+
+Use or create:
+
+```text
+config/company_ats_audit.csv
+```
+
+Suggested fields:
+
+```text
+company_name
+career_url
+ats_type
+supported_now
+connector_needed
+connector_priority
+status
+notes
+```
+
+Do not assume this file is complete.
+
+---
+
+## Step 14 Filtering Strategy Status
+
+Step 14 is complete.
+
+CareerSignal is not accounting-only.
+
+The filtering strategy supports multiple job-search lanes:
+
+```text
+Accounting roles
+Finance roles
+General analyst roles
+Business analyst roles
+Operations analyst roles
+Compliance analyst roles
+Data/reporting analyst roles
+Plant supervisor jobs
+Operations supervisor jobs
+Water/wastewater or public utility-adjacent jobs
+Other realistic roles that fit the user’s background
+```
+
+Filtering strategy should define:
+
+```text
+strong title matches
+maybe title matches
+weak/stretch title matches
+excluded/heavily penalized titles
+strong locations
+acceptable locations
+remote/hybrid rules
+North Carolina rules
+nearby city/region rules
+seniority rules
+experience rules
+sector-specific rules
+```
+
+Filtering strategy is planning/config.
+
+Match scoring refinement is implementation.
+
+---
+
+## Step 15 Match Scoring Refinement Status
+
+Step 15 should use the Step 14 filtering strategy.
+
+Important distinction:
+
+```text
+Step 14 = decide what CareerSignal should care about
+Step 15 = assign scoring weights and implement/refine scoring logic
+```
+
+Step 15 should not recreate existing files if they already exist.
+
+Step 15 should preserve:
 
 ```python
 score_job(job)
 ```
 
-## Email Report
+Step 15 may update:
 
-```python
-build_and_send_daily_report(summary, new_jobs, failed_sources, test_mode=True)
+```text
+src/careersignal/match_scoring.py
+scripts/test_match_scoring.py
+config/match_rules.json or config/match_rules.csv, if created
+README.md, only lightly if needed
 ```
 
-## Greenhouse Runner
+Step 15 should keep scores from 0 to 100.
+
+Suggested score bands:
+
+```text
+80–100: Strong match
+60–79: Possible match
+40–59: Weak/stretch match
+0–39: Low match or likely skip
+```
+
+Step 15 should support multiple lanes, not just accounting and finance.
+
+---
+
+## Current Roadmap
+
+### Step 15: Match Scoring Refinement
+
+Turn filtering strategy into better scoring weights and possibly editable config.
+
+### Step 16: Daily Automation
+
+Use Windows Task Scheduler to run CareerSignal automatically and send the daily email report.
+
+### Step 17: Application Tracker
+
+Add saved/applied/interview/rejected/offer/skipped/closed tracking and response-rate reporting.
+
+Nice-to-have, not required for first resume-ready version.
+
+### Step 18: GitHub + Portfolio Polish
+
+Clean README, screenshots, sample outputs, final testing, resume bullets, and portfolio presentation.
+
+Required before adding to resume.
+
+### Step 19: Optional Streamlit UI
+
+Only if a prettier local interface is wanted later.
+
+Nice-to-have, not required.
+
+---
+
+## Must-Do vs Nice-to-Have
+
+Must-do path:
+
+```text
+12C: Integrate Workday Connector
+13: ATS Coverage Audit
+14: Filtering Strategy
+15: Match Scoring Refinement
+16: Daily Automation
+18: GitHub + Portfolio Polish
+```
+
+Nice-to-have:
+
+```text
+17: Application Tracker
+19: Optional Streamlit UI
+```
+
+---
+
+## Testing Commands
+
+Useful commands:
 
 ```bash
+PYTHONPATH=src python scripts/test_config_loader.py
+PYTHONPATH=src python scripts/test_database.py
+PYTHONPATH=src python scripts/test_match_scoring.py
+PYTHONPATH=src python scripts/test_email_report.py
 python scripts/collect_greenhouse_jobs.py --preview
-python scripts/collect_greenhouse_jobs.py --send
-```
-
-## Excel Export
-
-```text
-scripts/export_to_excel.py
-exports/careersignal_export.xlsx
-```
-
-## Database Path
-
-```text
-data/careersignal.db
-```
-
-Do not use:
-
-```text
-data/jobs.db
-```
-
----
-
-# 22. Anti-Backtracking Rules
-
-Before adding or changing code:
-
-1. Check this project state file.
-2. Check existing function names.
-3. Check existing file names.
-4. Search before inventing a new name.
-5. Do not rename working functions casually.
-6. Do not create duplicate scripts that do almost the same thing.
-7. Do not change database paths.
-8. Do not change output paths unless the whole pipeline is updated.
-9. Do not touch Greenhouse when working on isolated Workday normalization.
-10. Do not integrate before the isolated step works.
-
-Useful search command:
-
-```bash
-grep -RIn "function_or_file_name_here" .
-```
-
----
-
-# 23. Separation of Concerns
-
-Keep responsibilities separate.
-
-## Collectors
-
-Collectors should:
-
-- Fetch jobs.
-- Normalize jobs.
-- Return normalized dictionaries.
-
-Collectors should not:
-
-- Send emails.
-- Export Excel files.
-- Update Power BI.
-- Handle dashboard logic.
-
-## Database Module
-
-Database code should:
-
-- Initialize database.
-- Insert or update jobs.
-- Query jobs.
-- Log runs.
-
-Database code should not:
-
-- Fetch jobs from ATS platforms.
-- Send emails.
-- Build dashboards.
-
-## Email Module
-
-Email code should:
-
-- Build email content.
-- Send reports.
-- Support test mode.
-
-Email code should not:
-
-- Fetch jobs.
-- Normalize jobs.
-- Directly scrape ATS platforms.
-
-## Export Script
-
-Excel export should:
-
-- Read from SQLite.
-- Create Excel output.
-- Save to the official export path.
-
-Excel export should not:
-
-- Fetch jobs from ATS platforms.
-- Send emails.
-
-## Power BI
-
-Power BI should:
-
-- Read the Excel export.
-- Visualize job data.
-
-Power BI should not:
-
-- Be required for job collection.
-- Be required for normalization.
-- Be required for email reports.
-
----
-
-# 24. Current Known Good Commands
-
-These commands should remain valid.
-
-```bash
-python scripts/collect_greenhouse_jobs.py --preview
-python scripts/collect_greenhouse_jobs.py --send
 python scripts/export_to_excel.py
 ```
 
-After Step 12B, this should also work:
+Windows PowerShell:
+
+```powershell
+$env:PYTHONPATH="src"
+python scripts/test_config_loader.py
+python scripts/test_database.py
+python scripts/test_match_scoring.py
+python scripts/test_email_report.py
+python scripts/collect_greenhouse_jobs.py --preview
+python scripts/export_to_excel.py
+```
+
+If the main runner has been renamed or split later, update this file.
+
+---
+
+## Required Checks for Future Coding Steps
+
+For every future coding step, include:
+
+1. Files to create/edit
+2. Exact code
+3. Commands to test
+4. Grep/search checks for old names or broken imports
+5. Git commit guidance
+
+Always include checks for:
 
 ```bash
-python scripts/preview_workday_normalized_jobs.py \
-  --api-url "PASTE_WORKDAY_API_URL_HERE" \
-  --company-name "Example Company" \
-  --job-url-base "PASTE_PUBLIC_WORKDAY_CAREER_BASE_URL_HERE" \
-  --limit 10
+grep -RIn "data/jobs.db" .
+grep -RIn "create_tables" .
+grep -RIn "insert_normalized_jobs" .
+grep -RIn "fetch_all_jobs" .
+```
+
+PowerShell equivalent:
+
+```powershell
+Select-String -Path .\* -Pattern "data/jobs.db" -Recurse
+Select-String -Path .\* -Pattern "create_tables" -Recurse
+Select-String -Path .\* -Pattern "insert_normalized_jobs" -Recurse
+Select-String -Path .\* -Pattern "fetch_all_jobs" -Recurse
 ```
 
 ---
 
-# 25. Files That Should Not Be Changed During Step 12B
+## Git Guidance
 
-Unless there is a specific bug unrelated to Workday normalization, do not change these during Step 12B:
+After project-state updates:
 
-```text
-src/careersignal/database.py
-src/careersignal/match_scoring.py
-src/careersignal/email_report.py
-scripts/collect_greenhouse_jobs.py
-scripts/export_to_excel.py
-config/company_config.csv
-reports/careersignal_dashboard.pbix
-exports/careersignal_export.xlsx
-data/careersignal.db
+```bash
+git add docs/CareerSignal_Project_State.md
+git commit -m "Update CareerSignal project state"
+git push
 ```
 
-Step 12B should mainly affect:
+After feature steps, use specific commit messages, such as:
 
-```text
-src/careersignal/collectors/__init__.py
-src/careersignal/collectors/workday.py
-scripts/preview_workday_normalized_jobs.py
-docs/CareerSignal_Project_State.md
+```bash
+git add .
+git commit -m "Refine match scoring rules"
+git push
 ```
 
----
-
-# 26. Files That May Be Changed During Step 12C
-
-Step 12C may affect:
+Avoid committing:
 
 ```text
-config/company_config.csv
-scripts/collect_greenhouse_jobs.py
-src/careersignal/collectors/workday.py
-src/careersignal/database.py
-src/careersignal/match_scoring.py
-src/careersignal/email_report.py
-scripts/export_to_excel.py
-exports/careersignal_export.xlsx
-reports/careersignal_dashboard.pbix
-```
-
-But only after Step 12B normalization is working.
-
----
-
-# 27. Portfolio Purpose
-
-CareerSignal should look useful to employers because it shows:
-
-- Python scripting.
-- API/data fetching.
-- CSV config loading.
-- Data normalization.
-- SQLite database design.
-- New record detection.
-- Error handling.
-- Logging.
-- Email reporting.
-- Excel export.
-- Power BI dashboarding.
-- Git/GitHub workflow.
-- Project documentation.
-- Incremental development.
-- Real-world business use case.
-
-This project is especially meant to support applications for roles involving:
-
-- Accounting.
-- Finance.
-- FP&A.
-- Business analysis.
-- Data analysis.
-- Operations analysis.
-- Reporting.
-- Entry-level analyst work.
-
----
-
-# 28. README vs Project State
-
-## README.md
-
-Purpose:
-
-- Public project overview.
-- Recruiter-friendly.
-- Explains what the project does.
-- Explains how to run main commands.
-- Explains tech stack.
-- Shows project value.
-
-Tone:
-
-```text
-Clean, professional, concise.
-```
-
-## docs/CareerSignal_Project_State.md
-
-Purpose:
-
-- Internal development source of truth.
-- Tracks official names.
-- Tracks step status.
-- Prevents accidental backtracking.
-- Helps continue work across ChatGPT sessions.
-
-Tone:
-
-```text
-Practical, detailed, boring on purpose.
-```
-
-The README should not become bloated with every internal rule.
-
-The project state file can be detailed because it is meant for development control.
-
----
-
-# 29. Current Status Summary
-
-Current status:
-
-```text
-Step 12A is done.
-Step 12B is active.
-Step 12C is later.
-```
-
-Current goal:
-
-```text
-Normalize Workday jobs into the official CareerSignal job shape.
-```
-
-Current guardrail:
-
-```text
-Do not integrate Workday into the main pipeline yet.
-```
-
-Current success condition:
-
-```text
-A preview script prints normalized Workday jobs, and every job has the official fields exactly.
+.env
+logs/
+data/careersignal.db if intentionally ignored
+exports/careersignal_export.xlsx if intentionally ignored
+temporary test files
 ```
 
 ---
 
-# 30. Final Rule
+## Important Reminder for Future ChatGPT Help
 
-When unsure, do the boring safe thing:
+Before giving code:
 
-```text
-Search existing names.
-Preserve working functions.
-Keep the current step isolated.
-Test before integrating.
-Commit cleanly.
-```
-
-Do not get clever and accidentally create CareerSignal 2: Electric Dumbass.
+1. Read this file.
+2. Do not recreate existing files.
+3. Do not rename official functions.
+4. Do not change `data/careersignal.db`.
+5. Do not use old function names.
+6. Explain dependencies before rewriting core files.
+7. Keep new work compatible with the existing pipeline.
+8. Preserve Greenhouse and Workday support.
+9. Preserve email, Excel, Power BI, logging, and scoring behavior unless the user asks to change them.
+10. Keep the response beginner-friendly and step-by-step.
