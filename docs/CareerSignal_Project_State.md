@@ -16,9 +16,11 @@ Prefer updating dependent scripts to use the current official names.
 
 ## Project Name
 
-`CareerSignal`
+```text
+CareerSignal
+```
 
-CareerSignal is a Python portfolio project that monitors target company career pages, collects job postings, stores results in SQLite, scores jobs against target criteria, exports Excel reports, sends email summaries, and powers a Power BI dashboard.
+CareerSignal is a Python portfolio project that monitors target company career pages, collects job postings, stores results in SQLite, scores jobs against target criteria, exports Excel reports, sends email summaries, supports Power BI reporting, and can run automatically through Windows Task Scheduler.
 
 ---
 
@@ -35,16 +37,17 @@ Completed steps:
 5. SQLite database
 6. New job detection
 7. Daily email report
-8. Match scoring
+8. Initial match scoring
 9. Error handling and logging
 10. Excel export
 11. Power BI dashboard
-12A. Workday proof of concept
-12B. Workday normalization
-12C. Workday integration into the main pipeline
-13. ATS Coverage Audit started, with unresolved follow-up items
-14. Filtering Strategy completed
-15. Match Scoring Refinement completed
+    12A. Workday proof of concept
+    12B. Workday normalization
+    12C. Workday integration into the main pipeline
+12. ATS Coverage Audit started, with unresolved follow-up items
+13. Filtering Strategy completed
+14. Match Scoring Refinement completed
+15. Daily Automation runner added for Windows Task Scheduler
 
 The main product loop exists:
 
@@ -111,7 +114,8 @@ CareerSignal/
 ├── exports/
 │   └── careersignal_export.xlsx
 ├── logs/
-│   └── careersignal.log
+│   ├── careersignal.log
+│   └── scheduled_task.log
 ├── reports/
 │   └── careersignal_dashboard.pbix
 ├── scripts/
@@ -136,13 +140,14 @@ CareerSignal/
 │           ├── greenhouse.py
 │           └── workday.py
 ├── tests/
+├── run_careersignal_daily.bat
 ├── .env.example
 ├── .gitignore
 ├── README.md
 └── requirements.txt
 ```
 
-Some generated files may be ignored by Git, including `.env`, logs, generated database files, and generated exports.
+Some generated files may be ignored by Git, including `.env`, logs, generated database files, generated exports, and local Power BI cache files.
 
 ---
 
@@ -157,12 +162,16 @@ README.md
 requirements.txt
 .env.example
 .gitignore
+run_careersignal_daily.bat
 config/company_config.csv
+config/company_ats_audit.csv
+config/match_rules.json or config/match_rules.csv if created
 data/careersignal.db
 docs/CareerSignal_Project_State.md
 docs/filtering_strategy.md
 exports/careersignal_export.xlsx
 logs/careersignal.log
+logs/scheduled_task.log
 reports/careersignal_dashboard.pbix
 scripts/collect_greenhouse_jobs.py
 scripts/export_to_excel.py
@@ -306,6 +315,14 @@ grep -RIn "insert_normalized_jobs" .
 grep -RIn "fetch_all_jobs" .
 ```
 
+PowerShell:
+
+```powershell
+Select-String -Path .\* -Pattern "create_tables" -Recurse
+Select-String -Path .\* -Pattern "insert_normalized_jobs" -Recurse
+Select-String -Path .\* -Pattern "fetch_all_jobs" -Recurse
+```
+
 ---
 
 ### Match Scoring
@@ -324,7 +341,20 @@ score_job(job)
 
 Do not rename this function.
 
-Step 15 may refine the internals of match scoring, add match reasons, or move editable scoring rules into config, but it should preserve `score_job(job)` unless explicitly approved.
+Step 15 refined match scoring and may have added editable scoring rules in config.
+
+Scores should remain in the 0 to 100 range.
+
+Suggested score bands:
+
+```text
+80-100: Strong match
+60-79: Possible match
+40-59: Weak/stretch match
+0-39: Low match or likely skip
+```
+
+CareerSignal is not accounting-only. Scoring should support multiple job lanes.
 
 ---
 
@@ -356,7 +386,7 @@ File:
 src/careersignal/logging_config.py
 ```
 
-Logs should go to:
+Main log file:
 
 ```text
 logs/careersignal.log
@@ -365,6 +395,12 @@ logs/careersignal.log
 A failed company source should not crash the whole run.
 
 Failed sources should be tracked and included in the daily email report where possible.
+
+Scheduled task output may also be written to:
+
+```text
+logs/scheduled_task.log
+```
 
 ---
 
@@ -390,7 +426,7 @@ python scripts/collect_greenhouse_jobs.py --send
 
 Important:
 
-The script name still says `collect_greenhouse_jobs.py`, but after Workday integration it may function as the main collector runner. Do not rename this script unless intentionally doing a cleanup/refactor step.
+The script name still says `collect_greenhouse_jobs.py`, but after Workday integration it functions as the main collector runner. Do not rename this script unless intentionally doing a cleanup/refactor step.
 
 ---
 
@@ -468,28 +504,6 @@ Step 11 was completed, though dashboard polish may still be improved later.
 
 ---
 
-## Current README Status
-
-README has been updated after Step 14 or should be updated to reflect:
-
-* Greenhouse support
-* Workday support
-* SQLite database
-* new job detection
-* match scoring
-* email report
-* logging
-* Excel export
-* Power BI dashboard
-* ATS coverage audit
-* filtering strategy beyond accounting/finance
-
-README polish is still planned for Step 18.
-
-Do not treat README as final portfolio polish yet.
-
----
-
 ## Step 13 ATS Coverage Audit Status
 
 Step 13 is started but not fully resolved.
@@ -514,7 +528,7 @@ These need to be revisited later:
 3. Identify which companies are truly Workday or Greenhouse and can be added now.
 4. Identify which unsupported ATSs appear often enough to justify new connectors.
 5. Do not build connectors for one-off systems unless they are high-value companies.
-6. Review companies where search/Gemini produced bad or incorrect career pages.
+6. Review companies where search or AI produced bad or incorrect career pages.
 7. Review companies with redirects, proprietary systems, or confusing career portals.
 8. Decide whether `generic_html` is worth building for smaller firms or custom pages.
 9. Decide whether Lever, Ashby, SmartRecruiters, or iCIMS should be the next connector based on actual company count.
@@ -654,7 +668,7 @@ Step 15 may update:
 ```text
 src/careersignal/match_scoring.py
 scripts/test_match_scoring.py
-config/match_rules.json or config/match_rules.csv, if created
+config/match_rules.json or config/match_rules.csv
 README.md, only lightly if needed
 ```
 
@@ -663,22 +677,122 @@ Step 15 should keep scores from 0 to 100.
 Suggested score bands:
 
 ```text
-80–100: Strong match
-60–79: Possible match
-40–59: Weak/stretch match
-0–39: Low match or likely skip
+80-100: Strong match
+60-79: Possible match
+40-59: Weak/stretch match
+0-39: Low match or likely skip
 ```
 
 Step 15 should support multiple lanes, not just accounting and finance.
 
 ---
 
+## Step 16 Daily Automation Status
+
+Step 16 is complete if the project has:
+
+```text
+run_careersignal_daily.bat
+```
+
+and Windows Task Scheduler is configured to run it daily.
+
+The daily automation should run:
+
+```bat
+python scripts\collect_greenhouse_jobs.py --send
+python scripts\export_to_excel.py
+```
+
+The batch file should:
+
+1. Change into the CareerSignal project folder
+2. Activate the virtual environment if needed
+3. Set `PYTHONPATH=src`
+4. Run the collector in send mode
+5. Run the Excel export
+6. Write useful output to:
+
+```text
+logs/scheduled_task.log
+```
+
+The automation should preserve:
+
+```text
+Greenhouse support
+Workday support
+SQLite database behavior
+Email reporting
+Logging
+Excel export
+Power BI export path
+Match scoring behavior
+Preview mode
+Send mode
+GitHub-safe secret handling
+```
+
+The automation should not commit or expose:
+
+```text
+.env
+email passwords
+SMTP secrets
+logs with sensitive details
+local database files if ignored
+generated exports if ignored
+```
+
+Recommended scheduled run time:
+
+```text
+7:30 AM daily
+```
+
+If the computer is usually asleep in the morning, a midday run may be more reliable.
+
+Manual test command:
+
+```powershell
+.\run_careersignal_daily.bat
+```
+
+Useful verification commands:
+
+```powershell
+Get-Content .\logs\scheduled_task.log -Tail 100
+Get-Content .\logs\careersignal.log -Tail 100
+Get-Item .\data\careersignal.db
+Get-Item .\exports\careersignal_export.xlsx
+```
+
+---
+
+## Current README Status
+
+README has been updated through Step 16 or should be updated to reflect:
+
+* Greenhouse support
+* Workday support
+* SQLite database
+* New job detection
+* Match scoring
+* Email report
+* Logging
+* Excel export
+* Power BI dashboard
+* ATS coverage audit
+* Filtering strategy beyond accounting/finance
+* Windows Task Scheduler automation
+
+README polish is still planned for Step 18.
+
+Do not treat README as final portfolio polish yet.
+
+---
+
 ## Current Roadmap
-
-
-### Step 16: Daily Automation
-
-Use Windows Task Scheduler to run CareerSignal automatically and send the daily email report.
 
 ### Step 17: Application Tracker
 
@@ -686,11 +800,15 @@ Add saved/applied/interview/rejected/offer/skipped/closed tracking and response-
 
 Nice-to-have, not required for first resume-ready version.
 
+---
+
 ### Step 18: GitHub + Portfolio Polish
 
 Clean README, screenshots, sample outputs, final testing, resume bullets, and portfolio presentation.
 
-Required before adding to resume.
+Required before adding heavily to a resume.
+
+---
 
 ### Step 19: Optional Streamlit UI
 
@@ -705,7 +823,6 @@ Nice-to-have, not required.
 Must-do path:
 
 ```text
-16: Daily Automation
 18: GitHub + Portfolio Polish
 ```
 
@@ -715,6 +832,8 @@ Nice-to-have:
 17: Application Tracker
 19: Optional Streamlit UI
 ```
+
+Step 16 is now part of the completed core project path if the batch file and scheduled task are working.
 
 ---
 
@@ -740,6 +859,19 @@ python scripts/test_database.py
 python scripts/test_match_scoring.py
 python scripts/test_email_report.py
 python scripts/collect_greenhouse_jobs.py --preview
+python scripts/export_to_excel.py
+```
+
+Daily automation test:
+
+```powershell
+.\run_careersignal_daily.bat
+```
+
+Real send mode:
+
+```powershell
+python scripts/collect_greenhouse_jobs.py --send
 python scripts/export_to_excel.py
 ```
 
@@ -775,6 +907,26 @@ Select-String -Path .\* -Pattern "insert_normalized_jobs" -Recurse
 Select-String -Path .\* -Pattern "fetch_all_jobs" -Recurse
 ```
 
+Also check official function names when relevant:
+
+```bash
+grep -RIn "build_and_send_daily_report" .
+grep -RIn "score_job" .
+grep -RIn "initialize_database" .
+grep -RIn "insert_or_update_jobs" .
+grep -RIn "get_jobs_first_seen_in_last_24_hours" .
+```
+
+PowerShell:
+
+```powershell
+Select-String -Path .\* -Pattern "build_and_send_daily_report" -Recurse
+Select-String -Path .\* -Pattern "score_job" -Recurse
+Select-String -Path .\* -Pattern "initialize_database" -Recurse
+Select-String -Path .\* -Pattern "insert_or_update_jobs" -Recurse
+Select-String -Path .\* -Pattern "get_jobs_first_seen_in_last_24_hours" -Recurse
+```
+
 ---
 
 ## Git Guidance
@@ -787,11 +939,19 @@ git commit -m "Update CareerSignal project state"
 git push
 ```
 
-After feature steps, use specific commit messages, such as:
+After README updates:
 
 ```bash
-git add .
-git commit -m "Refine match scoring rules"
+git add README.md
+git commit -m "Update CareerSignal README"
+git push
+```
+
+After Step 16 automation:
+
+```bash
+git add run_careersignal_daily.bat README.md docs/CareerSignal_Project_State.md
+git commit -m "Add daily automation documentation"
 git push
 ```
 
@@ -803,6 +963,8 @@ logs/
 data/careersignal.db if intentionally ignored
 exports/careersignal_export.xlsx if intentionally ignored
 temporary test files
+email passwords
+SMTP secrets
 ```
 
 ---
@@ -820,4 +982,6 @@ Before giving code:
 7. Keep new work compatible with the existing pipeline.
 8. Preserve Greenhouse and Workday support.
 9. Preserve email, Excel, Power BI, logging, and scoring behavior unless the user asks to change them.
-10. Keep the response beginner-friendly and step-by-step.
+10. Preserve preview mode and send mode.
+11. Keep `.env` and secrets out of GitHub.
+12. Keep the response beginner-friendly and step-by-step.
