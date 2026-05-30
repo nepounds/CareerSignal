@@ -1,5 +1,7 @@
 # CareerSignal
 
+[![CareerSignal Tests](https://github.com/nepounds/CareerSignal/actions/workflows/tests.yml/badge.svg)](https://github.com/nepounds/CareerSignal/actions/workflows/tests.yml)
+
 CareerSignal is a Python/SQL career intelligence pipeline that monitors target company career pages, collects job postings, stores results in SQLite, scores job fit, sends daily email reports, exports Excel reports, and supports Power BI dashboard reporting.
 
 The project was built as a portfolio project to demonstrate practical Python, SQL, automation, reporting, and business analysis skills.
@@ -35,6 +37,7 @@ CareerSignal can:
 * Feed a Power BI dashboard
 * Run automatically with Windows Task Scheduler
 * Separate supported companies from unsupported/manual-only companies through an ATS audit
+* Run automated tests and lint checks through GitHub Actions
 
 ## How It Works
 
@@ -277,6 +280,9 @@ CareerSignal/
 │   └── .gitkeep
 ├── reports/
 │   └── careersignal_dashboard.pbix
+├── .github/
+│   └── workflows/
+│       └── tests.yml
 ├── scripts/
 │   ├── collect_greenhouse_jobs.py
 │   ├── export_to_excel.py
@@ -298,7 +304,8 @@ CareerSignal/
 │           ├── greenhouse.py
 │           └── workday.py
 ├── tests/
-│   └── .gitkeep
+│   ├── test_email_report.py
+│   └── test_match_scoring.py
 ├── run_careersignal_daily.bat
 ├── .env.example
 ├── .gitignore
@@ -407,6 +414,41 @@ Check logs:
 Get-Content .\logs\careersignal.log -Tail 100
 Get-Content .\logs\scheduled_task.log -Tail 100
 ```
+
+Run pytest unit tests:
+
+```powershell
+$env:PYTHONPATH="src"
+pytest tests
+```
+
+Run Ruff lint checks:
+
+```powershell
+ruff check src scripts tests
+```
+
+## Testing and Code Quality
+
+CareerSignal includes a small pytest test suite and a GitHub Actions workflow.
+
+The tests currently cover:
+
+* Match scoring behavior
+* Email subject generation
+* Email body generation
+* Failed-source reporting in the daily email
+
+The project also uses Ruff for linting. Ruff checks the code for simple quality issues such as unused imports, syntax problems, and basic cleanup items.
+
+GitHub Actions runs both checks automatically on push and pull request:
+
+```text
+ruff check src scripts tests
+pytest tests
+```
+
+This helps confirm that the project can be checked outside the local development machine and that future changes do not break the core tested behavior.
 
 ## ATS Audit
 
@@ -522,6 +564,9 @@ Key strengths:
 * Windows Task Scheduler automation
 * ATS audit and source triage
 * Separation between production-ready sources and unsupported/manual sources
+* Pytest unit tests for core behavior
+* GitHub Actions CI workflow
+* Ruff linting for code quality checks
 
 A major strength of the project is that it deals with messy real-world data instead of assuming every company has a clean, scrapeable careers page.
 
@@ -539,7 +584,7 @@ Current limitations:
 * Workday URLs can require manual review because Workday career sites vary by company.
 * Power BI Desktop requires manual refresh unless the report is published and configured separately.
 * The project does not currently include an application tracker.
-* The current tests are script-based rather than a full formal test suite.
+* The project includes basic pytest coverage, but the test suite is still small and does not yet cover every collector, database edge case, or reporting path.
 * The project is local-first and not deployed as a hosted application.
 * Some audit results still require manual verification.
 
@@ -582,11 +627,21 @@ Last successful refresh: date/time
 
 That would make the dashboard easier to understand.
 
-### 4. Improve Test Structure
+### 4. Expand Test Coverage
 
-The current project uses script-style tests.
+The project now includes pytest unit tests and GitHub Actions CI, but the test suite is still intentionally small.
 
-A future version could move more tests into the `tests/` folder and use a formal testing framework such as `pytest`.
+A future version should expand tests around:
+
+* Database insert/update behavior
+* Collector normalization
+* Workday URL edge cases
+* Greenhouse collector behavior
+* Excel export output
+* Empty result handling
+* Email report formatting paths
+
+This would make future refactoring safer.
 
 ### 5. Add More ATS Connectors
 
@@ -663,7 +718,8 @@ Planned or possible future improvements:
 * Add an application tracker.
 * Improve Power BI dashboard pages.
 * Add stronger empty-state reporting.
-* Move more tests into a formal test suite.
+* Expand pytest coverage for database insert/update behavior, collector normalization, and edge cases.
+* Add stricter linting or formatting rules as the project grows.
 * Add more detailed run history reporting.
 * Improve Workday endpoint validation.
 * Add connector-specific diagnostics.
@@ -697,9 +753,10 @@ config/company_config.csv
 config/company_ats_audit.csv
 docs/
 reports/careersignal_dashboard.pbix
+.github/workflows/tests.yml
 scripts/
 src/
-tests/.gitkeep
+tests/
 ```
 
 ## Final Project Summary
