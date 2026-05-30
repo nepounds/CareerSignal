@@ -1,11 +1,10 @@
 import csv
-import re
 from pathlib import Path
 
 import requests
 
 
-INPUT_PATH = Path("config/company_ats_audit_cleaned.csv")
+INPUT_PATH = Path("config/company_ats_audit.csv")
 OUTPUT_PATH = Path("config/company_ats_audit_verification_results.csv")
 
 TIMEOUT_SECONDS = 15

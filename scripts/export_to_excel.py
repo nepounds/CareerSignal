@@ -3,7 +3,6 @@ from __future__ import annotations
 import argparse
 import sqlite3
 import sys
-from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
