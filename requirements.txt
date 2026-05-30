@@ -1,5 +1,4 @@
 beautifulsoup4==4.14.3
--e git+https://github.com/nepounds/CareerSignal.git@e648e6119e91982ff6ed2e2bcd9c2393298d2c12#egg=careersignal
 certifi==2026.4.22
 charset-normalizer==3.4.7
 idna==3.15
