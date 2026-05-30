@@ -19,6 +19,7 @@ exports/*.xlsx
 # Keep placeholder files
 !data/.gitkeep
 !logs/.gitkeep
+!exports/.gitkeep
 
 # VS Code settings
 .vscode/

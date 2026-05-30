@@ -1,0 +1,218 @@
+industry,company_name,career_url,ats_type,status,notes
+Accounting Firms,BDO,https://ebqb.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1001/jobs,oracle,future_connector,Corrected from bad Workday guess. Current jobs site uses Oracle Cloud Recruiting; unsupported until an Oracle connector exists.
+Accounting Firms,BRC (Bernard Robinson & Company),https://www.brc.cpa/careers/current-opportunities/,unknown,manual_only,count for future connector decision
+Accounting Firms,"Carr, Riggs & Ingram",https://www.criadv.com/career-opportunities/,unknown,manual_only,Corrected from bad Workday guess. Public careers page is custom/website-based; keep out of company_config.csv until a reliable jobs endpoint is confirmed.
+Accounting Firms,Cherry Bekaert,https://cbh.wd12.myworkdayjobs.com/CherryBekaert,workday,ready_now,Corrected Workday tenant/site URL; can test for company_config.csv.
+Accounting Firms,CLA (CliftonLarsonAllen),https://cliftonlarsonallen.wd1.myworkdayjobs.com/CLA,workday,ready_now,Corrected Workday tenant/site URL; can test for company_config.csv.
+Accounting Firms,Dean Dorton,https://jobs.jobvite.com/deandortoncareers/jobs,jobvite,future_connector,raw ATS: UKG Pro; count for future connector decision
+Accounting Firms,Deloitte,https://apply.deloitte.com/en_US/careers/SearchJobs,unknown,manual_only,raw ATS: Custom / Avature; count for future connector decision
+Accounting Firms,EisnerAmper,https://careers.eisneramper.com/search,unknown,manual_only,can test for company_config.csv
+Accounting Firms,Elliott Davis,https://elliottdavis.wd5.myworkdayjobs.com/ED,workday,ready_now,can test for company_config.csv
+Accounting Firms,EY (Ernst & Young),https://usearlycareers.ey.com/,unknown,manual_only,count for future connector decision
+Accounting Firms,Forvis (Forvis Mazars),https://jobs.forvismazars.us/jobs,unknown,manual_only,Corrected from bad Workday guess. US experienced careers currently route through Avature; unsupported until Avature connector exists.
+Accounting Firms,Frost PLLC,https://frost.bamboohr.com/careers,bamboo,manual_only,raw ATS: Custom / Email; manual tracking or later custom handling
+Accounting Firms,Grant Thornton,https://ehzq.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/jobs,oracle,future_connector,Corrected from bad Workday guess. Current US jobs site uses Oracle Cloud Recruiting; unsupported until an Oracle connector exists.
+Accounting Firms,Hall CPA,https://hall-cpa-llc.breezy.hr/,breezy,future_connector,raw ATS: Custom / Email; manual tracking or later custom handling
+Accounting Firms,Johnson Lambert,https://www.johnsonlambert.com/open-positions/,unknown,manual_only,count for future connector decision
+Accounting Firms,KPMG,https://www.kpmguscareers.com/job-search/?career-level-parents=Early%20Career%7C&career-level=&spage=1#,unknown,manual_only,raw ATS: Custom / Avature; count for future connector decision
+Accounting Firms,Myers Stauffer,https://ebez.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_4/,oracle,future_connector,can test for company_config.csv
+Accounting Firms,PBMares,https://www2.appone.com/Search/Search.aspx?ServerVar=PBMaresLLP.appone.com&results=yes,unknown,manual_only,count for future connector decision
+Accounting Firms,PwC (PricewaterhouseCoopers),https://jobs.us.pwc.com/search-jobs,unknown,manual_only,can test for company_config.csv
+Accounting Firms,RSM,https://jobs.rsmus.com/?country=United+States&utm_source=usa_corporate_site&utm_medium=referral&utm_campaign=internal_navigation,unknown,manual_only,Corrected from old Workday URL. Current RSM jobs site is not a direct supported Workday/Greenhouse URL; keep manual until endpoint is mapped.
+Accounting Firms,Sharpe Patel,https://www.sharpepatelcpas.com/careers,unknown,manual_only,raw ATS: Custom / Email; manual tracking or later custom handling
+Accounting Firms,Sorren (includes Williams Overman Pierce),https://sorren.wd12.myworkdayjobs.com/US,workday,ready_now,raw ATS: Custom / Email; manual tracking or later custom handling
+Accounting Firms,"TJT / Thomas, Judy & Tucker",https://tjtpa.com/current-opportunities/,unknown,manual_only,raw ATS: Custom / Email; manual tracking or later custom handling
+Accounting Firms,TRP Sumner,https://recruiting.paylocity.com/recruiting/jobs/All/3a118fc6-d1a2-4bef-ad38-06a1c8d3259c/TRP-Sumner-PLLC,unknown,manual_only,raw ATS: Custom / Email; manual tracking or later custom handling
+Banks & Financial Institutions,Bank of America,https://careers.bankofamerica.com/en-us/job-search,unknown,manual_only,Corrected Workday site URL for US lateral careers; can test for company_config.csv.
+Banks & Financial Institutions,CAPTRUST,https://careers-captrust.icims.com/jobs/search,icims,future_connector,can test for company_config.csv
+Banks & Financial Institutions,Civic Federal Credit Union,https://www.civicfcu.org/careers#section-job-listing-header,unknown,manual_only,count for future connector decision
+Banks & Financial Institutions,Coastal Federal Credit Union,https://coastal24.applicantpool.com/jobs/,applicantpool,future_connector,Corrected from bad Workday guess. Current jobs page uses ApplicantPool; unsupported until connector exists.
+Banks & Financial Institutions,Deutsche Bank,https://careers.db.com/professionals/search-roles/#/professional/results/,unknown,manual_only,manual tracking or later custom handling
+Banks & Financial Institutions,Dogwood State Bank,https://recruiting.ultipro.com/TOW1004/JobBoard/34f1c2d6-3076-1bf2-bd11-f311094865bd/?q=&o=postedDateDesc,ultipro,future_connector,count for future connector decision
+Banks & Financial Institutions,Fidelity Bank,https://workforcenow.adp.com/mascsr/default/mdf/recruitment/recruitment.html?cid=c277c689-75a7-486c-b02a-06548721c568&ccId=19000101_000001&type=JS&lang=en_US,adp,future_connector,iCIMS; count for future connector decision.
+Banks & Financial Institutions,First Citizens Bank,https://jobs.firstcitizens.com/jobs,unknown,manual_only,iCIMS; count for future connector decision.
+Banks & Financial Institutions,First Horizon Bank,https://recruiting.ultipro.com/FIR1007FTN/JobBoard/c005ef3e-175a-49c4-ba29-9f431f673944/?q=&o=postedDateDesc&w=&wc=&we=&wpst=,ultipro,future_connector,can test for company_config.csv
+Banks & Financial Institutions,KS Bank,https://secure5.entertimeonline.com/ta/CBIZ20618.careers?CareersSearch=&lang=en-US,unknown,manual_only,raw ATS: Custom / Email; manual tracking or later custom handling
+Banks & Financial Institutions,PNC,https://careers.pnc.com/global/en/search-results,unknown,manual_only,can test for company_config.csv
+Banks & Financial Institutions,SECU (State Employees' Credit Union),https://ncsecu.wd1.myworkdayjobs.com/SECU,workday,ready_now,count for future connector decision
+Banks & Financial Institutions,Self-Help Credit Union,https://selfhelp.wd108.myworkdayjobs.com/SELF_HELP_CAREERS,workday,ready_now,count for future connector decision
+Banks & Financial Institutions,Truist,https://careers.truist.com/us/en/search-results?keywords=,unknown,manual_only,can test for company_config.csv
+Banks & Financial Institutions,UBS,https://jobs.ubs.com/TGnewUI/Search/home/HomeWithPreLoad?partnerid=25008&siteid=5012&PageType=searchResults&SearchType=linkquery&LinkID=15231#keyWordSearch=&locationSearch=,unknown,manual_only,manual tracking or later custom handling
+Banks & Financial Institutions,Wells Fargo,https://www.wellsfargojobs.com/en/jobs/?search=&country=,unknown,manual_only,raw ATS: Custom / Taleo; count for future connector decision
+"Construction, Engineering & Infrastructure",AECOM,https://aecom.jobs/?utm_source=aecomdotcom&utm_medium=web&utm_campaign=careers&utm_id=+global_careers&utm_content=header_CTA_Global,unknown,manual_only,can test for company_config.csv
+"Construction, Engineering & Infrastructure",Balfour Beatty,https://www.balfourbeatty.com/careers/job-search/?searchTerm=&locationTerm=&industryTerm=&filters=,unknown,manual_only,can test for company_config.csv
+"Construction, Engineering & Infrastructure",Barnhill Contracting Company,https://barnhillcontracting.wd503.myworkdayjobs.com/Barnhill_Opportunities,workday,ready_now,count for future connector decision
+"Construction, Engineering & Infrastructure",Brasfield & Gorrie,https://careers.brasfieldgorrie.com/jobs,unknown,future_connector,iCIMS; count for future connector decision.
+"Construction, Engineering & Infrastructure",CBRE,https://careers.cbre.com/en_US/careers/SearchJobs/?9577=%5B17276%5D&9577_format=10224&listFilterMode=1&jobRecordsPerPage=6&,unknown,manual_only,can test for company_config.csv
+"Construction, Engineering & Infrastructure",Dewberry,https://careers-dewberry.icims.com/jobs/search?ss=1,icims,future_connector,count for future connector decision
+"Construction, Engineering & Infrastructure",DR Horton,https://drhorton.taleo.net/careersection/2/jobsearch.ftl?lang=en,taleo,future_connector,can test for company_config.csv
+"Construction, Engineering & Infrastructure",Fred Smith Company,https://fredsmithcompany.net/open-positions/,unknown,manual_only,raw ATS: Custom / Hiresential; manual tracking or later custom handling
+"Construction, Engineering & Infrastructure",HDR,https://hdr.taleo.net/careersection/ex/jobsearch.ftl?lang=en&portal=101430233,taleo,future_connector,manual tracking or later custom handling
+"Construction, Engineering & Infrastructure",Highwoods Properties,https://recruiting.ultipro.com/HIG1001HIW/JobBoard/cf2a3a89-ceb7-4bb7-aa13-3167c6417621/?q=&o=postedDateDesc,ultipro,future_connector,count for future connector decision
+"Construction, Engineering & Infrastructure",JLL,https://jll.wd1.myworkdayjobs.com/jllcareers,workday,ready_now,can test for company_config.csv
+"Construction, Engineering & Infrastructure",Kane Realty,https://kanerealtycorp.applicantpool.com/jobs/,applicantpool,manual_only,manual tracking or later custom handling
+"Construction, Engineering & Infrastructure",Kimley-Horn,https://jobs-kimley-horn.icims.com/jobs/search?ss=1&searchRelation=keyword_all&mode=apply&iis=kimley-horn.com&iisn=kimley-horn.com&mobile=false&width=1860&height=500&bga=true&needsRedirect=false&jan1offset=-300&jun1offset=-240,icims,future_connector,can test for company_config.csv
+"Construction, Engineering & Infrastructure",Lennar,https://careers.lennar.com/search,unknown,manual_only,can test for company_config.csv
+"Construction, Engineering & Infrastructure",McKim & Creed,https://recruiting.ultipro.com/MCK1004MCKI/JobBoard/f29e8f64-6bcd-4988-8fad-851c4970ffe4/?q=&o=postedDateDesc,ultipro,future_connector,count for future connector decision
+"Construction, Engineering & Infrastructure",S&ME,https://smeinc.applicantpro.com/jobs/,unknown,manual_only,count for future connector decision
+"Construction, Engineering & Infrastructure",T.A. Loving Company,https://taloving-hff.viewpointforcloud.com/careers/browsejobs,unknown,manual_only,count for future connector decision
+"Construction, Engineering & Infrastructure",Toll Brothers,https://www.tollcareercenter.com/locations/north-carolina/,unknown,manual_only,can test for company_config.csv
+"Construction, Engineering & Infrastructure",WithersRavenel,https://withersravenel.com/jobs/,adp,future_connector,count for future connector decision
+Corporate Insurance,Aetna,https://cvshealth.wd1.myworkdayjobs.com/CVS_Health_Careers,workday,ready_now,can test for company_config.csv
+Corporate Insurance,BCBS (Blue Cross Blue Shield of NC),https://bcbsnc.wd5.myworkdayjobs.com/en-US/BCBSNC,workday,needs_review,can test for company_config.csv
+Corporate Insurance,Brightspeed,https://careers.brightspeed.com/jobs,unknown,manual_only,can test for company_config.csv
+Corporate Insurance,Centene / WellCare,https://jobs.centene.com/us/en/jobs/,unknown,manual_only,can test for company_config.csv
+Corporate Insurance,Cigna / Evernorth,https://jobs.thecignagroup.com/us/en/search-results,unknown,manual_only,can test for company_config.csv
+Corporate Insurance,Humana,https://careers.humana.com/us/en/search-results,unknown,manual_only,can test for company_config.csv
+Corporate Insurance,IAT Insurance Group,https://iatinsurancegroup.wd1.myworkdayjobs.com/iat,workday,ready_now,can test for company_config.csv
+Corporate Insurance,Markel,https://markelcorp.wd5.myworkdayjobs.com/GlobalCareers,workday,ready_now,can test for company_config.csv
+Corporate Insurance,MetLife,https://www.metlifecareers.com/en_US/ml/SearchJobs/?listFilterMode=1&jobRecordsPerPage=6&,unknown,manual_only,count for future connector decision
+Corporate Insurance,Nationwide,https://careers.nationwide.com/jobs,unknown,manual_only,can test for company_config.csv
+Corporate Insurance,North Carolina Farm Bureau Insurance,https://www.ncfbins.com/current-openings,unknown,manual_only,raw ATS: Custom / Email; manual tracking or later custom handling
+Corporate Insurance,The Hartford,https://www.jointhehartford.com/jobs/,unknown,manual_only,can test for company_config.csv
+Corporate Insurance,Travelers,https://careers.travelers.com/job-search-results/,unknown,manual_only,can test for company_config.csv
+Corporate Insurance,UnitedHealthcare / Optum,https://careers.unitedhealthgroup.com/search-jobs,unknown,manual_only,raw ATS: Custom / Taleo; count for future connector decision
+Government & Municipalities,City of Goldsboro,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Government & Municipalities,City of Greenville,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Government & Municipalities,City of Raleigh,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Government & Municipalities,City of Wilson,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Government & Municipalities,Durham County,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Government & Municipalities,FDIC,https://www.usajobs.gov/search/results/?l=North+Carolina&p=1&r=25,usajobs,future_connector,USAJobs; unsupported until USAJobs connector/API handling exists.
+Government & Municipalities,GUC (Greenville Utilities Commission),https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,raw ATS: Custom / NeoGov; count for future connector decision
+Government & Municipalities,Johnston County,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Government & Municipalities,NC Department of Health and Human Services,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Government & Municipalities,NC Department of Public Safety,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Government & Municipalities,NC Department of Revenue,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Government & Municipalities,NC Department of State Treasurer,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Government & Municipalities,NC Department of Transportation,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Government & Municipalities,NC Office of the State Auditor,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Government & Municipalities,NC Office of the State Controller,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Government & Municipalities,Pitt County,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Government & Municipalities,State of North Carolina,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Government & Municipalities,Town of Apex,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Government & Municipalities,Town of Cary,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Government & Municipalities,Town of Clayton,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Government & Municipalities,Town of Garner,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Government & Municipalities,Town of Knightdale,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Government & Municipalities,Town of Smithfield,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,manual tracking or later custom handling
+Government & Municipalities,Town of Wendell,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Government & Municipalities,Town of Zebulon,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Government & Municipalities,UNC System / state university finance offices,https://northcarolina.csod.com/ux/ats/careersite/4/home?c=northcarolina,unknown,manual_only,raw ATS: PeopleAdmin / Workday; count for future connector decision
+Government & Municipalities,Wake County,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Government & Municipalities,Wayne County,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Government & Municipalities,Wilson County,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Healthcare Systems & Payers,Alliance Health,https://recruiting.ultipro.com/ALL1034ABHC/JobBoard/ad28382f-2fcd-4cbb-bb18-24dd71b05bce/?q=&o=postedDateDesc,ultipro,future_connector,count for future connector decision
+Healthcare Systems & Payers,Community Care of North Carolina,https://workforcenow.adp.com/mascsr/default/mdf/recruitment/recruitment.html?cid=e19abba7-a8ad-4c26-948f-cf26888754a7&ccId=19000101_000001&type=MP&lang=en_US,adp,future_connector,count for future connector decision
+Healthcare Systems & Payers,Cone Health,https://careers.conehealth.com/us/en/search-results,unknown,manual_only,can test for company_config.csv
+Healthcare Systems & Payers,Duke Health,https://careers.dukehealth.org/us/en/search-results,unknown,manual_only,count for future connector decision
+Healthcare Systems & Payers,Duke University Health System corporate,https://careers.duke.edu/search/?createNewAlert=false&q=,unknown,manual_only,count for future connector decision
+Healthcare Systems & Payers,ECU Health,https://careers.ecuhealth.org/us/en/search-results,unknown,manual_only,can test for company_config.csv
+Healthcare Systems & Payers,Monarch,https://monarch.wd5.myworkdayjobs.com/Monarch,workday,ready_now,raw ATS: UKG Pro; count for future connector decision
+Healthcare Systems & Payers,Nash UNC Health Care,https://jobs.unchealthcare.org/search/nash-unc-health-care/jobs,unknown,manual_only,can test for company_config.csv
+Healthcare Systems & Payers,PruittHealth,https://careers.pruitthealth.com/us/en/search-results?keywords=,unknown,manual_only,count for future connector decision
+Healthcare Systems & Payers,RHA Health Services,https://rhahealthservices.wd1.myworkdayjobs.com/en-US/1,workday,needs_review,count for future connector decision
+Healthcare Systems & Payers,Trillium Health Resources,https://workforcenow.adp.com/mascsr/default/mdf/recruitment/recruitment.html?cid=86242cb5-2fdf-4468-b205-d8aef6aa10d5&ccId=19000101_000001&type=MP&lang=en_US,adp,future_connector,count for future connector decision
+Healthcare Systems & Payers,UNC Health,https://jobs.unchealthcare.org/search/jobs?q=&location=&cfm14=,unknown,manual_only,can test for company_config.csv
+Healthcare Systems & Payers,WakeMed Health & Hospitals,https://jobs.wakemed.org/careers-home/jobs,unknown,manual_only,can test for company_config.csv
+Healthcare Systems & Payers,Well Care Health,https://wellcarehealth.wd1.myworkdayjobs.com/en-US/External,workday,needs_review,count for future connector decision
+"Logistics, Supply Chain & Distribution",Advance Auto Parts,https://jobs.advanceautoparts.com/us/en/search-results,unknown,manual_only,can test for company_config.csv
+"Logistics, Supply Chain & Distribution",Amazon,https://www.amazon.jobs/en/search?base_query=&loc_query=,unknown,manual_only,manual tracking or later custom handling
+"Logistics, Supply Chain & Distribution",McLane Carolina,https://aa224.taleo.net/careersection/ex/moresearch.ftl?lang=en&portal=101430233&radius=1&radiusType=K&searchExpanded=true,taleo,future_connector,can test for company_config.csv
+"Logistics, Supply Chain & Distribution",US Foods,https://careers.usfoods.com/us/en/search-results?m=3,unknown,manual_only,can test for company_config.csv
+"Manufacturing, Food & BioPharma",ABB,https://careers.abb/global/en/search-results,unknown,manual_only,can test for company_config.csv
+"Manufacturing, Food & BioPharma",Aisin,https://myjobs.adp.com/aisincareers/cx?__tx_annotation=false&c=2194231&d=AisinExternal&sor=adprm,adp,future_connector,can test for company_config.csv
+"Manufacturing, Food & BioPharma",Alcami,https://careers-alcami.icims.com/jobs/search?mode=job&iis=Company+Website&mobile=false&width=1429&height=500&bga=true&needsRedirect=false&jan1offset=-300&jun1offset=-240,icims,future_connector,count for future connector decision
+"Manufacturing, Food & BioPharma",Ashley Furniture,https://ashleyfurniturecareers.com/jobs,unknown,manual_only,can test for company_config.csv
+"Manufacturing, Food & BioPharma",BASF,https://basf.jobs/?locale=en_US&currentPage=1&pageSize=10&addresses%2Fcountry=United+States,unknown,manual_only,manual tracking or later custom handling
+"Manufacturing, Food & BioPharma",Bayer,https://talent.bayer.com/careers?pid=562949956234521&job%20type=professional,unknown,manual_only,count for future connector decision
+"Manufacturing, Food & BioPharma",BD / Becton Dickinson,https://jobs.bd.com/en/search-jobs?k=&l=&orgIds=159,unknown,manual_only,can test for company_config.csv
+"Manufacturing, Food & BioPharma",Biogen,https://biibhr.wd3.myworkdayjobs.com/external,workday,ready_now,can test for company_config.csv
+"Manufacturing, Food & BioPharma",bioMérieux,https://careers.biomerieux.com/search/jobs?location=&q=,unknown,manual_only,can test for company_config.csv
+"Manufacturing, Food & BioPharma",Bridgestone Americas,https://www.bebridgestone.com/en/jobs/,unknown,manual_only,can test for company_config.csv
+"Manufacturing, Food & BioPharma",Butterball,https://careers.butterball.com/us/en/search-results,unknown,manual_only,count for future connector decision
+"Manufacturing, Food & BioPharma",Case Farms,https://careers.casefarms.com/careers-home/jobs,unknown,manual_only,manual tracking or later custom handling
+"Manufacturing, Food & BioPharma",Catalent,https://careers.catalent.com/us/en/search-results?keywords=,unknown,manual_only,can test for company_config.csv
+"Manufacturing, Food & BioPharma",Caterpillar,https://careers.caterpillar.com/en/jobs/,unknown,manual_only,can test for company_config.csv
+"Manufacturing, Food & BioPharma",Collins Aerospace,https://careers.rtx.com/global/en/search-results,unknown,manual_only,can test for company_config.csv
+"Manufacturing, Food & BioPharma",Corning,https://corningjobs.corning.com/search/?createNewAlert=false&q=&locationsearch=,unknown,manual_only,Not a direct Workday URL. Keep out of company_config.csv until a working Workday endpoint is confirmed.
+"Manufacturing, Food & BioPharma",CSL Seqirus,https://csl.wd1.myworkdayjobs.com/en-US/CSL_External,workday,needs_review,can test for company_config.csv
+"Manufacturing, Food & BioPharma",Eaton,https://eaton.eightfold.ai/careers,unknown,manual_only,can test for company_config.csv
+"Manufacturing, Food & BioPharma",Eli Lilly and Company,https://careers.lilly.com/us/en/search-results,unknown,manual_only,can test for company_config.csv
+"Manufacturing, Food & BioPharma",Fresenius Kabi,https://freseniusglobal.wd3.myworkdayjobs.com/FK_Careers,workday,ready_now,can test for company_config.csv
+"Manufacturing, Food & BioPharma",FUJIFILM Diosynth Biotechnologies,https://uscareers-fujifilm.icims.com/jobs/search?mode=redo&pr=0&schemaId=%24T%7BJob%7D.%24T%7BJobPost%7D.%24F%7BPostedDateTime%7D&o=A&searchPositionType=24213&mobile=false&width=1440&height=500&bga=true&needsRedirect=false&jan1offset=-300&jun1offset=-240,icims,future_connector,can test for company_config.csv
+"Manufacturing, Food & BioPharma",GE Aerospace,https://careers.geaerospace.com/global/en/search-results,unknown,manual_only,can test for company_config.csv
+"Manufacturing, Food & BioPharma",Grifols,https://jobsearch.grifols.com/search?createNewAlert=false&q=&locationsearch=,unknown,manual_only,can test for company_config.csv
+"Manufacturing, Food & BioPharma",Honeywell,https://careers.honeywell.com/en/sites/Honeywell/jobs?mode=location,unknown,manual_only,manual tracking or later custom handling
+"Manufacturing, Food & BioPharma",Humacyte,https://workforcenow.adp.com/mascsr/default/mdf/recruitment/recruitment.html?cid=d04444ef-3464-49c4-81aa-2d3eeb7dfc39&ccId=19000101_000001&type=JS&lang=en_US,adp,future_connector,manual tracking or later custom handling
+"Manufacturing, Food & BioPharma",Hyster-Yale Materials Handling,https://hysteryale.wd1.myworkdayjobs.com/Hyster-YaleCareers,workday,ready_now,can test for company_config.csv
+"Manufacturing, Food & BioPharma",J&J (Johnson & Johnson),https://www.careers.jnj.com/en/jobs/?search=&country=&origin=global,unknown,manual_only,manual tracking or later custom handling
+"Manufacturing, Food & BioPharma",John Deere,https://careers.deere.com/careers?location=united%20states,unknown,manual_only,can test for company_config.csv
+"Manufacturing, Food & BioPharma",KBI Biopharma,https://jsrglobal.wd1.myworkdayjobs.com/en-US/KBI_Biopharma,workday,needs_review,iCIMS; count for future connector decision.
+"Manufacturing, Food & BioPharma",Kriya Therapeutics,https://kriyatherapeutics.com/careers/,unknown,manual_only,Not a direct Greenhouse board URL. Keep out of company_config.csv until a working Greenhouse board slug is confirmed.
+"Manufacturing, Food & BioPharma",Labcorp,https://careers.labcorp.com/global/en/early-career-jobs,unknown,manual_only,can test for company_config.csv
+"Manufacturing, Food & BioPharma",Martin Marietta,https://jobs.jobvite.com/martinmarietta/search?r=&c=&q=,jobvite,future_connector,can test for company_config.csv
+"Manufacturing, Food & BioPharma",Merck,https://jobs.merck.com/us/en/search-results,unknown,manual_only,can test for company_config.csv
+"Manufacturing, Food & BioPharma",Mount Olive Pickle Company,https://recruiting.paylocity.com/recruiting/jobs/All/79f4eea2-8daa-4a10-827f-54e4abf74c9b/Mt-Olive-Pickle-Company,paylocity,future_connector,count for future connector decision
+"Manufacturing, Food & BioPharma",Novo Nordisk,https://www.novonordisk.com/careers/find-a-job/career-search-results.html?searchText=&countries=Denmark%3BUnited+States%3BChina+Mainland%3BArgentina%3BAustralia%3BBelgium%3BBrazil%3BCanada%3BCzech+Republic%3BFrance%3BGreece%%26+Strategy%3BManufacturing%3BMarket+Access%3BMedical+Affairs%3BQuality%3BSales,unknown,manual_only,can test for company_config.csv
+"Manufacturing, Food & BioPharma",Pfizer,https://www.pfizer.com/about/careers/search-results?langcode=en&count=10&sort=latest,unknown,manual_only,can test for company_config.csv
+"Manufacturing, Food & BioPharma",Prolec GE Waukesha,https://workforcenow.adp.com/mascsr/default/mdf/recruitment/recruitment.html?cid=4f2488ef-4bca-483d-b781-fe39c53a74c2&ccId=19000101_000001&lang=en_US,adp,future_connector,manual tracking or later custom handling
+"Manufacturing, Food & BioPharma",RTI Surgical,https://careers.rti.org/careers-home,unknown,manual_only,count for future connector decision
+"Manufacturing, Food & BioPharma",Schindler Elevator Corporation,https://job.schindler.com/Schindler/search/?q=&locationsearch=&optionsFacetsDD_country=US&locale=en_US,unknown,manual_only,count for future connector decision
+"Manufacturing, Food & BioPharma",Siemens,https://jobs.siemens.com/en_US/externaljobs,unknown,manual_only,count for future connector decision
+"Manufacturing, Food & BioPharma",Syngenta,https://jobs.syngenta.com/?job=744000129245760,unknown,manual_only,raw ATS: Custom / Taleo; count for future connector decision
+"Manufacturing, Food & BioPharma",Sysco,https://careers.sysco.com/en/search-jobs?k=&l=&orgIds=1105,unknown,manual_only,can test for company_config.csv
+"Manufacturing, Food & BioPharma",Teleflex,https://careers.teleflex.com/search/?createNewAlert=false&q=,unknown,manual_only,can test for company_config.csv
+"Manufacturing, Food & BioPharma",Thermo Fisher Scientific / PPD / Patheon,https://jobs.thermofisher.com/global/en/search-results?m=3,unknown,manual_only,can test for company_config.csv
+"Manufacturing, Food & BioPharma",United Therapeutics,https://vhr-unither.wd5.myworkdayjobs.com/External,workday,needs_review,can test for company_config.csv
+"Manufacturing, Food & BioPharma",Vulcan Materials Company,https://vulcanmat.taleo.net/careersection/2/jobsearch.ftl?lang=en,taleo,future_connector,can test for company_config.csv
+"Manufacturing, Food & BioPharma",Wayne-Sanderson Farms,https://waynefarms.wd1.myworkdayjobs.com/en-US/WayneFarms,workday,needs_review,count for future connector decision
+Military / Federal Contractors / Defense-Adjacent,Booz Allen Hamilton,https://careers.boozallen.com/jobs/search,unknown,manual_only,can test for company_config.csv
+Military / Federal Contractors / Defense-Adjacent,CACI,https://searchcareers.caci.com/careers?start=0&pid=1443150934864&sort_by=relevance,unknown,manual_only,can test for company_config.csv
+Military / Federal Contractors / Defense-Adjacent,Defense Commissary Agency,https://www.usajobs.gov/search/results/?l=North+Carolina&p=1&r=25,usajobs,future_connector,USAJobs; unsupported until USAJobs connector/API handling exists.
+Military / Federal Contractors / Defense-Adjacent,Federal civilian finance/admin roles through USAJobs,https://www.usajobs.gov/search/results/?l=North+Carolina&p=1&r=25,usajobs,future_connector,USAJobs; unsupported until USAJobs connector/API handling exists.
+Military / Federal Contractors / Defense-Adjacent,General Dynamics Information Technology,https://www.gdit.com/careers/search/,unknown,manual_only,can test for company_config.csv
+Military / Federal Contractors / Defense-Adjacent,L3Harris,https://careers.l3harris.com/en/search-jobs?k=&orgIds=4832,unknown,manual_only,can test for company_config.csv
+Military / Federal Contractors / Defense-Adjacent,Leidos,https://careers.leidos.com/search/jobs?q=,unknown,manual_only,can test for company_config.csv
+Military / Federal Contractors / Defense-Adjacent,Seymour Johnson Air Force Base civilian jobs,https://www.usajobs.gov/search/results/?l=North+Carolina&p=1&r=25,usajobs,future_connector,USAJobs; unsupported until USAJobs connector/API handling exists.
+"Research, Nonprofit & Universities",East Carolina University,https://ecu.peopleadmin.com//postings/search?utf8=%E2%9C%93&query=&query_v0_posted_at_date=&query_position_type_id%5B%5D=2&435=&commit=Search,unknown,manual_only,PeopleAdmin; count for future connector decision.
+"Research, Nonprofit & Universities",EPA RTP,https://www.usajobs.gov/search/results/?l=North+Carolina&p=1&r=25,usajobs,future_connector,USAJobs; unsupported until USAJobs connector/API handling exists.
+"Research, Nonprofit & Universities",Johnston Community College,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+"Research, Nonprofit & Universities",NC State University Foundation,https://jobs.ncsu.edu/postings/search,unknown,manual_only,count for future connector decision
+"Research, Nonprofit & Universities",NIEHS / NIH,https://www.usajobs.gov/search/results/?l=North+Carolina&p=1&r=25,usajobs,future_connector,USAJobs; unsupported until USAJobs connector/API handling exists.
+"Research, Nonprofit & Universities",Research Triangle Foundation,https://www.rtp.org/the-foundation/employment/,unknown,manual_only,manual tracking or later custom handling
+"Research, Nonprofit & Universities",RTI International,https://careers.rti.org/careers-home,unknown,manual_only,can test for company_config.csv
+"Research, Nonprofit & Universities",UNC System Office,https://northcarolina.csod.com/ux/ats/careersite/4/home?c=northcarolina,unknown,manual_only,count for future connector decision
+"Research, Nonprofit & Universities",UNC-Chapel Hill,https://northcarolina.csod.com/ux/ats/careersite/4/home?c=northcarolina,unknown,manual_only,PeopleAdmin; count for future connector decision.
+"Research, Nonprofit & Universities",Wake Tech,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+"Research, Nonprofit & Universities",Wayne Community College,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Retail / Restaurant / Consumer Corporate,Bojangles corporate,https://www.bojangles.com/positions/,unknown,manual_only,Not a direct Workday URL. Keep out of company_config.csv until a working Workday endpoint is confirmed.
+Retail / Restaurant / Consumer Corporate,Food Lion / Ahold Delhaize,https://foodlion.careerswithus.com/search-page,unknown,manual_only,count for future connector decision
+Retail / Restaurant / Consumer Corporate,Sheetz,https://jobs.sheetz.com/jobs,unknown,manual_only,can test for company_config.csv
+Technology & Enterprise Software,Bandwidth,https://job-boards.greenhouse.io/bandwidth,greenhouse,ready_now,Not a direct Greenhouse board URL. Keep out of company_config.csv until a working Greenhouse board slug is confirmed.
+Technology & Enterprise Software,Cisco Systems,https://careers.cisco.com/global/en/search-results,unknown,manual_only,raw ATS: Custom / Avature; count for future connector decision
+Technology & Enterprise Software,Citrix / Cloud Software Group,https://careers.cloud.com/jobs/search?query=,unknown,manual_only,can test for company_config.csv
+Technology & Enterprise Software,Epic Games,https://www.epicgames.com/site/careers/jobs,unknown,manual_only,Not a direct Greenhouse board URL. Keep out of company_config.csv until a working Greenhouse board slug is confirmed.
+Technology & Enterprise Software,Genesys,https://genesys.wd1.myworkdayjobs.com/Genesys,workday,ready_now,can test for company_config.csv
+Technology & Enterprise Software,Google,https://www.google.com/about/careers/applications/jobs/results,unknown,manual_only,manual tracking or later custom handling
+Technology & Enterprise Software,IBM,https://www.ibm.com/careers/search,unknown,manual_only,count for future connector decision
+Technology & Enterprise Software,IQVIA,https://jobs.iqvia.com/en/jobs,unknown,manual_only,can test for company_config.csv
+Technology & Enterprise Software,Lenovo,https://jobs.lenovo.com/en_US/careers/SearchJobs/?listFilterMode=1&jobRecordsPerPage=10&,unknown,manual_only,count for future connector decision
+Technology & Enterprise Software,NetApp,https://careers.netapp.com/search-jobs,unknown,manual_only,count for future connector decision
+Technology & Enterprise Software,Oracle,https://careers.oracle.com/en/sites/jobsearch/jobs,unknown,manual_only,raw ATS: Taleo / Oracle Cloud; count for future connector decision
+Technology & Enterprise Software,Pendo,https://job-boards.greenhouse.io/pendo,greenhouse,ready_now,Not a direct Greenhouse board URL. Keep out of company_config.csv until a working Greenhouse board slug is confirmed.
+Technology & Enterprise Software,Red Hat,https://redhat.wd5.myworkdayjobs.com/jobs/,workday,ready_now,can test for company_config.csv
+Technology & Enterprise Software,SAS Institute,https://globalcareers-sas.icims.com/jobs/intro?hashed=-435680032&mobile=false&width=1180&height=500&bga=true&needsRedirect=false&jan1offset=-300&jun1offset=-240,icims,future_connector,iCIMS; count for future connector decision.
+Technology & Enterprise Software,Toshiba Global Commerce Solutions,https://toshibausa.rec.pro.ukg.net/TOS1004TSHB/JobBoard/a0ac2fa0-9040-406f-913a-2bfefe11c1a6/?q=&o=postedDateDesc&w=&wc=&we=&wpst=,ukg,future_connector,count for future connector decision
+Technology & Enterprise Software,Wolfspeed,https://cree.wd108.myworkdayjobs.com/EXT,workday,ready_now,can test for company_config.csv
+Utilities & Energy,Aqua America / Essential Utilities,https://aquaamerica.wd5.myworkdayjobs.com/Essential_Careers,workday,ready_now,can test for company_config.csv
+Utilities & Energy,Dominion Energy,https://careers.dominionenergy.com/search/?createNewAlert=false&q=,unknown,manual_only,count for future connector decision
+Utilities & Energy,Edgecombe-Martin County EMC,https://www.ememc.com/careers,unknown,manual_only,raw ATS: Custom / Email; manual tracking or later custom handling
+Utilities & Energy,ElectriCities of NC,https://www.electricities.com/careers/,unknown,manual_only,raw ATS: Custom / ADP; count for future connector decision
+Utilities & Energy,Harnett Regional Water,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Utilities & Energy,Johnston County Public Utilities,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Utilities & Energy,NCEMC (North Carolina Electric Membership Corporation),https://recruiting.ultipro.com/NCE1000NCEM/JobBoard/43e4a9c7-9321-42e7-8795-035a140772d9/?q=&o=postedDateDesc,ultipro,future_connector,raw ATS: Custom / ADP; count for future connector decision
+Utilities & Energy,Raleigh Water,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision
+Utilities & Energy,Raleigh-Durham Airport Authority,https://www.rdu.com/careers/tenant-partners/,unknown,manual_only,count for future connector decision
+Utilities & Energy,Tri-County EMC,https://recruiting.ultipro.com/NCE1000NCEM/JobBoard/43e4a9c7-9321-42e7-8795-035a140772d9/?q=&o=postedDateDesc,ultipro,future_connector,raw ATS: Custom / Email; manual tracking or later custom handling
+Utilities & Energy,Wake Electric,https://wemc.com/careers/,unknown,manual_only,raw ATS: Custom / Email; manual tracking or later custom handling
+Utilities & Energy,Wilson Energy,https://www.governmentjobs.com/jobs?keyword=&location=,neogov,future_connector,count for future connector decision

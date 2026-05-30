@@ -1,41 +1,35 @@
 # CareerSignal
 
-CareerSignal is a Python portfolio project that monitors job postings from target companies, stores the results in SQLite, scores each job against custom career criteria, sends daily email reports, exports Excel reports, and supports a Power BI dashboard.
+CareerSignal is a Python/SQL career intelligence pipeline that monitors target company career pages, collects job postings, stores them in SQLite, scores jobs against target criteria, sends daily email reports, exports Excel reports, and supports Power BI dashboard reporting.
 
-The project was built to solve a real job-search problem: instead of manually checking dozens of company career pages every day, CareerSignal collects and organizes relevant postings automatically.
+The project was built as a portfolio project to show practical Python, SQL, automation, data pipeline, reporting, and business analysis skills.
 
----
+## Project Summary
 
-## Project Status
+CareerSignal helps reduce manual job searching by checking configured company career pages and surfacing new jobs that match defined target roles, locations, and keywords.
 
-CareerSignal currently has a working end-to-end pipeline.
+The pipeline currently supports:
 
-Completed features include:
-
-* Company configuration file
-* Greenhouse job collection
-* Workday job collection
-* Standard normalized job format
-* SQLite database storage
+* Greenhouse job boards
+* Workday job boards
+* Company-level configuration
+* Normalized job records
+* SQLite job storage
 * New job detection
-* Daily email report
+* Match scoring
+* Daily email reports
 * Error handling and logging
 * Excel export
-* Power BI dashboard support
-* ATS coverage audit planning
-* Filtering strategy
-* Match scoring refinement
-* Windows Task Scheduler automation runner
+* Power BI dashboard reporting
+* Windows Task Scheduler automation
 
----
-
-## What CareerSignal Does
-
-CareerSignal follows this general workflow:
+## How It Works
 
 ```text
-Target companies
-→ ATS collectors
+Windows Task Scheduler
+→ run_careersignal_daily.bat
+→ Python collection runner
+→ Greenhouse / Workday collectors
 → normalized job records
 → SQLite database
 → new job detection
@@ -45,7 +39,78 @@ Target companies
 → Power BI dashboard
 ```
 
-The system is designed to help track jobs across multiple target lanes, including:
+### 1. Task Scheduler
+
+Windows Task Scheduler runs the project automatically each day using:
+
+```text
+run_careersignal_daily.bat
+```
+
+The batch file runs the main collection script in send mode and then refreshes the Excel export.
+
+### 2. Python Collection Runner
+
+The main runner is:
+
+```text
+scripts/collect_greenhouse_jobs.py
+```
+
+Even though the filename references Greenhouse, the script currently functions as the main collection runner for supported ATS types.
+
+Preview mode:
+
+```powershell
+python scripts/collect_greenhouse_jobs.py --preview
+```
+
+Send mode:
+
+```powershell
+python scripts/collect_greenhouse_jobs.py --send
+```
+
+### 3. Greenhouse and Workday Collectors
+
+CareerSignal currently supports two ATS types:
+
+```text
+greenhouse
+workday
+```
+
+Collector modules live in:
+
+```text
+src/careersignal/collectors/
+```
+
+Each collector returns normalized job dictionaries so the rest of the pipeline can process jobs consistently.
+
+### 4. SQLite Database
+
+CareerSignal stores collected jobs in:
+
+```text
+data/careersignal.db
+```
+
+The database is used to:
+
+* Store job postings
+* Avoid duplicate job records
+* Track first-seen and last-seen dates
+* Identify jobs first seen in the past 24 hours
+* Support reporting and exports
+
+### 5. Match Scoring
+
+Jobs are scored against target criteria such as title, keywords, location, seniority, and fit.
+
+The scoring system supports multiple job-search lanes, not only accounting roles.
+
+Examples of supported lanes include:
 
 * Accounting roles
 * Finance roles
@@ -56,35 +121,88 @@ The system is designed to help track jobs across multiple target lanes, includin
 * Data/reporting analyst roles
 * Plant supervisor roles
 * Operations supervisor roles
-* Water/wastewater or utility-adjacent roles
-* Other realistic roles that fit the user’s background
+* Water/wastewater or public utility-adjacent roles
 
-This is not an accounting-only project.
-
----
-
-## Current Supported ATS Platforms
-
-CareerSignal currently supports:
+Suggested score bands:
 
 ```text
-greenhouse
-workday
+80-100: Strong match
+60-79: Possible match
+40-59: Weak/stretch match
+0-39: Low match or likely skip
 ```
 
-Future possible ATS connectors may include:
+### 6. Daily Email Report
+
+CareerSignal can send a daily email report that includes:
+
+* Run summary
+* Newly discovered matching jobs
+* Match scores
+* Failed sources, if any
+* Collection status
+
+Send mode:
+
+```powershell
+python scripts/collect_greenhouse_jobs.py --send
+```
+
+### 7. Excel Export
+
+CareerSignal exports job data to:
 
 ```text
-lever
-ashby
-smartrecruiters
-icims
-generic_html
+exports/careersignal_export.xlsx
 ```
 
-Those are not built yet. Future connectors should only be added if enough target companies use them or if one very high-priority company makes the connector worth building.
+Manual export command:
 
----
+```powershell
+python scripts/export_to_excel.py
+```
+
+The Excel file is used as the data source for the Power BI dashboard.
+
+### 8. Power BI Dashboard
+
+The Power BI report is stored in:
+
+```text
+reports/careersignal_dashboard.pbix
+```
+
+The dashboard should pull from:
+
+```text
+exports/careersignal_export.xlsx
+```
+
+Power BI Desktop requires manual refresh unless the report is published and configured with scheduled refresh separately.
+
+Refresh manually in Power BI Desktop:
+
+```text
+Home > Refresh
+```
+
+## Current Features
+
+* Greenhouse ATS support
+* Workday ATS support
+* Company configuration through CSV
+* Normalized job format
+* SQLite database storage
+* Duplicate job prevention
+* New job detection
+* Match scoring
+* Daily email report
+* Failed-source reporting
+* Error handling and logging
+* Excel export
+* Power BI dashboard
+* Windows Task Scheduler automation
+* Filtering strategy for multiple job-search lanes
 
 ## Project Structure
 
@@ -93,7 +211,7 @@ CareerSignal/
 ├── config/
 │   ├── company_config.csv
 │   ├── company_ats_audit.csv
-│   └── match_rules.json
+│   └── match_rules.json or match_rules.csv
 ├── data/
 │   └── careersignal.db
 ├── docs/
@@ -117,17 +235,14 @@ CareerSignal/
 │   └── test_match_scoring.py
 ├── src/
 │   └── careersignal/
-│       ├── __init__.py
 │       ├── config_loader.py
 │       ├── database.py
 │       ├── email_report.py
 │       ├── logging_config.py
 │       ├── match_scoring.py
 │       └── collectors/
-│           ├── __init__.py
 │           ├── greenhouse.py
 │           └── workday.py
-├── tests/
 ├── run_careersignal_daily.bat
 ├── .env.example
 ├── .gitignore
@@ -135,366 +250,225 @@ CareerSignal/
 └── requirements.txt
 ```
 
-Some generated files may be ignored by Git, including `.env`, logs, local database files, and generated exports.
+## Setup
 
----
+### 1. Clone the repository
 
-## Main Files
+```powershell
+git clone <repository-url>
+cd CareerSignal
+```
 
-### Company Config
+### 2. Create and activate a virtual environment
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
+
+### 3. Install requirements
+
+```powershell
+pip install -r requirements.txt
+```
+
+### 4. Configure environment variables
+
+Copy the example environment file:
+
+```powershell
+copy .env.example .env
+```
+
+Then update `.env` with your local email settings.
+
+Do not commit `.env`.
+
+### 5. Confirm company configuration
+
+Company settings live in:
 
 ```text
 config/company_config.csv
 ```
 
-This file stores the companies CareerSignal should check.
-
-Current supported `ats_type` values:
+Supported ATS values are:
 
 ```text
 greenhouse
 workday
 ```
 
-Expected config fields include:
+## Common Commands
 
-```text
-company
-ats_type
-career_url
-workday_api_url
-job_url_base
-target_location
-keywords
-job_title_keywords
-excluded_keywords
-is_active
-```
-
----
-
-### Database
-
-CareerSignal uses SQLite.
-
-Current database path:
-
-```text
-data/careersignal.db
-```
-
-The project should not use:
-
-```text
-data/jobs.db
-```
-
----
-
-### Main Collector Runner
-
-The current main runner is:
-
-```text
-scripts/collect_greenhouse_jobs.py
-```
-
-The file name still says Greenhouse because that was the first collector built, but the runner now supports both Greenhouse and Workday through the shared pipeline.
-
-Preview mode:
-
-```bash
-python scripts/collect_greenhouse_jobs.py --preview
-```
-
-Send mode:
-
-```bash
-python scripts/collect_greenhouse_jobs.py --send
-```
-
-Preview mode is used for testing without sending the real daily email.
-
-Send mode is used for the real daily run.
-
----
-
-### Excel Export
-
-CareerSignal exports job data to Excel:
-
-```bash
-python scripts/export_to_excel.py
-```
-
-Default output:
-
-```text
-exports/careersignal_export.xlsx
-```
-
-This export supports the Power BI dashboard.
-
----
-
-### Power BI Dashboard
-
-Power BI report file:
-
-```text
-reports/careersignal_dashboard.pbix
-```
-
-Power BI data source:
-
-```text
-exports/careersignal_export.xlsx
-```
-
-After running a fresh Excel export, refresh the dashboard manually in Power BI:
-
-```text
-Home > Refresh
-```
-
----
-
-## Daily Automation
-
-CareerSignal can be automated with Windows Task Scheduler.
-
-The daily automation should run:
-
-```bat
-python scripts\collect_greenhouse_jobs.py --send
-python scripts\export_to_excel.py
-```
-
-The project includes a batch runner:
-
-```text
-run_careersignal_daily.bat
-```
-
-The batch file should:
-
-1. Change into the CareerSignal project folder
-2. Activate the virtual environment if available
-3. Set `PYTHONPATH=src`
-4. Run the collector in send mode
-5. Run the Excel export
-6. Write scheduled-task output to:
-
-```text
-logs/scheduled_task.log
-```
-
-Recommended daily run time:
-
-```text
-7:30 AM
-```
-
-If the computer is usually asleep in the morning, a midday time may be more reliable.
-
----
-
-## Environment Variables
-
-CareerSignal uses a local `.env` file for private settings.
-
-The `.env` file should not be committed to GitHub.
-
-A safe example file may be tracked instead:
-
-```text
-.env.example
-```
-
-The real `.env` may include settings such as:
-
-```text
-EMAIL_HOST=
-EMAIL_PORT=
-EMAIL_USERNAME=
-EMAIL_PASSWORD=
-EMAIL_FROM=
-EMAIL_TO=
-```
-
-Secrets should stay local.
-
----
-
-## Logging
-
-Main application log:
-
-```text
-logs/careersignal.log
-```
-
-Scheduled task log:
-
-```text
-logs/scheduled_task.log
-```
-
-The goal is for one failed company source to be logged without crashing the entire daily run.
-
-Failed sources should be included in the daily email report when possible.
-
----
-
-## Match Scoring
-
-CareerSignal scores jobs from 0 to 100.
-
-Suggested score bands:
-
-```text
-80-100: Strong match
-60-79: Possible match
-40-59: Weak/stretch match
-0-39: Low match or likely skip
-```
-
-The scoring system supports multiple job lanes, not just accounting and finance.
-
-Official scoring function:
-
-```python
-score_job(job)
-```
-
-This function should not be renamed unless the rest of the project is intentionally updated.
-
----
-
-## Testing Commands
-
-From PowerShell:
+Set `PYTHONPATH` in PowerShell:
 
 ```powershell
 $env:PYTHONPATH="src"
+```
 
+Run tests:
+
+```powershell
 python scripts/test_config_loader.py
 python scripts/test_database.py
 python scripts/test_match_scoring.py
 python scripts/test_email_report.py
-python scripts/collect_greenhouse_jobs.py --preview
-python scripts/export_to_excel.py
 ```
 
-To test the real daily send flow:
+Preview job collection:
+
+```powershell
+python scripts/collect_greenhouse_jobs.py --preview
+```
+
+Send the daily email report:
 
 ```powershell
 python scripts/collect_greenhouse_jobs.py --send
+```
+
+Export to Excel:
+
+```powershell
 python scripts/export_to_excel.py
 ```
 
-To test the automation runner:
+Run the daily automation manually:
 
 ```powershell
 .\run_careersignal_daily.bat
 ```
 
----
-
-## Search Checks
-
-Use these checks to avoid old names and broken paths.
-
-Git Bash:
-
-```bash
-grep -RIn "data/jobs.db" .
-grep -RIn "create_tables" .
-grep -RIn "insert_normalized_jobs" .
-grep -RIn "fetch_all_jobs" .
-```
-
-PowerShell:
+Check logs:
 
 ```powershell
-Select-String -Path .\* -Pattern "data/jobs.db" -Recurse
-Select-String -Path .\* -Pattern "create_tables" -Recurse
-Select-String -Path .\* -Pattern "insert_normalized_jobs" -Recurse
-Select-String -Path .\* -Pattern "fetch_all_jobs" -Recurse
+Get-Content .\logs\careersignal.log -Tail 100
+Get-Content .\logs\scheduled_task.log -Tail 100
 ```
 
-Those old names should not appear in active project code.
+## Screenshots
 
----
+Recommended screenshots for GitHub:
 
-## Current Roadmap
+```text
+docs/screenshots/powerbi_overview_dashboard.png
+docs/screenshots/sample_daily_email.png
+docs/screenshots/excel_export_sample.png
+docs/screenshots/task_scheduler_setup.png
+```
 
-### Step 17: Application Tracker
+Suggested README image section:
 
-Possible future feature.
+```markdown
+## Screenshots
 
-This would add tracking for jobs that were:
+### Power BI Dashboard
 
-* Saved
-* Applied
-* Interviewed
-* Rejected
-* Offered
-* Skipped
-* Closed
+![Power BI dashboard](docs/screenshots/powerbi_overview_dashboard.png)
 
-This is useful, but not required for the first resume-ready version.
+### Daily Email Report
 
----
+![Sample daily email](docs/screenshots/sample_daily_email.png)
 
-### Step 18: GitHub and Portfolio Polish
+### Excel Export
 
-Required before adding the project heavily to a resume.
+![Excel export sample](docs/screenshots/excel_export_sample.png)
 
-Planned polish work:
+### Task Scheduler Setup
 
-* Clean README
-* Add screenshots
-* Add sample outputs
-* Confirm GitHub-safe files
-* Final test run
-* Resume bullets
-* Portfolio explanation
+![Task Scheduler setup](docs/screenshots/task_scheduler_setup.png)
+```
 
----
+Only use screenshots with fake, sample, or non-sensitive data.
 
-### Step 19: Optional Streamlit UI
+## Known Limitations
 
-Optional future feature.
+* Power BI Desktop requires manual refresh unless the report is published and scheduled refresh is configured separately.
+* Some ATS platforms are not supported yet.
+* The Step 13 ATS coverage audit still has unresolved follow-up items.
+* Workday URLs may require manual review because Workday career sites can vary by company.
+* Application tracking is planned but not included in this version.
+* Generated local files may contain private data and should not be committed unless converted to sample data.
 
-This could provide a local dashboard-style interface, but it is not required because the project already has Excel and Power BI reporting.
+## Future Improvements
 
----
+* Resolve remaining Step 13 ATS audit items.
+* Add more supported ATS connectors only when enough target companies justify them.
+* Add an application tracker for saved, applied, interview, rejected, offer, skipped, and closed statuses.
+* Improve Power BI dashboard pages.
+* Add optional Streamlit UI.
 
-## Skills Demonstrated
+## GitHub Safety Notes
 
-CareerSignal demonstrates practical experience with:
+Do not commit:
 
-* Python scripting
-* API collection
-* ATS data collection
-* Data normalization
-* SQLite databases
-* SQL-backed persistence
-* Email automation
-* Error handling and logging
-* Excel export
-* Power BI dashboard support
-* Match scoring logic
-* Config-driven design
-* Windows automation
-* Git/GitHub project organization
-* AI-assisted development workflow
+```text
+.env
+.venv/
+logs/
+data/careersignal.db
+exports/careersignal_export.xlsx
+email passwords
+SMTP secrets
+private job exports
+temporary test files
+```
 
----
+Safe files to commit generally include:
+
+```text
+README.md
+requirements.txt
+.env.example
+.gitignore
+run_careersignal_daily.bat
+config/company_config.csv if it contains no private data
+config/company_ats_audit.csv if it contains no private data
+docs/
+reports/careersignal_dashboard.pbix if it does not contain private data
+scripts/
+src/
+tests/
+```
+
+## Final Validation Checklist
+
+Before treating the project as resume-ready, confirm:
+
+* Preview run works.
+* Send run works.
+* Email arrives.
+* Email only includes jobs first seen in the past 24 hours.
+* Match scores show correctly in the email.
+* Failed sources show correctly in the email when a source fails.
+* Excel export updates.
+* Power BI refresh works from `exports/careersignal_export.xlsx`.
+* Logs update.
+* No references to `data/jobs.db` remain.
+* No old function names remain.
+* No secrets are staged for Git.
+* README screenshots use sample or non-sensitive data.
 
 ## Portfolio Summary
 
-CareerSignal is a job-posting monitoring and reporting tool built with Python, SQLite, Excel, and Power BI. It collects postings from supported ATS platforms, stores normalized job records, detects new jobs, scores postings against custom criteria, sends daily email summaries, and exports data for dashboard reporting.
+CareerSignal demonstrates:
 
-The project is designed as a practical business automation and analytics portfolio project.
+* Python scripting
+* SQL and SQLite database design
+* Data normalization
+* API-style data collection
+* Error handling and logging
+* Match scoring logic
+* Email automation
+* Excel reporting
+* Power BI reporting
+* Windows Task Scheduler automation
+* Git/GitHub project organization
+
+## Resume Bullet Options
+
+* Built CareerSignal, a Python/SQL job intelligence pipeline that collects postings from Greenhouse and Workday career sites, stores normalized job data in SQLite, scores role fit, and sends automated daily email reports.
+* Designed a configurable job-monitoring system using Python, SQLite, Excel exports, Power BI, and Windows Task Scheduler to automate job discovery and reporting.
+* Created a portfolio data pipeline that normalizes job postings, prevents duplicate records, detects newly posted roles, applies match scoring, logs failed sources, and exports data for dashboard reporting.
+* Developed an automated career tracking workflow with Python collectors, SQL-backed storage, daily email reporting, Excel output, and Power BI visualization.

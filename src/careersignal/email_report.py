@@ -22,10 +22,128 @@ def shorten_match_notes(match_notes: str | None, max_parts: int = 4) -> str:
     """
 
     if not match_notes:
-        return "No match notes available."
+        return ""
 
     parts = match_notes.split("; ")
     return "; ".join(parts[:max_parts])
+
+
+def infer_match_notes(job: dict[str, Any]) -> str:
+    """
+    Build a simple fallback explanation when match_notes is not present.
+
+    This keeps the email useful even when the scoring layer only provides
+    a numeric score.
+    """
+
+    existing_notes = shorten_match_notes(job.get("match_notes"))
+
+    if existing_notes:
+        return existing_notes
+
+    title = str(job.get("title", "") or "")
+    location = str(job.get("location", "") or "")
+    department = str(job.get("department", "") or "")
+    match_score = job.get("match_score", 0)
+
+    title_lower = title.lower()
+    location_lower = location.lower()
+    department_lower = department.lower()
+
+    reasons = []
+
+    title_terms = [
+        "accounting",
+        "accountant",
+        "finance",
+        "financial",
+        "analyst",
+        "business",
+        "operations",
+        "compliance",
+        "reporting",
+        "data",
+        "supervisor",
+        "plant",
+        "utility",
+    ]
+
+    matched_title_terms = [
+        term for term in title_terms if term in title_lower
+    ]
+
+    if matched_title_terms:
+        displayed_terms = ", ".join(sorted(set(matched_title_terms))[:3])
+        reasons.append(f"title matches target terms: {displayed_terms}")
+
+    department_terms = [
+        "accounting",
+        "finance",
+        "operations",
+        "compliance",
+        "reporting",
+        "data",
+    ]
+
+    matched_department_terms = [
+        term for term in department_terms if term in department_lower
+    ]
+
+    if matched_department_terms:
+        displayed_terms = ", ".join(sorted(set(matched_department_terms))[:2])
+        reasons.append(f"department aligns with target area: {displayed_terms}")
+
+    if "remote" in location_lower:
+        reasons.append("location is remote-friendly")
+    elif "nc" in location_lower or "north carolina" in location_lower:
+        reasons.append("location is in North Carolina")
+    elif "united states" in location_lower:
+        reasons.append("location is in the United States")
+
+    try:
+        numeric_score = int(match_score)
+    except (TypeError, ValueError):
+        numeric_score = 0
+
+    if numeric_score >= 80:
+        reasons.append("score falls in the strong match range")
+    elif numeric_score >= 60:
+        reasons.append("score falls in the possible match range")
+    elif numeric_score > 0:
+        reasons.append("score shows some alignment with target criteria")
+
+    if not reasons:
+        return "Matched by configured title, keyword, location, or scoring rules."
+
+    return "; ".join(reasons[:4])
+
+
+def get_display_job_url(job: dict[str, Any]) -> str:
+    """
+    Choose the best URL to display in the email.
+
+    Demo screenshot data should avoid obvious fake URLs. If a demo row still
+    contains example.com, this tries to fall back to a real company/career URL
+    when one is present in the job dictionary.
+    """
+
+    job_url = str(job.get("job_url", "") or "").strip()
+    career_url = str(job.get("career_url", "") or "").strip()
+    job_url_base = str(job.get("job_url_base", "") or "").strip()
+
+    if job_url and "example.com" not in job_url.lower():
+        return job_url
+
+    if career_url and "example.com" not in career_url.lower():
+        return career_url
+
+    if job_url_base and "example.com" not in job_url_base.lower():
+        return job_url_base
+
+    if job_url:
+        return job_url
+
+    return "No URL available"
 
 
 def build_email_body(
@@ -78,9 +196,9 @@ def build_email_body(
             company_name = job.get("company_name", "Unknown Company")
             title = job.get("title", "Unknown Title")
             location = job.get("location", "Unknown Location")
-            job_url = job.get("job_url", "No URL available")
+            job_url = get_display_job_url(job)
             match_score = job.get("match_score", 0)
-            match_notes = shorten_match_notes(job.get("match_notes"))
+            match_notes = infer_match_notes(job)
 
             lines.append(f"{index}. {company_name}")
             lines.append(f"   Match Score: {match_score}/100")
