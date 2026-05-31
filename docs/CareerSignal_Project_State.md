@@ -84,11 +84,42 @@ After Step 18, README should be treated as the main GitHub-facing project overvi
 
 ### Step 17: Application Tracker
 
-Add saved/applied/interview/rejected/offer/skipped/closed tracking and response-rate reporting.
+Step 17: Application Tracker
 
-Nice-to-have, not required for first resume-ready version.
+Goal:
+Add a manual application tracking system to CareerSignal that records applications submitted by the user, tracks response outcomes, calculates ghosting/rejection danger zones, and summarizes application performance overall and by company.
 
-Skipped for now.
+Core fields:
+- date applied
+- company name
+- job title
+- job URL
+- status
+- response dates
+- notes
+
+Core reporting:
+- total applications
+- interviews
+- acceptances
+- formal rejections
+- ghostings
+- active applications
+- totals by company
+- rejection/ghosting/interview/acceptance counts by company
+- application aging buckets
+
+Aging rules:
+- 15–30 days with no response = rejection danger zone
+- 31–60 days with no response = ghosting danger zone
+- 61+ days with no response = ghosted
+- ghosted applications count as negative outcomes/rejections in total outcome reporting
+
+Email integration:
+Do not add to the daily job alert email at first. Prefer a separate weekly application tracker email, likely Friday at 4 PM, after the core reporting works.
+
+Power BI:
+Application tracker data should eventually export to Excel and support Power BI visuals for totals, company outcomes, response rates, and aging buckets.
 
 ---
 
