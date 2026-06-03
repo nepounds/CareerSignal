@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import sqlite3
 import sys
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
@@ -20,7 +21,32 @@ if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
 
+from careersignal.application_tracker import fetch_applications  # noqa: E402
 from careersignal.match_scoring import score_job  # noqa: E402
+
+
+APPLICATION_EXPORT_COLUMNS = [
+    "application_id",
+    "date_applied",
+    "company_name",
+    "job_title",
+    "job_url",
+    "source",
+    "status",
+    "first_response_date",
+    "interview_date",
+    "final_response_date",
+    "notes",
+    "created_at",
+    "updated_at",
+]
+
+NEGATIVE_OUTCOME_STATUSES = {"rejected", "ghosted"}
+ACTIVE_STATUSES = {"applied"}
+INTERVIEW_STATUSES = {"interview"}
+ACCEPTED_STATUSES = {"accepted"}
+REJECTED_STATUSES = {"rejected"}
+GHOSTED_STATUSES = {"ghosted"}
 
 
 def table_exists(connection: sqlite3.Connection, table_name: str) -> bool:
@@ -96,7 +122,10 @@ def add_match_scores(jobs_df: pd.DataFrame) -> pd.DataFrame:
             scoring_result = score_job(job)
             match_score = extract_match_score(scoring_result)
         except Exception as error:
-            print(f"Warning: Could not score job '{job.get('title', 'Unknown')}'. Error: {error}")
+            print(
+                f"Warning: Could not score job "
+                f"'{job.get('title', 'Unknown')}'. Error: {error}"
+            )
             match_score = None
 
         scores.append(match_score)
@@ -200,7 +229,10 @@ def build_company_summary(jobs_df: pd.DataFrame) -> pd.DataFrame:
         summary_df.groupby("company_name", dropna=False)
         .agg(
             total_jobs=("title", "count"),
-            high_match_jobs=("match_score", lambda scores: (scores.fillna(0) >= 70).sum()),
+            high_match_jobs=(
+                "match_score",
+                lambda scores: (scores.fillna(0) >= 70).sum(),
+            ),
             best_match_score=("match_score", "max"),
             average_match_score=("match_score", "mean"),
         )
@@ -214,6 +246,212 @@ def build_company_summary(jobs_df: pd.DataFrame) -> pd.DataFrame:
     )
 
     return company_summary_df
+
+
+def parse_date_safely(value: Any) -> date | None:
+    """
+    Convert a stored date value to a date object, or return None.
+    """
+
+    if not value:
+        return None
+
+    if isinstance(value, datetime):
+        return value.date()
+
+    if isinstance(value, date):
+        return value
+
+    try:
+        return datetime.strptime(str(value), "%Y-%m-%d").date()
+    except ValueError:
+        return None
+
+
+def calculate_days_since_applied(date_applied: Any) -> int | None:
+    """
+    Calculate days since date_applied without changing database records.
+    """
+
+    parsed_date = parse_date_safely(date_applied)
+
+    if parsed_date is None:
+        return None
+
+    return (date.today() - parsed_date).days
+
+
+def get_aging_bucket(days_since_applied: int | None, status: str) -> str:
+    """
+    Return an aging bucket for reporting only.
+
+    This function does not update the database.
+    """
+
+    if status != "applied":
+        return "responded / closed"
+
+    if days_since_applied is None:
+        return "missing or invalid application date"
+
+    if days_since_applied <= 14:
+        return "active / normal waiting period"
+
+    if days_since_applied <= 30:
+        return "rejection danger zone"
+
+    if days_since_applied <= 60:
+        return "ghosting danger zone"
+
+    return "ghosted candidate / should be reviewed"
+
+
+def build_applications_dataframe() -> pd.DataFrame:
+    """
+    Build the row-level Applications export sheet.
+    """
+
+    applications = fetch_applications()
+
+    if not applications:
+        return pd.DataFrame(columns=APPLICATION_EXPORT_COLUMNS)
+
+    applications_df = pd.DataFrame(applications)
+
+    for column in APPLICATION_EXPORT_COLUMNS:
+        if column not in applications_df.columns:
+            applications_df[column] = ""
+
+    return applications_df[APPLICATION_EXPORT_COLUMNS]
+
+
+def build_application_summary_dataframe(
+    applications_df: pd.DataFrame,
+) -> pd.DataFrame:
+    """
+    Build overall Application Tracker summary totals.
+    """
+
+    if applications_df.empty:
+        summary_rows = [
+            ("total_applications", 0),
+            ("active_applications", 0),
+            ("interviews", 0),
+            ("acceptances", 0),
+            ("formal_rejections", 0),
+            ("ghostings", 0),
+            ("negative_outcomes", 0),
+        ]
+    else:
+        statuses = applications_df["status"].fillna("").str.lower()
+
+        summary_rows = [
+            ("total_applications", len(applications_df)),
+            ("active_applications", statuses.isin(ACTIVE_STATUSES).sum()),
+            ("interviews", statuses.isin(INTERVIEW_STATUSES).sum()),
+            ("acceptances", statuses.isin(ACCEPTED_STATUSES).sum()),
+            ("formal_rejections", statuses.isin(REJECTED_STATUSES).sum()),
+            ("ghostings", statuses.isin(GHOSTED_STATUSES).sum()),
+            ("negative_outcomes", statuses.isin(NEGATIVE_OUTCOME_STATUSES).sum()),
+        ]
+
+    return pd.DataFrame(summary_rows, columns=["metric", "value"])
+
+
+def build_company_application_summary_dataframe(
+    applications_df: pd.DataFrame,
+) -> pd.DataFrame:
+    """
+    Build company-level Application Tracker summary totals.
+    """
+
+    columns = [
+        "company_name",
+        "total_applications",
+        "active_applications",
+        "interviews",
+        "acceptances",
+        "formal_rejections",
+        "ghostings",
+        "negative_outcomes",
+    ]
+
+    if applications_df.empty:
+        return pd.DataFrame(columns=columns)
+
+    summary_df = applications_df.copy()
+    summary_df["status"] = summary_df["status"].fillna("").str.lower()
+
+    grouped_rows = []
+
+    for company_name, company_rows in summary_df.groupby(
+        "company_name",
+        dropna=False,
+    ):
+        statuses = company_rows["status"]
+
+        grouped_rows.append(
+            {
+                "company_name": company_name,
+                "total_applications": len(company_rows),
+                "active_applications": statuses.isin(ACTIVE_STATUSES).sum(),
+                "interviews": statuses.isin(INTERVIEW_STATUSES).sum(),
+                "acceptances": statuses.isin(ACCEPTED_STATUSES).sum(),
+                "formal_rejections": statuses.isin(REJECTED_STATUSES).sum(),
+                "ghostings": statuses.isin(GHOSTED_STATUSES).sum(),
+                "negative_outcomes": statuses.isin(
+                    NEGATIVE_OUTCOME_STATUSES
+                ).sum(),
+            }
+        )
+
+    return pd.DataFrame(grouped_rows, columns=columns).sort_values(
+        by=["total_applications", "company_name"],
+        ascending=[False, True],
+    )
+
+
+def build_application_aging_dataframe(
+    applications_df: pd.DataFrame,
+) -> pd.DataFrame:
+    """
+    Build aging bucket report without changing application statuses.
+    """
+
+    columns = [
+        "application_id",
+        "company_name",
+        "job_title",
+        "date_applied",
+        "status",
+        "days_since_applied",
+        "aging_bucket",
+    ]
+
+    if applications_df.empty:
+        return pd.DataFrame(columns=columns)
+
+    aging_df = applications_df.copy()
+
+    aging_df["status"] = aging_df["status"].fillna("").str.lower()
+
+    aging_df["days_since_applied"] = aging_df["date_applied"].apply(
+        calculate_days_since_applied
+    )
+
+    aging_df["aging_bucket"] = aging_df.apply(
+        lambda row: get_aging_bucket(
+            row["days_since_applied"],
+            row["status"],
+        ),
+        axis=1,
+    )
+
+    return aging_df[columns].sort_values(
+        by=["days_since_applied", "company_name"],
+        ascending=[False, True],
+        na_position="last",
+    )
 
 
 def clean_sheet_name(sheet_name: str) -> str:
@@ -257,6 +495,35 @@ def write_sheet(
         worksheet.column_dimensions[column_letter].width = adjusted_width
 
 
+def write_application_tracker_sheets(writer: pd.ExcelWriter) -> None:
+    """
+    Write Application Tracker sheets into the existing CareerSignal export workbook.
+    """
+
+    applications_df = build_applications_dataframe()
+
+    application_summary_df = build_application_summary_dataframe(
+        applications_df
+    )
+
+    company_application_summary_df = build_company_application_summary_dataframe(
+        applications_df
+    )
+
+    application_aging_df = build_application_aging_dataframe(
+        applications_df
+    )
+
+    write_sheet(writer, "Applications", applications_df)
+    write_sheet(writer, "Application Summary", application_summary_df)
+    write_sheet(
+        writer,
+        "Company Application Summary",
+        company_application_summary_df,
+    )
+    write_sheet(writer, "Application Aging", application_aging_df)
+
+
 def export_to_excel(
     database_path: Path = DATABASE_PATH,
     export_path: Path = DEFAULT_EXPORT_PATH,
@@ -279,10 +546,12 @@ def export_to_excel(
         all_jobs_df = sort_jobs(all_jobs_df)
 
         new_jobs_df = get_new_jobs(all_jobs_df)
+
         high_match_jobs_df = get_high_match_jobs(
             all_jobs_df,
             minimum_score=minimum_match_score,
         )
+
         company_summary_df = build_company_summary(all_jobs_df)
 
         daily_runs_table_name = get_existing_table_name(
@@ -318,6 +587,8 @@ def export_to_excel(
 
         if not failed_sources_df.empty:
             write_sheet(writer, "Failed Sources", failed_sources_df)
+
+        write_application_tracker_sheets(writer)
 
     return export_path
 
