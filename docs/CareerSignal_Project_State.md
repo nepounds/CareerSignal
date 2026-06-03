@@ -2,89 +2,66 @@
 
 ## Current Project Status
 
-CareerSignal currently has a working end-to-end job alert pipeline and a manual Application Tracker layer that is now functional through terminal summary reporting.
+CareerSignal currently has a working end-to-end job alert pipeline and a manual Application Tracker layer.
 
 Completed steps:
 
 1. Project setup and GitHub structure
-
 2. Company config file
-
 3. First ATS collector
-
 4. Standard normalized job format
-
 5. SQLite database
-
 6. New job detection
-
 7. Daily email report
-
 8. Initial match scoring
-
 9. Error handling and logging
-
 10. Excel export
-
 11. Power BI dashboard
-
 12. Workday support
-
-    * 12A. Workday proof of concept
-    * 12B. Workday normalization
-    * 12C. Workday integration into the main pipeline
-
+   - 12A. Workday proof of concept
+   - 12B. Workday normalization
+   - 12C. Workday integration into the main pipeline
 13. ATS Coverage Audit started, with unresolved follow-up items
-
 14. Filtering Strategy completed
-
 15. Match Scoring Refinement completed
-
 16. Daily Automation runner added for Windows Task Scheduler
-
 17. Application Tracker started
+   - 17A. Application Tracker database foundation completed
+   - 17B. Application Tracker reusable module completed
+   - 17C. Manual add-application script completed
+   - 17D. Manual status-update script completed
+   - 17E. Application Tracker summary reporting completed
+   - 17F. Application Tracker Excel export integration completed
 
-    * 17A. Application Tracker database foundation completed
-    * 17B. Application Tracker reusable module completed
-    * 17C. Manual add-application script completed
-    * 17D. Manual status-update script completed
-    * 17E. Application Tracker summary reporting completed
+Current next step:
 
-Current step:
-
-```text
-17F: Application Tracker Excel export integration
-```
+- 17G: Weekly Application Tracker email
 
 The main product loop exists:
 
-```text
-company_config.csv
-→ supported ATS collector
-→ normalized job dictionaries
-→ SQLite database
-→ new job detection
-→ match scoring
-→ daily email report
-→ Excel export
-→ Power BI dashboard
-→ Windows Task Scheduler automation
-```
+    company_config.csv
+    → supported ATS collector
+    → normalized job dictionaries
+    → SQLite database
+    → new job detection
+    → match scoring
+    → daily email report
+    → Excel export
+    → Power BI dashboard
+    → Windows Task Scheduler automation
 
 Application Tracker is a manual tracking layer that sits beside the automated job collection pipeline.
 
 Application Tracker loop:
 
-```text
-manual application entry
-→ applications table in data/careersignal.db
-→ reusable application_tracker.py module
-→ manual add/update scripts
-→ terminal summary reporting
-→ future Excel export
-→ future weekly email
-→ future Power BI visuals
-```
+    manual application entry
+    → applications table in data/careersignal.db
+    → reusable application_tracker.py module
+    → manual add/update scripts
+    → summary reporting
+    → Excel export sheets
+    → future weekly email
+    → future Power BI visuals
 
 ---
 
@@ -92,63 +69,67 @@ manual application entry
 
 Preserve this structure.
 
-```text
-CareerSignal/
-├── config/
-│   ├── company_config.csv
-│   ├── company_ats_audit.csv
-│   └── match_rules.json or match_rules.csv if created
-├── data/
-│   └── careersignal.db
-├── docs/
-│   ├── CareerSignal_Project_State.md
-│   ├── filtering_strategy.md
-│   ├── ATS_Coverage_Audit.md or related Step 13 notes if created
-│   └── screenshots/
-│       └── powerbi_overview_dashboard.png
-├── exports/
-│   └── careersignal_export.xlsx
-├── logs/
-│   ├── careersignal.log
-│   └── scheduled_task.log
-├── reports/
-│   └── careersignal_dashboard.pbix
-├── scripts/
-│   ├── add_application.py
-│   ├── update_application_status.py
-│   ├── report_applications.py
-│   ├── collect_greenhouse_jobs.py
-│   ├── export_to_excel.py
-│   ├── init_application_tracker.py
-│   ├── preview_workday_jobs.py
-│   ├── test_config_loader.py
-│   ├── test_database.py
-│   ├── test_email_report.py
-│   ├── test_match_scoring.py
-│   └── other preview/test scripts created during Workday, scoring, or tracker steps
-├── src/
-│   └── careersignal/
-│       ├── __init__.py
-│       ├── application_tracker.py
-│       ├── application_tracker_db.py
-│       ├── config_loader.py
-│       ├── database.py
-│       ├── email_report.py
-│       ├── logging_config.py
-│       ├── match_scoring.py
-│       └── collectors/
-│           ├── __init__.py
-│           ├── greenhouse.py
-│           └── workday.py
-├── tests/
-├── run_careersignal_daily.bat
-├── .env.example
-├── .gitignore
-├── README.md
-└── requirements.txt
-```
+    CareerSignal/
+    ├── config/
+    │   ├── company_config.csv
+    │   ├── company_ats_audit.csv
+    │   └── match_rules.json or match_rules.csv if created
+    ├── data/
+    │   └── careersignal.db
+    ├── docs/
+    │   ├── CareerSignal_Project_State.md
+    │   ├── filtering_strategy.md
+    │   ├── ATS_Coverage_Audit.md or related Step 13 notes if created
+    │   └── screenshots/
+    │       └── powerbi_overview_dashboard.png
+    ├── exports/
+    │   └── careersignal_export.xlsx
+    ├── logs/
+    │   ├── careersignal.log
+    │   └── scheduled_task.log
+    ├── reports/
+    │   └── careersignal_dashboard.pbix
+    ├── scripts/
+    │   ├── add_application.py
+    │   ├── update_application_status.py
+    │   ├── report_applications.py
+    │   ├── collect_greenhouse_jobs.py
+    │   ├── export_to_excel.py
+    │   ├── init_application_tracker.py
+    │   ├── preview_workday_jobs.py
+    │   ├── test_config_loader.py
+    │   ├── test_database.py
+    │   ├── test_email_report.py
+    │   ├── test_match_scoring.py
+    │   └── other preview/test scripts created during Workday, scoring, or tracker steps
+    ├── src/
+    │   └── careersignal/
+    │       ├── __init__.py
+    │       ├── application_tracker.py
+    │       ├── application_tracker_db.py
+    │       ├── config_loader.py
+    │       ├── database.py
+    │       ├── email_report.py
+    │       ├── logging_config.py
+    │       ├── match_scoring.py
+    │       └── collectors/
+    │           ├── __init__.py
+    │           ├── greenhouse.py
+    │           └── workday.py
+    ├── tests/
+    ├── run_careersignal_daily.bat
+    ├── .env.example
+    ├── .gitignore
+    ├── README.md
+    └── requirements.txt
 
-Some generated files may be ignored by Git, including `.env`, logs, generated database files, generated exports, and local Power BI cache files.
+Some generated files may be ignored by Git, including:
+
+- .env
+- logs/
+- generated database files
+- generated exports
+- local Power BI cache files
 
 ---
 
@@ -168,34 +149,28 @@ Prefer updating dependent scripts to use the current official function names.
 
 Preserve the existing project structure:
 
-```text
-scripts/ contains runnable scripts
-src/careersignal/ contains reusable modules
-data/careersignal.db is the SQLite database
-config/company_config.csv is the company config
-```
+- scripts/ contains runnable scripts
+- src/careersignal/ contains reusable modules
+- data/careersignal.db is the SQLite database
+- config/company_config.csv is the company config
 
 Do not use:
 
-```text
-data/jobs.db
-```
+- data/jobs.db
 
 Do not rename:
 
-```text
-scripts/collect_greenhouse_jobs.py
-```
+- scripts/collect_greenhouse_jobs.py
 
-Even though the script name says Greenhouse, after Workday integration it functions as the main collector runner. Do not rename this script unless intentionally doing a cleanup/refactor step.
+Even though the script name says Greenhouse, after Workday integration it functions as the main collector runner.
+
+Do not rename this script unless intentionally doing a cleanup/refactor step.
 
 Do not modify the daily job alert email during Application Tracker steps unless explicitly approved.
 
-Do not modify Excel export during Application Tracker steps unless explicitly working on the export integration step.
-
 Do not modify Power BI during Application Tracker steps unless explicitly working on the Power BI integration step.
 
-Do not build weekly Application Tracker email until summary reporting and export behavior are stable.
+Do not build the weekly Application Tracker email until summary reporting and Excel export work.
 
 Keep Application Tracker steps small and separate.
 
@@ -207,43 +182,41 @@ These files already exist or have already been worked on.
 
 Do not recreate them from scratch unless they are missing.
 
-```text
-README.md
-requirements.txt
-.env.example
-.gitignore
-run_careersignal_daily.bat
-config/company_config.csv
-config/company_ats_audit.csv
-config/match_rules.json or config/match_rules.csv if created
-data/careersignal.db
-docs/CareerSignal_Project_State.md
-docs/filtering_strategy.md
-exports/careersignal_export.xlsx
-logs/careersignal.log
-logs/scheduled_task.log
-reports/careersignal_dashboard.pbix
-scripts/add_application.py
-scripts/update_application_status.py
-scripts/report_applications.py
-scripts/collect_greenhouse_jobs.py
-scripts/export_to_excel.py
-scripts/init_application_tracker.py
-scripts/preview_workday_jobs.py
-scripts/test_config_loader.py
-scripts/test_database.py
-scripts/test_email_report.py
-scripts/test_match_scoring.py
-src/careersignal/config_loader.py
-src/careersignal/database.py
-src/careersignal/email_report.py
-src/careersignal/logging_config.py
-src/careersignal/match_scoring.py
-src/careersignal/collectors/greenhouse.py
-src/careersignal/collectors/workday.py
-src/careersignal/application_tracker.py
-src/careersignal/application_tracker_db.py
-```
+    README.md
+    requirements.txt
+    .env.example
+    .gitignore
+    run_careersignal_daily.bat
+    config/company_config.csv
+    config/company_ats_audit.csv
+    config/match_rules.json or config/match_rules.csv if created
+    data/careersignal.db
+    docs/CareerSignal_Project_State.md
+    docs/filtering_strategy.md
+    exports/careersignal_export.xlsx
+    logs/careersignal.log
+    logs/scheduled_task.log
+    reports/careersignal_dashboard.pbix
+    scripts/add_application.py
+    scripts/update_application_status.py
+    scripts/report_applications.py
+    scripts/collect_greenhouse_jobs.py
+    scripts/export_to_excel.py
+    scripts/init_application_tracker.py
+    scripts/preview_workday_jobs.py
+    scripts/test_config_loader.py
+    scripts/test_database.py
+    scripts/test_email_report.py
+    scripts/test_match_scoring.py
+    src/careersignal/config_loader.py
+    src/careersignal/database.py
+    src/careersignal/email_report.py
+    src/careersignal/logging_config.py
+    src/careersignal/match_scoring.py
+    src/careersignal/collectors/greenhouse.py
+    src/careersignal/collectors/workday.py
+    src/careersignal/application_tracker.py
+    src/careersignal/application_tracker_db.py
 
 If a future step needs to modify one of these files, explain:
 
@@ -259,35 +232,25 @@ If a future step needs to modify one of these files, explain:
 
 Official database path:
 
-```text
-data/careersignal.db
-```
+- data/careersignal.db
 
 Do not use:
 
-```text
-data/jobs.db
-```
+- data/jobs.db
 
 The main database already supports job storage, new job detection, and pipeline reporting.
 
 Application Tracker also uses:
 
-```text
-data/careersignal.db
-```
+- data/careersignal.db
 
 Application Tracker table:
 
-```text
-applications
-```
+- applications
 
 Application Tracker primary key:
 
-```text
-application_id
-```
+- application_id
 
 ---
 
@@ -295,25 +258,21 @@ application_id
 
 Likely file:
 
-```text
-src/careersignal/collectors/greenhouse.py
-```
+- src/careersignal/collectors/greenhouse.py
 
 Existing runner command:
 
-```bash
-python scripts/collect_greenhouse_jobs.py --preview
-```
+    python scripts/collect_greenhouse_jobs.py --preview
 
 Send real email:
 
-```bash
-python scripts/collect_greenhouse_jobs.py --send
-```
+    python scripts/collect_greenhouse_jobs.py --send
 
 Important:
 
-The script name still says `collect_greenhouse_jobs.py`, but after Workday integration it functions as the main collector runner. Do not rename this script unless intentionally doing a cleanup/refactor step.
+The script name still says collect_greenhouse_jobs.py, but after Workday integration it functions as the main collector runner.
+
+Do not rename this script unless intentionally doing a cleanup/refactor step.
 
 ---
 
@@ -321,25 +280,19 @@ The script name still says `collect_greenhouse_jobs.py`, but after Workday integ
 
 Likely file:
 
-```text
-src/careersignal/collectors/workday.py
-```
+- src/careersignal/collectors/workday.py
 
 Workday was split into three parts:
 
-```text
-12A: Workday Proof of Concept
-12B: Workday Normalization
-12C: Integrate Workday Connector
-```
+- 12A: Workday Proof of Concept
+- 12B: Workday Normalization
+- 12C: Integrate Workday Connector
 
 All three are considered complete if the current branch has Workday jobs flowing through the same pipeline as Greenhouse.
 
 Workday jobs should use:
 
-```python
-"source_ats": "workday"
-```
+    "source_ats": "workday"
 
 Workday jobs must use the official normalized job shape.
 
@@ -351,45 +304,37 @@ Step 15 is complete and used the Step 14 filtering strategy.
 
 Important distinction:
 
-```text
-Step 14 = decide what CareerSignal should care about
-Step 15 = assign scoring weights and implement/refine scoring logic
-```
+- Step 14 = decide what CareerSignal should care about
+- Step 15 = assign scoring weights and implement/refine scoring logic
 
 Match scoring should preserve:
 
-```python
-score_job(job)
-```
+- score_job(job)
 
 Scores should remain from 0 to 100.
 
 Suggested score bands:
 
-```text
-80-100: Strong match
-60-79: Possible match
-40-59: Weak/stretch match
-0-39: Low match or likely skip
-```
+- 80-100: Strong match
+- 60-79: Possible match
+- 40-59: Weak/stretch match
+- 0-39: Low match or likely skip
 
 CareerSignal is not accounting-only.
 
 The filtering and scoring strategy supports multiple job-search lanes:
 
-```text
-Accounting roles
-Finance roles
-General analyst roles
-Business analyst roles
-Operations analyst roles
-Compliance analyst roles
-Data/reporting analyst roles
-Plant supervisor jobs
-Operations supervisor jobs
-Water/wastewater or public utility-adjacent jobs
-Other realistic roles that fit the user's background
-```
+- Accounting roles
+- Finance roles
+- General analyst roles
+- Business analyst roles
+- Operations analyst roles
+- Compliance analyst roles
+- Data/reporting analyst roles
+- Plant supervisor jobs
+- Operations supervisor jobs
+- Water/wastewater or public utility-adjacent jobs
+- Other realistic roles that fit the user's background
 
 ---
 
@@ -399,7 +344,7 @@ Email reporting should continue to support preview/test mode and send mode.
 
 Daily job alert email should not be modified during Application Tracker steps unless explicitly approved.
 
-Application Tracker weekly email should come later, after tracker reporting and export behavior are stable.
+Application Tracker weekly email should come later, after tracker reporting and Excel export work.
 
 ---
 
@@ -407,21 +352,15 @@ Application Tracker weekly email should come later, after tracker reporting and 
 
 Likely file:
 
-```text
-src/careersignal/logging_config.py
-```
+- src/careersignal/logging_config.py
 
 Logs should go to:
 
-```text
-logs/careersignal.log
-```
+- logs/careersignal.log
 
 Scheduled task logs should go to:
 
-```text
-logs/scheduled_task.log
-```
+- logs/scheduled_task.log
 
 A failed company source should not crash the whole run.
 
@@ -433,30 +372,56 @@ Failed sources should be tracked and included in the daily email report where po
 
 File:
 
-```text
-scripts/export_to_excel.py
-```
+- scripts/export_to_excel.py
 
 Export output:
 
-```text
-exports/careersignal_export.xlsx
-```
+- exports/careersignal_export.xlsx
 
 The Excel export feeds the Power BI dashboard.
 
 Do not break this output path without updating the README and Power BI notes.
 
-Application Tracker export integration is the next planned step.
+Step 17F added Application Tracker sheets to the existing workbook.
 
-Possible future Application Tracker export sheets:
+Existing job export sheets should remain intact.
 
-```text
-Applications
-Application Summary
-Company Application Summary
-Application Aging
-```
+Application Tracker export sheets now added:
+
+- Applications
+- Application Summary
+- Company Application Summary
+- Application Aging
+
+The export should still run with:
+
+    python scripts/export_to_excel.py
+
+The export should still create or update:
+
+- exports/careersignal_export.xlsx
+
+The Power BI source path remains unchanged.
+
+No separate tracker workbook should exist unless intentionally approved later.
+
+Application Tracker export behavior:
+
+- Applications sheet contains row-level records from the applications table.
+- Application Summary sheet contains overall tracker totals.
+- Company Application Summary sheet contains company-level tracker totals.
+- Application Aging sheet contains waiting-period and ghosting-risk buckets.
+- Aging logic reports risk only.
+- Aging logic does not automatically change statuses in the database.
+
+Aging rules:
+
+- 0-14 days with no response = active / normal waiting period
+- 15-30 days with no response = rejection danger zone
+- 31-60 days with no response = ghosting danger zone
+- 61+ days with no response = ghosted candidate / should be reviewed
+
+Ghosted applications count as negative outcomes in summary reporting.
 
 ---
 
@@ -464,25 +429,21 @@ Application Aging
 
 Power BI report:
 
-```text
-reports/careersignal_dashboard.pbix
-```
+- reports/careersignal_dashboard.pbix
 
 Power BI data source:
 
-```text
-exports/careersignal_export.xlsx
-```
+- exports/careersignal_export.xlsx
 
 After generating a fresh Excel export, refresh Power BI manually:
 
-```text
-Home > Refresh
-```
+- Home > Refresh
 
 Current dashboard exists and should not be treated as unstarted.
 
-Application Tracker visuals should come later, after Application Tracker export sheets are stable.
+Application Tracker visuals should come later.
+
+Step 17F did not modify Power BI visuals or the Power BI file.
 
 ---
 
@@ -490,56 +451,44 @@ Application Tracker visuals should come later, after Application Tracker export 
 
 Step 16 is complete if the project has:
 
-```text
-run_careersignal_daily.bat
-```
+- run_careersignal_daily.bat
 
 and Windows Task Scheduler is configured to run it daily.
 
 The daily automation should run:
 
-```bat
-python scripts\collect_greenhouse_jobs.py --send
-python scripts\export_to_excel.py
-```
+    python scripts\collect_greenhouse_jobs.py --send
+    python scripts\export_to_excel.py
 
 The batch file should:
 
 1. Change into the CareerSignal project folder
 2. Activate the virtual environment if needed
-3. Set `PYTHONPATH=src`
+3. Set PYTHONPATH=src
 4. Run the collector in send mode
 5. Run the Excel export
-6. Write useful output to `logs/scheduled_task.log`
+6. Write useful output to logs/scheduled_task.log
 
 Recommended scheduled run time:
 
-```text
-7:30 AM daily
-```
+- 7:30 AM daily
 
 Manual test command:
 
-```powershell
-.\run_careersignal_daily.bat
-```
+    .\run_careersignal_daily.bat
 
 Useful verification commands:
 
-```powershell
-Get-Content .\logs\scheduled_task.log -Tail 100
-Get-Content .\logs\careersignal.log -Tail 100
-Get-Item .\data\careersignal.db
-Get-Item .\exports\careersignal_export.xlsx
-```
+    Get-Content .\logs\scheduled_task.log -Tail 100
+    Get-Content .\logs\careersignal.log -Tail 100
+    Get-Item .\data\careersignal.db
+    Get-Item .\exports\careersignal_export.xlsx
 
 Known scheduler troubleshooting notes:
 
-```text
-Do not close the .bat/cmd window when it appears during the scheduled run.
-Do not run Checkpoint VPN or NordVPN during the scheduled job if they block SMTP traffic.
-If email does not send, check whether VPN or network restrictions blocked smtp.gmail.com on port 587.
-```
+- Do not close the .bat/cmd window when it appears during the scheduled run.
+- Do not run Checkpoint VPN or NordVPN during the scheduled job if they block SMTP traffic.
+- If email does not send, check whether VPN or network restrictions blocked smtp.gmail.com on port 587.
 
 ---
 
@@ -565,7 +514,7 @@ Step 13 follow-up items:
 3. Identify which companies are truly Workday or Greenhouse and can be added now.
 4. Identify which unsupported ATSs appear often enough to justify new connectors.
 5. Do not build connectors for one-off systems unless they are high-value companies.
-6. Review companies where search or AI-generated results produced bad or incorrect career pages.
+6. Review companies where search/Gemini produced bad or incorrect career pages.
 7. Review companies with redirects, proprietary systems, or confusing career portals.
 8. Add the rest of the confirmed Greenhouse companies.
 9. Circle back to Workday URL issues.
@@ -588,7 +537,7 @@ Do not build weekly email yet.
 
 Do not build Power BI visuals yet.
 
-Do not update Excel export until the specific export integration step.
+Excel export integration is complete as of Step 17F.
 
 ---
 
@@ -596,27 +545,21 @@ Do not update Excel export until the specific export integration step.
 
 Official database:
 
-```text
-data/careersignal.db
-```
+- data/careersignal.db
 
 Official Application Tracker table:
 
-```text
-applications
-```
+- applications
 
 Official Application Tracker primary key:
 
-```text
-application_id
-```
+- application_id
 
 Important:
 
-Earlier planning notes may have referred to the table as `application_tracker`, but the actual implemented table name is `applications`.
+Earlier planning notes may have referred to the table as application_tracker, but the actual implemented table name is applications.
 
-Use `applications` going forward unless a future intentional migration renames it.
+Use applications going forward unless a future intentional migration renames it.
 
 ---
 
@@ -624,9 +567,7 @@ Use `applications` going forward unless a future intentional migration renames i
 
 Status:
 
-```text
-Complete
-```
+- Complete
 
 Purpose:
 
@@ -634,89 +575,69 @@ Create the database foundation for manually tracking job applications.
 
 Expected database:
 
-```text
-data/careersignal.db
-```
+- data/careersignal.db
 
 Implemented table:
 
-```text
-applications
-```
+- applications
 
 Implemented primary key:
 
-```text
-application_id
-```
+- application_id
 
 Core fields support:
 
-```text
-application_id
-date_applied
-company_name
-job_title
-job_url
-source
-status
-first_response_date
-interview_date
-final_response_date
-notes
-created_at
-updated_at
-```
+- application_id
+- date_applied
+- company_name
+- job_title
+- job_url
+- source
+- status
+- first_response_date
+- interview_date
+- final_response_date
+- notes
+- created_at
+- updated_at
 
 Valid statuses:
 
-```text
-applied
-interview
-rejected
-accepted
-ghosted
-withdrawn
-closed
-```
+- applied
+- interview
+- rejected
+- accepted
+- ghosted
+- withdrawn
+- closed
 
 Aging rules:
 
-```text
-0-14 days with no response = active / normal waiting period
-15-30 days with no response = rejection danger zone
-31-60 days with no response = ghosting danger zone
-61+ days with no response = ghosted
-```
+- 0-14 days with no response = active / normal waiting period
+- 15-30 days with no response = rejection danger zone
+- 31-60 days with no response = ghosting danger zone
+- 61+ days with no response = ghosted
 
 Reporting rule:
 
-```text
-Ghosted applications should count as negative outcomes/rejections in total outcome reporting.
-```
+- Ghosted applications should count as negative outcomes/rejections in total outcome reporting.
 
 Initializer script:
 
-```text
-scripts/init_application_tracker.py
-```
+- scripts/init_application_tracker.py
 
 Reusable database setup file:
 
-```text
-src/careersignal/application_tracker_db.py
-```
+- src/careersignal/application_tracker_db.py
 
 17A does not include:
 
-```text
-manual command-line scripts
-summary reporting
-weekly email
-Excel export
-Power BI visuals
-daily email changes
-```
+- manual command-line scripts
+- summary reporting
+- weekly email
+- Excel export
+- Power BI visuals
+- daily email changes
 
 ---
 
@@ -724,9 +645,7 @@ daily email changes
 
 Status:
 
-```text
-Complete
-```
+- Complete
 
 Purpose:
 
@@ -734,47 +653,37 @@ Add reusable Python logic for interacting with the Application Tracker table.
 
 Implemented file:
 
-```text
-src/careersignal/application_tracker.py
-```
+- src/careersignal/application_tracker.py
 
 Official table constant:
 
-```python
-APPLICATION_TRACKER_TABLE = "applications"
-```
+    APPLICATION_TRACKER_TABLE = "applications"
 
 Official reusable functions:
 
-```text
-get_current_timestamp
-validate_application_status
-add_application
-update_application_status
-update_application_notes
-update_application_response_dates
-fetch_application_by_id
-fetch_applications
-```
+- get_current_timestamp
+- validate_application_status
+- add_application
+- update_application_status
+- update_application_notes
+- update_application_response_dates
+- fetch_application_by_id
+- fetch_applications
 
 Important function behavior:
 
-```text
-add_application(...) returns the inserted application_id as an int.
-fetch_application_by_id(...) returns one application record as a dict or None.
-fetch_applications(...) returns a list of application record dicts.
-```
+- add_application(...) returns the inserted application_id as an int.
+- fetch_application_by_id(...) returns one application record as a dict or None.
+- fetch_applications(...) returns a list of application record dicts.
 
 17B does not include:
 
-```text
-manual command-line scripts
-summary reporting
-weekly email
-Excel export
-Power BI visuals
-daily email changes
-```
+- manual command-line scripts
+- summary reporting
+- weekly email
+- Excel export
+- Power BI visuals
+- daily email changes
 
 ---
 
@@ -782,9 +691,7 @@ daily email changes
 
 Status:
 
-```text
-Complete
-```
+- Complete
 
 Goal:
 
@@ -792,89 +699,73 @@ Create a runnable script for manually adding application records from PowerShell
 
 Implemented file:
 
-```text
-scripts/add_application.py
-```
+- scripts/add_application.py
 
 Expected behavior:
 
-```text
-User runs a command with company, title, date applied, URL/source/notes if available.
-Script validates required input.
-Script calls add_application(...) from src/careersignal/application_tracker.py.
-Script inserts the application into the applications table.
-Script prints a clean confirmation, including the returned application_id.
-```
+- User runs a command with company, title, date applied, URL/source/notes if available.
+- Script validates required input.
+- Script calls add_application(...) from src/careersignal/application_tracker.py.
+- Script inserts the application into the applications table.
+- Script prints a clean confirmation, including the returned application_id.
 
 Example command:
 
-```powershell
-python scripts/add_application.py --company "RSM" --title "Audit Associate" --date-applied "2026-06-01" --url "https://example.com/job" --source "company website" --notes "Applied through company portal"
-```
+    python scripts/add_application.py --company "RSM" --title "Audit Associate" --date-applied "2026-06-01" --url "https://example.com/job" --source "company website" --notes "Applied through company portal"
 
 Minimal command:
 
-```powershell
-python scripts/add_application.py --company "RSM" --title "Audit Associate" --date-applied "2026-06-01"
-```
+    python scripts/add_application.py --company "RSM" --title "Audit Associate" --date-applied "2026-06-01"
 
 Test insert command:
 
-```powershell
-python scripts/add_application.py --company "TEST COMPANY DELETE ME" --title "Fake Test Application" --date-applied "2026-06-01" --url "https://example.com/test-job" --source "manual test" --notes "Delete this after Step 17C or 17D test"
-```
+    python scripts/add_application.py --company "TEST COMPANY DELETE ME" --title "Fake Test Application" --date-applied "2026-06-01" --url "https://example.com/test-job" --source "manual test" --notes "Delete this after test"
 
 PowerShell-safe confirmation query:
 
-```powershell
-@'
-import sqlite3
+    @'
+    import sqlite3
 
-conn = sqlite3.connect("data/careersignal.db")
-conn.row_factory = sqlite3.Row
+    conn = sqlite3.connect("data/careersignal.db")
+    conn.row_factory = sqlite3.Row
 
-rows = conn.execute(
-    "SELECT * FROM applications WHERE company_name = ? ORDER BY application_id DESC",
-    ("TEST COMPANY DELETE ME",)
-).fetchall()
+    rows = conn.execute(
+        "SELECT * FROM applications WHERE company_name = ? ORDER BY application_id DESC",
+        ("TEST COMPANY DELETE ME",)
+    ).fetchall()
 
-for row in rows:
-    print(dict(row))
+    for row in rows:
+        print(dict(row))
 
-conn.close()
-'@ | python -
-```
+    conn.close()
+    '@ | python -
 
 PowerShell-safe cleanup query:
 
-```powershell
-@'
-import sqlite3
+    @'
+    import sqlite3
 
-conn = sqlite3.connect("data/careersignal.db")
+    conn = sqlite3.connect("data/careersignal.db")
 
-conn.execute(
-    "DELETE FROM applications WHERE company_name = ?",
-    ("TEST COMPANY DELETE ME",)
-)
+    conn.execute(
+        "DELETE FROM applications WHERE company_name = ?",
+        ("TEST COMPANY DELETE ME",)
+    )
 
-conn.commit()
-conn.close()
+    conn.commit()
+    conn.close()
 
-print("Deleted fake test application")
-'@ | python -
-```
+    print("Deleted fake test application")
+    '@ | python -
 
 17C does not include:
 
-```text
-summary reporting
-status updates
-weekly email
-Excel export changes
-Power BI changes
-daily email changes
-```
+- summary reporting
+- status updates
+- weekly email
+- Excel export changes
+- Power BI changes
+- daily email changes
 
 ---
 
@@ -882,9 +773,7 @@ daily email changes
 
 Status:
 
-```text
-Complete
-```
+- Complete
 
 Goal:
 
@@ -892,58 +781,44 @@ Create a runnable script for manually updating an application’s status.
 
 Implemented file:
 
-```text
-scripts/update_application_status.py
-```
+- scripts/update_application_status.py
 
 Expected behavior:
 
-```text
-User provides application_id and new status.
-Script validates status using validate_application_status(...).
-Script calls update_application_status(...) from src/careersignal/application_tracker.py.
-Script updates the matching row in the applications table.
-Script prints a clean confirmation showing application_id, company_name, job_title, old status, and new status.
-```
+- User provides application_id and new status.
+- Script validates status using validate_application_status(...).
+- Script calls update_application_status(...) from src/careersignal/application_tracker.py.
+- Script updates the matching row in the applications table.
+- Script prints a clean confirmation showing application_id, company_name, job_title, old status, and new status.
 
 Supported command:
 
-```powershell
-python scripts/update_application_status.py --id 4 --status interview
-```
+    python scripts/update_application_status.py --id 4 --status interview
 
 Optional notes command:
 
-```powershell
-python scripts/update_application_status.py --id 4 --status rejected --notes "Rejected by email"
-```
+    python scripts/update_application_status.py --id 4 --status rejected --notes "Rejected by email"
 
 Optional date command:
 
-```powershell
-python scripts/update_application_status.py --id 4 --status interview --date "2026-06-10"
-```
+    python scripts/update_application_status.py --id 4 --status interview --date "2026-06-10"
 
 Important implementation notes:
 
-```text
-The script uses existing reusable functions from src/careersignal/application_tracker.py.
-The script does not rewrite the reusable module.
-The script does not modify the daily job alert email.
-The script does not modify Excel export.
-The script does not modify Power BI.
-The script does not build summary reporting.
-```
+- The script uses existing reusable functions from src/careersignal/application_tracker.py.
+- The script does not rewrite the reusable module.
+- The script does not modify the daily job alert email.
+- The script does not modify Excel export.
+- The script does not modify Power BI.
+- The script does not build summary reporting.
 
 17D does not include:
 
-```text
-summary reporting
-weekly email
-Excel export changes
-Power BI changes
-daily email changes
-```
+- summary reporting
+- weekly email
+- Excel export changes
+- Power BI changes
+- daily email changes
 
 ---
 
@@ -951,92 +826,53 @@ daily email changes
 
 Status:
 
-```text
-Complete
-```
+- Complete
 
 Goal:
 
-Add terminal summary reporting for Application Tracker records.
+Add summary reporting for Application Tracker.
 
 Implemented file:
 
-```text
-scripts/report_applications.py
-```
+- scripts/report_applications.py
 
-17E added a clean terminal report showing:
+Expected reporting:
 
-```text
-total applications
-active applications
-interviews
-acceptances
-formal rejections
-ghostings
-negative outcomes
-totals by company
-interviews by company
-rejections by company
-ghostings by company
-acceptances by company
-application aging buckets
-applications in rejection danger zone
-applications in ghosting danger zone
-applications 61+ days old still marked applied
-```
+- total applications
+- active applications
+- interviews
+- acceptances
+- formal rejections
+- ghostings
+- negative outcomes
+- totals by company
+- interviews by company
+- rejections by company
+- ghostings by company
+- acceptances by company
+- application aging buckets
 
-Reporting rule:
+Ghostings count as negative outcomes.
 
-```text
-Ghosted applications count as negative outcomes along with formal rejections.
-```
+Reporting logic should use:
 
-Aging rules:
-
-```text
-0-14 days with no response = active / normal waiting period
-15-30 days with no response = rejection danger zone
-31-60 days with no response = ghosting danger zone
-61+ days with no response = should be considered ghosted if still marked applied
-```
-
-Implemented command:
-
-```powershell
-python scripts/report_applications.py
-```
-
-Supported optional flags:
-
-```powershell
-python scripts/report_applications.py --help
-python scripts/report_applications.py --show-all
-python scripts/report_applications.py --company "Company Name"
-python scripts/report_applications.py --as-of 2026-06-03
-python scripts/report_applications.py --as-of 2026-06-03 --company "TEST COMPANY DELETE ME" --show-all
-```
-
-Important implementation notes:
-
-```text
-The script uses fetch_applications(...) from src/careersignal/application_tracker.py.
-No changes were required to src/careersignal/application_tracker.py.
-No database schema changes were made.
-No daily job alert email changes were made.
-No Excel export changes were made.
-No Power BI changes were made.
-No weekly tracker email was built.
-```
+- applications table
+- application_id primary key
+- data/careersignal.db database
+- official functions from src/careersignal/application_tracker.py where practical
 
 17E does not include:
 
-```text
-weekly email
-Excel export changes
-Power BI changes
-daily job alert email changes
-```
+- weekly email
+- Excel export changes
+- Power BI changes
+- daily job alert email changes
+
+17E is complete because the Application Tracker summary reporting script exists and reporting logic is now available for command-line review.
+
+Run command:
+
+    python scripts/report_applications.py
 
 ---
 
@@ -1044,46 +880,147 @@ daily job alert email changes
 
 Status:
 
-```text
-Current next step
-```
+- Complete
 
 Goal:
 
 Add Application Tracker sheets to the existing Excel export.
 
-Existing export file:
+Updated file:
 
-```text
-scripts/export_to_excel.py
-```
+- scripts/export_to_excel.py
 
-Existing output:
+Existing export output preserved:
 
-```text
-exports/careersignal_export.xlsx
-```
+- exports/careersignal_export.xlsx
 
-Possible future sheets:
+Required sheets added:
 
-```text
-Applications
-Application Summary
-Company Application Summary
-Application Aging
-```
+- Applications
+- Application Summary
+- Company Application Summary
+- Application Aging
 
-Important rules for 17F:
+Expected behavior:
 
-```text
-Do not change the Power BI source path.
-Do not break existing job export sheets.
-Do not modify the daily job alert email.
-Do not build the weekly tracker email yet.
-Keep Application Tracker export logic compatible with the current applications table.
-Use applications as the table name.
-Use application_id as the primary key.
-```
+- Running python scripts/export_to_excel.py still works.
+- Existing job export sheets remain intact.
+- Application Tracker sheets are added to the same workbook.
+- Power BI source path remains unchanged.
+- No separate tracker workbook is created.
+- No database schema change is made.
+- No statuses are automatically changed.
+- No daily email behavior is changed.
+- No Power BI visuals are changed.
+
+Application Tracker sheet behavior:
+
+Applications sheet:
+
+- Full row-level application tracker data from the applications table.
+- Expected fields include:
+  - application_id
+  - date_applied
+  - company_name
+  - job_title
+  - job_url
+  - source
+  - status
+  - first_response_date
+  - interview_date
+  - final_response_date
+  - notes
+  - created_at
+  - updated_at
+
+Application Summary sheet:
+
+- total applications
+- active applications
+- interviews
+- acceptances
+- formal rejections
+- ghostings
+- negative outcomes
+
+Company Application Summary sheet:
+
+- company_name
+- total applications
+- active applications
+- interviews
+- acceptances
+- formal rejections
+- ghostings
+- negative outcomes
+
+Application Aging sheet:
+
+- application_id
+- company_name
+- job_title
+- date_applied
+- status
+- days_since_applied
+- aging_bucket
+
+Aging rules:
+
+- 0-14 days with no response = active / normal waiting period
+- 15-30 days with no response = rejection danger zone
+- 31-60 days with no response = ghosting danger zone
+- 61+ days with no response = ghosted candidate / should be reviewed
+
+Important:
+
+- Application Aging reports aging only.
+- It does not mutate the database.
+- It does not automatically change statuses to ghosted.
+- Ghosted applications count as negative outcomes.
+
+Step 17F preserved:
+
+- data/careersignal.db
+- applications table
+- application_id primary key
+- Greenhouse support
+- Workday support
+- database behavior
+- email behavior
+- logging behavior
+- match scoring behavior
+- Power BI source path
+- Windows Task Scheduler behavior
+
+Run command:
+
+    python scripts/export_to_excel.py
+
+PowerShell-safe sheet confirmation command:
+
+    @'
+    from openpyxl import load_workbook
+
+    workbook = load_workbook("exports/careersignal_export.xlsx", read_only=True)
+
+    for sheet_name in workbook.sheetnames:
+        print(sheet_name)
+
+    required = {
+        "Applications",
+        "Application Summary",
+        "Company Application Summary",
+        "Application Aging",
+    }
+
+    missing = required - set(workbook.sheetnames)
+
+    if missing:
+        print("Missing:", missing)
+        raise SystemExit(1)
+
+    print("All Step 17F sheets exist.")
+    '@ | python -
 
 ---
 
@@ -1091,34 +1028,35 @@ Use application_id as the primary key.
 
 Status:
 
-```text
-Planned
-```
+- Planned
 
 Goal:
 
-Add a separate weekly Application Tracker email after reporting and export behavior are stable.
+Add a separate weekly Application Tracker email after reporting and Excel export work.
 
 Preferred schedule:
 
-```text
-Friday at 4 PM
-```
+- Friday at 4 PM
 
 Do not add Application Tracker stats to the daily job alert email at first.
 
 The weekly email may include:
 
-```text
-applications this week
-total active applications
-interviews received
-rejections received
-new ghostings
-applications entering rejection danger zone
-applications entering ghosting danger zone
-company response summary
-```
+- applications this week
+- total active applications
+- interviews received
+- rejections received
+- new ghostings
+- applications entering rejection danger zone
+- applications entering ghosting danger zone
+- company response summary
+
+Important:
+
+- This should be separate from the daily job alert email unless explicitly approved.
+- This should not break daily automation.
+- This should not modify Power BI.
+- This should reuse existing tracker reporting logic where practical.
 
 ---
 
@@ -1126,9 +1064,7 @@ company response summary
 
 Status:
 
-```text
-Optional / later
-```
+- Optional / later
 
 Goal:
 
@@ -1136,14 +1072,18 @@ Add Application Tracker visuals to Power BI after Excel export sheets are stable
 
 Possible visuals:
 
-```text
-KPI cards for total applications, interviews, rejections, ghostings, acceptances
-bar chart for applications by company
-bar chart for outcomes by company
-aging table
-status distribution chart
-applications over time
-```
+- KPI cards for total applications, interviews, rejections, ghostings, acceptances
+- bar chart for applications by company
+- bar chart for outcomes by company
+- aging table
+- status distribution chart
+- applications over time
+
+Important:
+
+- Do not modify the Power BI file unless explicitly working on this step.
+- Do not change the Power BI source path.
+- Use exports/careersignal_export.xlsx as the data source.
 
 ---
 
@@ -1155,26 +1095,21 @@ Current active step.
 
 Completed:
 
-```text
-17A: Database foundation
-17B: Reusable module
-17C: Manual add-application script
-17D: Manual status-update script
-17E: Application tracker summary reporting
-```
+- 17A: Database foundation
+- 17B: Reusable module
+- 17C: Manual add-application script
+- 17D: Manual status-update script
+- 17E: Application tracker summary reporting
+- 17F: Excel export integration
 
 Current next step:
 
-```text
-17F: Excel export integration
-```
+- 17G: Weekly tracker email
 
 Planned:
 
-```text
-17G: Weekly tracker email
-17H: Optional Power BI visuals
-```
+- 17G: Weekly tracker email
+- 17H: Optional Power BI visuals
 
 ---
 
@@ -1182,9 +1117,7 @@ Planned:
 
 Status:
 
-```text
-Planned, not current
-```
+- Planned, not current
 
 Purpose:
 
@@ -1194,44 +1127,44 @@ Required before heavily featuring the project on a resume.
 
 Step 18 should update:
 
-```text
-README.md
-docs/CareerSignal_Project_State.md
-```
+- README.md
+- docs/CareerSignal_Project_State.md
 
-Step 18 should not rename official functions, change database paths, recreate existing files, or break existing behavior.
+Step 18 should not:
+
+- rename official functions
+- change database paths
+- recreate existing files
+- break existing behavior
+- change the Power BI source path without documenting it
+- expose secrets
 
 Step 18 validation should confirm:
 
-```text
-preview run works
-send run works
-email arrives
-email only includes jobs first seen in the past 24 hours
-match scores show correctly
-failed sources show correctly
-Excel export updates
-Power BI refresh works from exports/careersignal_export.xlsx
-logs update
-no data/jobs.db references
-no old function names
-no secrets staged for Git
-Application Tracker add script works
-Application Tracker status update script works
-Application Tracker report script works
-```
+- preview run works
+- send run works
+- email arrives
+- email only includes jobs first seen in the past 24 hours
+- match scores show correctly
+- failed sources show correctly
+- Excel export updates
+- Application Tracker sheets exist in the Excel export
+- Power BI refresh works from exports/careersignal_export.xlsx
+- logs update
+- no data/jobs.db references
+- no old function names
+- no secrets staged for Git
 
 Step 18 known action items:
 
-```text
-Fix or confirm the Power BI data source so it pulls from exports/careersignal_export.xlsx instead of an old test file.
-Check and confirm that match scoring appears correctly in sent emails.
-Make sure sent emails include only jobs first seen in the past 24 hours.
-Circle back to Step 13 Workday URL issues.
-Add the rest of the Greenhouse companies.
-Polish README for portfolio/resume presentation.
-Add screenshots and sample outputs.
-```
+- Fix or confirm the Power BI data source so it pulls from exports/careersignal_export.xlsx instead of an old test file.
+- Check and confirm that match scoring appears correctly in sent emails.
+- Make sure sent emails include only jobs first seen in the past 24 hours.
+- Circle back to Step 13 Workday URL issues.
+- Add the rest of the confirmed Greenhouse companies.
+- Polish README for portfolio/resume presentation.
+- Add screenshots and sample outputs.
+- Add or update notes for the Application Tracker and Excel export sheets.
 
 ---
 
@@ -1239,9 +1172,7 @@ Add screenshots and sample outputs.
 
 Status:
 
-```text
-Optional / later
-```
+- Optional / later
 
 Only if a prettier local interface is wanted later.
 
@@ -1253,18 +1184,13 @@ Nice-to-have, not required.
 
 Current must-do path:
 
-```text
-17F: Application Tracker Excel export integration
-18: GitHub + Portfolio Polish
-```
+- 17G: Weekly tracker email, if the user wants to finish the Application Tracker communication loop
+- 18: GitHub + Portfolio Polish
 
 Nice-to-have:
 
-```text
-17G: Weekly tracker email
-17H: Power BI Application Tracker visuals
-19: Optional Streamlit UI
-```
+- 17H: Power BI Application Tracker visuals
+- 19: Optional Streamlit UI
 
 ---
 
@@ -1272,142 +1198,124 @@ Nice-to-have:
 
 Useful commands:
 
-```bash
-PYTHONPATH=src python scripts/test_config_loader.py
-PYTHONPATH=src python scripts/test_database.py
-PYTHONPATH=src python scripts/test_match_scoring.py
-PYTHONPATH=src python scripts/test_email_report.py
-python scripts/collect_greenhouse_jobs.py --preview
-python scripts/export_to_excel.py
-```
+    PYTHONPATH=src python scripts/test_config_loader.py
+    PYTHONPATH=src python scripts/test_database.py
+    PYTHONPATH=src python scripts/test_match_scoring.py
+    PYTHONPATH=src python scripts/test_email_report.py
+    python scripts/collect_greenhouse_jobs.py --preview
+    python scripts/export_to_excel.py
 
 Windows PowerShell:
 
-```powershell
-$env:PYTHONPATH="src"
-python scripts/test_config_loader.py
-python scripts/test_database.py
-python scripts/test_match_scoring.py
-python scripts/test_email_report.py
-python scripts/collect_greenhouse_jobs.py --preview
-python scripts/export_to_excel.py
-```
+    $env:PYTHONPATH="src"
+    python scripts/test_config_loader.py
+    python scripts/test_database.py
+    python scripts/test_match_scoring.py
+    python scripts/test_email_report.py
+    python scripts/collect_greenhouse_jobs.py --preview
+    python scripts/export_to_excel.py
 
 Daily automation test:
 
-```powershell
-.\run_careersignal_daily.bat
-```
+    .\run_careersignal_daily.bat
 
 Real send mode:
 
-```powershell
-python scripts/collect_greenhouse_jobs.py --send
-python scripts/export_to_excel.py
-```
+    python scripts/collect_greenhouse_jobs.py --send
+    python scripts/export_to_excel.py
 
 Application Tracker initializer:
 
-```powershell
-python scripts/init_application_tracker.py
-```
+    python scripts/init_application_tracker.py
 
 Application Tracker add-script help:
 
-```powershell
-python scripts/add_application.py --help
-```
+    python scripts/add_application.py --help
 
 Application Tracker status-update help:
 
-```powershell
-python scripts/update_application_status.py --help
-```
+    python scripts/update_application_status.py --help
 
-Application Tracker report help:
+Application Tracker reporting:
 
-```powershell
-python scripts/report_applications.py --help
-```
-
-Application Tracker summary report:
-
-```powershell
-python scripts/report_applications.py
-```
-
-Application Tracker report with all records:
-
-```powershell
-python scripts/report_applications.py --show-all
-```
-
-Application Tracker report for one company:
-
-```powershell
-python scripts/report_applications.py --company "RSM"
-```
-
-Application Tracker report with fixed aging date:
-
-```powershell
-python scripts/report_applications.py --as-of 2026-06-03
-```
+    python scripts/report_applications.py
 
 Application Tracker manual test insert:
 
-```powershell
-python scripts/add_application.py --company "TEST COMPANY DELETE ME" --title "Fake Test Application" --date-applied "2026-06-01" --url "https://example.com/test-job" --source "manual test" --notes "Delete this after test"
-```
+    python scripts/add_application.py --company "TEST COMPANY DELETE ME" --title "Fake Test Application" --date-applied "2026-06-01" --url "https://example.com/test-job" --source "manual test" --notes "Delete this after test"
 
 Application Tracker manual status-update test:
 
-```powershell
-python scripts/update_application_status.py --id 4 --status interview --notes "Moved to interview during Step 17D or 17E test" --date "2026-06-10"
-```
+    python scripts/update_application_status.py --id 4 --status interview --notes "Moved to interview during Step 17D test" --date "2026-06-10"
 
-Replace `4` with the actual `application_id` from the test insert.
+Replace 4 with the actual application_id from the test insert.
 
 Application Tracker PowerShell-safe confirmation query:
 
-```powershell
-@'
-import sqlite3
+    @'
+    import sqlite3
 
-conn = sqlite3.connect("data/careersignal.db")
-conn.row_factory = sqlite3.Row
+    conn = sqlite3.connect("data/careersignal.db")
+    conn.row_factory = sqlite3.Row
 
-rows = conn.execute(
-    "SELECT * FROM applications WHERE company_name = ? ORDER BY application_id DESC",
-    ("TEST COMPANY DELETE ME",)
-).fetchall()
+    rows = conn.execute(
+        "SELECT * FROM applications WHERE company_name = ? ORDER BY application_id DESC",
+        ("TEST COMPANY DELETE ME",)
+    ).fetchall()
 
-for row in rows:
-    print(dict(row))
+    for row in rows:
+        print(dict(row))
 
-conn.close()
-'@ | python -
-```
+    conn.close()
+    '@ | python -
 
 Application Tracker PowerShell-safe cleanup query:
 
-```powershell
-@'
-import sqlite3
+    @'
+    import sqlite3
 
-conn = sqlite3.connect("data/careersignal.db")
+    conn = sqlite3.connect("data/careersignal.db")
 
-conn.execute(
-    "DELETE FROM applications WHERE company_name = ?",
-    ("TEST COMPANY DELETE ME",)
-)
+    conn.execute(
+        "DELETE FROM applications WHERE company_name = ?",
+        ("TEST COMPANY DELETE ME",)
+    )
 
-conn.commit()
-conn.close()
+    conn.commit()
+    conn.close()
 
-print("Deleted fake test application")
-'@ | python -
-```
+    print("Deleted fake test application")
+    '@ | python -
+
+Excel export test:
+
+    python scripts/export_to_excel.py
+
+Excel export sheet confirmation:
+
+    @'
+    from openpyxl import load_workbook
+
+    workbook = load_workbook("exports/careersignal_export.xlsx", read_only=True)
+
+    for sheet_name in workbook.sheetnames:
+        print(sheet_name)
+
+    required = {
+        "Applications",
+        "Application Summary",
+        "Company Application Summary",
+        "Application Aging",
+    }
+
+    missing = required - set(workbook.sheetnames)
+
+    if missing:
+        print("Missing:", missing)
+        raise SystemExit(1)
+
+    print("All Step 17F sheets exist.")
+    '@ | python -
 
 ---
 
@@ -1421,108 +1329,68 @@ For every future coding step, include:
 4. Grep/search checks for old names or broken imports
 5. Git commit guidance
 
+Important PowerShell note:
+
+Do not use Select-String with the -Recurse parameter because this has caused problems on the user's machine.
+
+Use this pattern instead:
+
+    Get-ChildItem -Recurse -File | Select-String "search text"
+
 Always include checks for:
 
-```bash
-grep -RIn "data/jobs.db" .
-grep -RIn "create_tables" .
-grep -RIn "insert_normalized_jobs" .
-grep -RIn "fetch_all_jobs" .
-```
-
-PowerShell-safe equivalent:
-
-```powershell
-Get-ChildItem -Recurse -File | Select-String -Pattern "data/jobs.db"
-Get-ChildItem -Recurse -File | Select-String -Pattern "create_tables"
-Get-ChildItem -Recurse -File | Select-String -Pattern "insert_normalized_jobs"
-Get-ChildItem -Recurse -File | Select-String -Pattern "fetch_all_jobs"
-```
-
-Cleaner PowerShell search pattern that skips noisy generated folders/files:
-
-```powershell
-Get-ChildItem -Recurse -File |
-Where-Object {
-    $_.FullName -notmatch "\\.git\\" -and
-    $_.FullName -notmatch "\\.venv\\" -and
-    $_.FullName -notmatch "__pycache__" -and
-    $_.Extension -notin ".db", ".pyc", ".log", ".xlsx", ".pbix"
-} |
-Select-String -Pattern "data/jobs.db"
-```
+    Get-ChildItem -Recurse -File | Select-String "data/jobs.db"
+    Get-ChildItem -Recurse -File | Select-String "create_tables"
+    Get-ChildItem -Recurse -File | Select-String "insert_normalized_jobs"
+    Get-ChildItem -Recurse -File | Select-String "fetch_all_jobs"
 
 Also check official function names when relevant:
 
-```bash
-grep -RIn "build_and_send_daily_report" .
-grep -RIn "score_job" .
-grep -RIn "initialize_database" .
-grep -RIn "insert_or_update_jobs" .
-grep -RIn "get_jobs_first_seen_in_last_24_hours" .
-```
-
-PowerShell-safe equivalent:
-
-```powershell
-Get-ChildItem -Recurse -File | Select-String -Pattern "build_and_send_daily_report"
-Get-ChildItem -Recurse -File | Select-String -Pattern "score_job"
-Get-ChildItem -Recurse -File | Select-String -Pattern "initialize_database"
-Get-ChildItem -Recurse -File | Select-String -Pattern "insert_or_update_jobs"
-Get-ChildItem -Recurse -File | Select-String -Pattern "get_jobs_first_seen_in_last_24_hours"
-```
+    Get-ChildItem -Recurse -File | Select-String "build_and_send_daily_report"
+    Get-ChildItem -Recurse -File | Select-String "score_job"
+    Get-ChildItem -Recurse -File | Select-String "initialize_database"
+    Get-ChildItem -Recurse -File | Select-String "insert_or_update_jobs"
+    Get-ChildItem -Recurse -File | Select-String "get_jobs_first_seen_in_last_24_hours"
 
 Application Tracker checks when relevant:
 
-```bash
-grep -RIn "applications" .
-grep -RIn "application_id" .
-grep -RIn "application_tracker" .
-grep -RIn "data/jobs.db" .
-```
-
-PowerShell-safe equivalent:
-
-```powershell
-Get-ChildItem -Recurse -File | Select-String -Pattern "applications"
-Get-ChildItem -Recurse -File | Select-String -Pattern "application_id"
-Get-ChildItem -Recurse -File | Select-String -Pattern "application_tracker"
-Get-ChildItem -Recurse -File | Select-String -Pattern "data/jobs.db"
-```
+    Get-ChildItem -Recurse -File | Select-String "applications"
+    Get-ChildItem -Recurse -File | Select-String "application_id"
+    Get-ChildItem -Recurse -File | Select-String "application_tracker"
+    Get-ChildItem -Recurse -File | Select-String "data/jobs.db"
 
 Important:
 
-The module/file names still use `application_tracker`, but the actual database table is `applications`.
+The module/file names still use application_tracker, but the actual database table is applications.
 
 Acceptable references:
 
-```text
-src/careersignal/application_tracker.py
-src/careersignal/application_tracker_db.py
-scripts/init_application_tracker.py
-scripts/add_application.py
-scripts/update_application_status.py
-scripts/report_applications.py
-```
+- src/careersignal/application_tracker.py
+- src/careersignal/application_tracker_db.py
+- scripts/init_application_tracker.py
+- scripts/add_application.py
+- scripts/update_application_status.py
+- scripts/report_applications.py
+- from careersignal.application_tracker import fetch_applications
 
 Stale or suspicious references:
 
-```text
-application_tracker table
-SELECT * FROM application_tracker
-INSERT INTO application_tracker
-UPDATE application_tracker
-DELETE FROM application_tracker
-```
+- application_tracker table
+- SELECT * FROM application_tracker
+- INSERT INTO application_tracker
+- UPDATE application_tracker
+- DELETE FROM application_tracker
 
-Bad Application Tracker SQL checks:
+Bad old table SQL checks:
 
-```powershell
-Get-ChildItem -Recurse -File | Select-String -Pattern "SELECT \* FROM application_tracker"
-Get-ChildItem -Recurse -File | Select-String -Pattern "INSERT INTO application_tracker"
-Get-ChildItem -Recurse -File | Select-String -Pattern "UPDATE application_tracker"
-Get-ChildItem -Recurse -File | Select-String -Pattern "DELETE FROM application_tracker"
-```
+    Get-ChildItem -Recurse -File | Select-String "SELECT \* FROM application_tracker"
+    Get-ChildItem -Recurse -File | Select-String "INSERT INTO application_tracker"
+    Get-ChildItem -Recurse -File | Select-String "UPDATE application_tracker"
+    Get-ChildItem -Recurse -File | Select-String "DELETE FROM application_tracker"
+
+Expected result for bad old table SQL checks:
+
+- No results
 
 ---
 
@@ -1530,78 +1398,75 @@ Get-ChildItem -Recurse -File | Select-String -Pattern "DELETE FROM application_t
 
 After project-state updates:
 
-```bash
-git add docs/CareerSignal_Project_State.md
-git commit -m "Update CareerSignal project state"
-git push
-```
+    git add docs/CareerSignal_Project_State.md
+    git commit -m "Update CareerSignal project state"
+    git push
 
 After README updates:
 
-```bash
-git add README.md
-git commit -m "Update CareerSignal README"
-git push
-```
+    git add README.md
+    git commit -m "Update CareerSignal README"
+    git push
 
-After Application Tracker feature steps, use specific commit messages, such as:
+After Application Tracker feature steps, use specific commit messages.
 
-```bash
-git add .
-git commit -m "Add application tracker database foundation"
-git push
-```
+Step 17A:
 
-```bash
-git add .
-git commit -m "Add application tracker module"
-git push
-```
+    git add .
+    git commit -m "Add application tracker database foundation"
+    git push
 
-```bash
-git add .
-git commit -m "Add application entry script"
-git push
-```
+Step 17B:
 
-```bash
-git add .
-git commit -m "Add application status update script"
-git push
-```
+    git add .
+    git commit -m "Add application tracker module"
+    git push
 
-```bash
-git add .
-git commit -m "Add application tracker reporting"
-git push
-```
+Step 17C:
 
-Future 17F commit message suggestion:
+    git add .
+    git commit -m "Add application entry script"
+    git push
 
-```bash
-git add .
-git commit -m "Add application tracker Excel export sheets"
-git push
-```
+Step 17D:
+
+    git add .
+    git commit -m "Add application status update script"
+    git push
+
+Step 17E:
+
+    git add .
+    git commit -m "Add application tracker reporting"
+    git push
+
+Step 17F:
+
+    git add scripts/export_to_excel.py
+    git commit -m "Add application tracker sheets to Excel export"
+    git push
 
 Avoid committing:
 
-```text
-.env
-logs/
-data/careersignal.db if intentionally ignored
-exports/careersignal_export.xlsx if intentionally ignored
-temporary test files
-email passwords
-SMTP secrets
-```
+- .env
+- logs/
+- data/careersignal.db if intentionally ignored
+- exports/careersignal_export.xlsx if intentionally ignored
+- temporary test files
+- email passwords
+- SMTP secrets
 
 Before committing, always run:
 
-```powershell
-git status
-git diff --cached
-```
+    git status
+    git diff --cached
+
+If updating only the project state file, prefer:
+
+    git add docs/CareerSignal_Project_State.md
+    git diff --cached
+    git commit -m "Update CareerSignal project state"
+    git push
 
 ---
 
@@ -1612,26 +1477,28 @@ Before giving code:
 1. Read this file.
 2. Do not recreate existing files.
 3. Do not rename official functions.
-4. Do not change `data/careersignal.db`.
-5. Do not use `data/jobs.db`.
+4. Do not change data/careersignal.db.
+5. Do not use data/jobs.db.
 6. Do not use old function names.
 7. Explain dependencies before rewriting core files.
 8. Keep new work compatible with the existing pipeline.
 9. Preserve Greenhouse and Workday support.
 10. Preserve email, Excel, Power BI, logging, and scoring behavior unless asked to change them.
 11. Preserve preview mode and send mode.
-12. Keep `.env` and secrets out of GitHub.
+12. Keep .env and secrets out of GitHub.
 13. Keep the response beginner-friendly and step-by-step.
 14. During Step 17, do not modify daily job alert behavior unless explicitly approved.
 15. During Step 17, keep Application Tracker steps small and separate.
-16. During Step 17, use the actual table name `applications`.
-17. During Step 17, use the actual primary key `application_id`.
-18. During Step 17, keep runnable scripts in `scripts/`.
-19. During Step 17, keep reusable logic in `src/careersignal/`.
-20. During Step 17F, preserve the existing Excel export path: `exports/careersignal_export.xlsx`.
-21. During Step 17F, do not break existing job export sheets.
-22. During Step 17F, do not modify Power BI visuals yet.
-23. During Step 17F, do not build the weekly tracker email yet.
+16. During Step 17, use the actual table name applications.
+17. During Step 17, use the actual primary key application_id.
+18. During Step 17, keep runnable scripts in scripts/.
+19. During Step 17, keep reusable logic in src/careersignal/.
+20. Do not use Select-String -Recurse in PowerShell instructions.
+21. Use Get-ChildItem -Recurse -File | Select-String "pattern" instead.
+22. Do not create a separate Application Tracker workbook unless explicitly approved.
+23. Do not change the Power BI source path unless explicitly working on that issue.
+24. Do not add Application Tracker stats to the daily email unless explicitly approved.
+25. Keep the weekly Application Tracker email separate from the daily job alert email at first.
 
 ---
 
@@ -1639,73 +1506,66 @@ Before giving code:
 
 Database:
 
-```text
-data/careersignal.db
-```
+- data/careersignal.db
 
 Table:
 
-```text
-applications
-```
+- applications
 
 Primary key:
 
-```text
-application_id
-```
+- application_id
 
 Database setup file:
 
-```text
-src/careersignal/application_tracker_db.py
-```
+- src/careersignal/application_tracker_db.py
 
 Reusable logic file:
 
-```text
-src/careersignal/application_tracker.py
-```
+- src/careersignal/application_tracker.py
 
 Initializer script:
 
-```text
-scripts/init_application_tracker.py
-```
+- scripts/init_application_tracker.py
 
 Manual add script:
 
-```text
-scripts/add_application.py
-```
+- scripts/add_application.py
 
 Manual status-update script:
 
-```text
-scripts/update_application_status.py
-```
+- scripts/update_application_status.py
 
-Terminal summary report script:
+Summary reporting script:
 
-```text
-scripts/report_applications.py
-```
+- scripts/report_applications.py
+
+Excel export script:
+
+- scripts/export_to_excel.py
+
+Excel export workbook:
+
+- exports/careersignal_export.xlsx
+
+Application Tracker Excel sheets:
+
+- Applications
+- Application Summary
+- Company Application Summary
+- Application Aging
 
 Official reusable functions:
 
-```text
-get_current_timestamp
-validate_application_status
-add_application
-update_application_status
-update_application_notes
-update_application_response_dates
-fetch_application_by_id
-fetch_applications
-```
+- get_current_timestamp
+- validate_application_status
+- add_application
+- update_application_status
+- update_application_notes
+- update_application_response_dates
+- fetch_application_by_id
+- fetch_applications
 
 Current next planned step:
 
-```text
-17F: Application Tracker Excel export integration
-```
+- 17G: Weekly Application Tracker email
