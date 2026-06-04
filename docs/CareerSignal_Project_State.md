@@ -32,10 +32,11 @@ Completed steps:
    - 17D. Manual status-update script completed
    - 17E. Application Tracker summary reporting completed
    - 17F. Application Tracker Excel export integration completed
+   - 17G. Weekly Application Tracker email completed
 
 Current next step:
 
-- 17G: Weekly Application Tracker email
+- 17H: Optional Power BI Application Tracker visuals
 
 The main product loop exists:
 
@@ -60,7 +61,7 @@ Application Tracker loop:
     → manual add/update scripts
     → summary reporting
     → Excel export sheets
-    → future weekly email
+    → separate weekly Application Tracker email
     → future Power BI visuals
 
 ---
@@ -93,6 +94,7 @@ Preserve this structure.
     │   ├── add_application.py
     │   ├── update_application_status.py
     │   ├── report_applications.py
+    │   ├── send_weekly_application_tracker_email.py
     │   ├── collect_greenhouse_jobs.py
     │   ├── export_to_excel.py
     │   ├── init_application_tracker.py
@@ -170,7 +172,9 @@ Do not modify the daily job alert email during Application Tracker steps unless 
 
 Do not modify Power BI during Application Tracker steps unless explicitly working on the Power BI integration step.
 
-Do not build the weekly Application Tracker email until summary reporting and Excel export work.
+Do not modify Excel export during weekly email work unless explicitly approved.
+
+Do not schedule the weekly Application Tracker email unless explicitly approved.
 
 Keep Application Tracker steps small and separate.
 
@@ -200,6 +204,7 @@ Do not recreate them from scratch unless they are missing.
     scripts/add_application.py
     scripts/update_application_status.py
     scripts/report_applications.py
+    scripts/send_weekly_application_tracker_email.py
     scripts/collect_greenhouse_jobs.py
     scripts/export_to_excel.py
     scripts/init_application_tracker.py
@@ -340,11 +345,31 @@ The filtering and scoring strategy supports multiple job-search lanes:
 
 ### Email Reporting
 
-Email reporting should continue to support preview/test mode and send mode.
+Daily email reporting should continue to support preview/test mode and send mode.
+
+Daily job alert email is separate from the weekly Application Tracker email.
 
 Daily job alert email should not be modified during Application Tracker steps unless explicitly approved.
 
-Application Tracker weekly email should come later, after tracker reporting and Excel export work.
+Weekly Application Tracker email was added in Step 17G as a separate script:
+
+- scripts/send_weekly_application_tracker_email.py
+
+The weekly Application Tracker email uses:
+
+- preview mode
+- send mode
+- the applications table
+- data/careersignal.db
+- the existing .env/email credential pattern where possible
+
+The weekly email does not modify:
+
+- daily job alert behavior
+- Excel export
+- Power BI
+- database schema
+- Windows Task Scheduler configuration
 
 ---
 
@@ -445,6 +470,8 @@ Application Tracker visuals should come later.
 
 Step 17F did not modify Power BI visuals or the Power BI file.
 
+Step 17G also did not modify Power BI visuals or the Power BI file.
+
 ---
 
 ### Daily Automation
@@ -523,21 +550,17 @@ Step 13 follow-up items:
 
 ## Step 17 Application Tracker Status
 
-Step 17 is active.
+Step 17 is active, with 17A through 17G complete.
 
 Goal:
 
-Add a manual application tracking system to CareerSignal that records applications submitted by the user, tracks response outcomes, calculates ghosting/rejection danger zones, and summarizes application performance overall and by company.
+Add a manual application tracking system to CareerSignal that records applications submitted by the user, tracks response outcomes, calculates ghosting/rejection danger zones, summarizes application performance overall and by company, exports Application Tracker sheets to Excel, and sends a separate weekly Application Tracker email.
 
-Application Tracker remains separate from the automated job collector at first.
+Application Tracker remains separate from the automated job collector.
 
-Do not modify the daily job alert email yet.
+Do not modify the daily job alert email unless explicitly approved.
 
-Do not build weekly email yet.
-
-Do not build Power BI visuals yet.
-
-Excel export integration is complete as of Step 17F.
+Do not modify Power BI unless explicitly working on Application Tracker visuals.
 
 ---
 
@@ -616,7 +639,7 @@ Aging rules:
 - 0-14 days with no response = active / normal waiting period
 - 15-30 days with no response = rejection danger zone
 - 31-60 days with no response = ghosting danger zone
-- 61+ days with no response = ghosted
+- 61+ days with no response = ghosted candidate / should be reviewed
 
 Reporting rule:
 
@@ -1028,35 +1051,306 @@ PowerShell-safe sheet confirmation command:
 
 Status:
 
-- Planned
+- Complete
 
 Goal:
 
 Add a separate weekly Application Tracker email after reporting and Excel export work.
 
-Preferred schedule:
+Implemented file:
+
+- scripts/send_weekly_application_tracker_email.py
+
+Preferred future schedule:
 
 - Friday at 4 PM
 
-Do not add Application Tracker stats to the daily job alert email at first.
-
-The weekly email may include:
-
-- applications this week
-- total active applications
-- interviews received
-- rejections received
-- new ghostings
-- applications entering rejection danger zone
-- applications entering ghosting danger zone
-- company response summary
-
 Important:
 
-- This should be separate from the daily job alert email unless explicitly approved.
-- This should not break daily automation.
-- This should not modify Power BI.
-- This should reuse existing tracker reporting logic where practical.
+The weekly Application Tracker email remains separate from the daily job alert email.
+
+Application Tracker stats were not added to the daily job alert email.
+
+The existing daily email module was not modified during Step 17G.
+
+The existing daily collector script was not modified during Step 17G.
+
+The Excel export was not modified during Step 17G.
+
+Power BI was not modified during Step 17G.
+
+Windows Task Scheduler was not modified during Step 17G.
+
+Expected weekly tracker email content:
+
+- applications submitted this week
+- interviews received this week
+- rejections received this week
+- ghostings identified this week
+- total applications
+- total active applications
+- interviews
+- acceptances
+- formal rejections
+- ghostings
+- negative outcomes
+- rejection danger zone watchlist
+- ghosting danger zone watchlist
+- 61+ day ghosting candidates
+- company response summary
+
+Weekly email subject line:
+
+    CareerSignal Weekly Application Tracker Summary
+
+Preview command:
+
+    python scripts/send_weekly_application_tracker_email.py --preview
+
+Send command:
+
+    python scripts/send_weekly_application_tracker_email.py --send
+
+Safety behavior:
+
+- Script previews by default if no send flag is provided.
+- Script does not send unless --send is explicitly provided.
+- Script prints generated email content in preview mode.
+- Script uses the existing Application Tracker table: applications.
+- Script uses the existing Application Tracker primary key: application_id.
+- Script uses the existing database path through the reusable Application Tracker module.
+- Script does not change any database schema.
+- Script does not mutate application statuses.
+- Script does not schedule itself yet.
+
+Email configuration behavior:
+
+- The script uses environment variables and .env values.
+- It supports common email config variable names so the existing email credential pattern can be reused without editing the daily email module.
+
+Supported email config variable names include:
+
+- SMTP_HOST or SMTP_SERVER or EMAIL_HOST
+- SMTP_PORT or EMAIL_PORT
+- SMTP_USERNAME or EMAIL_USERNAME or EMAIL_SENDER or EMAIL_FROM
+- SMTP_PASSWORD or EMAIL_PASSWORD or EMAIL_APP_PASSWORD
+- EMAIL_FROM or EMAIL_SENDER
+- EMAIL_TO or EMAIL_RECIPIENT or RECIPIENT_EMAIL
+
+Step 17G preserved:
+
+- data/careersignal.db
+- applications table
+- application_id primary key
+- Greenhouse support
+- Workday support
+- database behavior
+- daily email behavior
+- logging behavior
+- Excel export behavior
+- Power BI source path
+- match scoring behavior
+- Windows Task Scheduler behavior
+
+Step 17G did not include:
+
+- Power BI Application Tracker visuals
+- Windows Task Scheduler setup for the weekly email
+- changes to daily job alert email
+- changes to Excel export
+- database schema changes
+- automatic ghosting status updates
+
+Test insert command for fake Step 17G rows:
+
+    @'
+    import sqlite3
+    from datetime import date, timedelta
+
+    today = date.today()
+
+    fake_rows = [
+        {
+            "date_applied": today.isoformat(),
+            "company_name": "TEST COMPANY DELETE ME",
+            "job_title": "Fake Weekly Application",
+            "job_url": "https://example.com/weekly",
+            "source": "manual test",
+            "status": "applied",
+            "notes": "Step 17G test row - submitted this week",
+        },
+        {
+            "date_applied": (today - timedelta(days=18)).isoformat(),
+            "company_name": "TEST COMPANY DELETE ME",
+            "job_title": "Fake Rejection Danger Zone Application",
+            "job_url": "https://example.com/rejection-zone",
+            "source": "manual test",
+            "status": "applied",
+            "notes": "Step 17G test row - rejection danger zone",
+        },
+        {
+            "date_applied": (today - timedelta(days=40)).isoformat(),
+            "company_name": "TEST COMPANY DELETE ME",
+            "job_title": "Fake Ghosting Danger Zone Application",
+            "job_url": "https://example.com/ghosting-zone",
+            "source": "manual test",
+            "status": "applied",
+            "notes": "Step 17G test row - ghosting danger zone",
+        },
+        {
+            "date_applied": (today - timedelta(days=70)).isoformat(),
+            "company_name": "TEST COMPANY DELETE ME",
+            "job_title": "Fake 61 Plus Day Application",
+            "job_url": "https://example.com/sixty-one-plus",
+            "source": "manual test",
+            "status": "applied",
+            "notes": "Step 17G test row - 61+ day candidate",
+        },
+    ]
+
+    conn = sqlite3.connect("data/careersignal.db")
+
+    for row in fake_rows:
+        conn.execute(
+            """
+            INSERT INTO applications (
+                date_applied,
+                company_name,
+                job_title,
+                job_url,
+                source,
+                status,
+                notes,
+                created_at,
+                updated_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+            """,
+            (
+                row["date_applied"],
+                row["company_name"],
+                row["job_title"],
+                row["job_url"],
+                row["source"],
+                row["status"],
+                row["notes"],
+            ),
+        )
+
+    conn.commit()
+    conn.close()
+
+    print("Inserted fake Step 17G test rows.")
+    '@ | python -
+
+Test status update command for fake Step 17G rows:
+
+    @'
+    import sqlite3
+    from datetime import date
+
+    today = date.today().isoformat()
+
+    conn = sqlite3.connect("data/careersignal.db")
+    conn.row_factory = sqlite3.Row
+
+    rows = conn.execute(
+        """
+        SELECT application_id, job_title
+        FROM applications
+        WHERE company_name = ?
+        ORDER BY application_id DESC
+        """,
+        ("TEST COMPANY DELETE ME",)
+    ).fetchall()
+
+    for row in rows:
+        job_title = row["job_title"]
+        application_id = row["application_id"]
+
+        if job_title == "Fake Weekly Application":
+            conn.execute(
+                """
+                UPDATE applications
+                SET status = ?,
+                    first_response_date = ?,
+                    interview_date = ?,
+                    updated_at = datetime('now')
+                WHERE application_id = ?
+                """,
+                ("interview", today, today, application_id),
+            )
+
+        elif job_title == "Fake Rejection Danger Zone Application":
+            conn.execute(
+                """
+                UPDATE applications
+                SET status = ?,
+                    first_response_date = ?,
+                    final_response_date = ?,
+                    updated_at = datetime('now')
+                WHERE application_id = ?
+                """,
+                ("rejected", today, today, application_id),
+            )
+
+        elif job_title == "Fake Ghosting Danger Zone Application":
+            conn.execute(
+                """
+                UPDATE applications
+                SET status = ?,
+                    final_response_date = ?,
+                    updated_at = datetime('now')
+                WHERE application_id = ?
+                """,
+                ("ghosted", today, application_id),
+            )
+
+    conn.commit()
+    conn.close()
+
+    print("Updated fake Step 17G test rows.")
+    '@ | python -
+
+PowerShell-safe cleanup command for fake Step 17G rows:
+
+    @'
+    import sqlite3
+
+    conn = sqlite3.connect("data/careersignal.db")
+
+    conn.execute(
+        "DELETE FROM applications WHERE company_name = ?",
+        ("TEST COMPANY DELETE ME",)
+    )
+
+    conn.commit()
+    conn.close()
+
+    print("Deleted fake Step 17G test rows.")
+    '@ | python -
+
+PowerShell-safe confirmation after cleanup:
+
+    @'
+    import sqlite3
+
+    conn = sqlite3.connect("data/careersignal.db")
+    conn.row_factory = sqlite3.Row
+
+    rows = conn.execute(
+        "SELECT * FROM applications WHERE company_name = ?",
+        ("TEST COMPANY DELETE ME",)
+    ).fetchall()
+
+    print(f"Remaining fake rows: {len(rows)}")
+
+    conn.close()
+    '@ | python -
+
+Expected cleanup result:
+
+    Remaining fake rows: 0
 
 ---
 
@@ -1101,14 +1395,14 @@ Completed:
 - 17D: Manual status-update script
 - 17E: Application tracker summary reporting
 - 17F: Excel export integration
+- 17G: Weekly tracker email
 
 Current next step:
 
-- 17G: Weekly tracker email
+- 17H: Optional Power BI Application Tracker visuals
 
 Planned:
 
-- 17G: Weekly tracker email
 - 17H: Optional Power BI visuals
 
 ---
@@ -1149,6 +1443,8 @@ Step 18 validation should confirm:
 - failed sources show correctly
 - Excel export updates
 - Application Tracker sheets exist in the Excel export
+- weekly Application Tracker email previews correctly
+- weekly Application Tracker email sends correctly
 - Power BI refresh works from exports/careersignal_export.xlsx
 - logs update
 - no data/jobs.db references
@@ -1164,7 +1460,7 @@ Step 18 known action items:
 - Add the rest of the confirmed Greenhouse companies.
 - Polish README for portfolio/resume presentation.
 - Add screenshots and sample outputs.
-- Add or update notes for the Application Tracker and Excel export sheets.
+- Add or update notes for the Application Tracker, Excel export sheets, and weekly tracker email.
 
 ---
 
@@ -1184,7 +1480,6 @@ Nice-to-have, not required.
 
 Current must-do path:
 
-- 17G: Weekly tracker email, if the user wants to finish the Application Tracker communication loop
 - 18: GitHub + Portfolio Polish
 
 Nice-to-have:
@@ -1204,6 +1499,7 @@ Useful commands:
     PYTHONPATH=src python scripts/test_email_report.py
     python scripts/collect_greenhouse_jobs.py --preview
     python scripts/export_to_excel.py
+    python scripts/send_weekly_application_tracker_email.py --preview
 
 Windows PowerShell:
 
@@ -1214,15 +1510,24 @@ Windows PowerShell:
     python scripts/test_email_report.py
     python scripts/collect_greenhouse_jobs.py --preview
     python scripts/export_to_excel.py
+    python scripts/send_weekly_application_tracker_email.py --preview
 
 Daily automation test:
 
     .\run_careersignal_daily.bat
 
-Real send mode:
+Real daily send mode:
 
     python scripts/collect_greenhouse_jobs.py --send
     python scripts/export_to_excel.py
+
+Weekly Application Tracker email preview:
+
+    python scripts/send_weekly_application_tracker_email.py --preview
+
+Weekly Application Tracker email send:
+
+    python scripts/send_weekly_application_tracker_email.py --send
 
 Application Tracker initializer:
 
@@ -1371,6 +1676,7 @@ Acceptable references:
 - scripts/add_application.py
 - scripts/update_application_status.py
 - scripts/report_applications.py
+- scripts/send_weekly_application_tracker_email.py
 - from careersignal.application_tracker import fetch_applications
 
 Stale or suspicious references:
@@ -1391,6 +1697,21 @@ Bad old table SQL checks:
 Expected result for bad old table SQL checks:
 
 - No results
+
+Weekly email checks:
+
+    Get-Item .\scripts\send_weekly_application_tracker_email.py
+    python scripts/send_weekly_application_tracker_email.py --preview
+
+Daily email preservation check:
+
+    python scripts/collect_greenhouse_jobs.py --preview
+
+Expected result:
+
+- Daily preview still works.
+- Weekly preview still works.
+- Weekly email remains separate from daily job alert email.
 
 ---
 
@@ -1446,6 +1767,12 @@ Step 17F:
     git commit -m "Add application tracker sheets to Excel export"
     git push
 
+Step 17G:
+
+    git add scripts/send_weekly_application_tracker_email.py
+    git commit -m "Add weekly application tracker email"
+    git push
+
 Avoid committing:
 
 - .env
@@ -1466,6 +1793,20 @@ If updating only the project state file, prefer:
     git add docs/CareerSignal_Project_State.md
     git diff --cached
     git commit -m "Update CareerSignal project state"
+    git push
+
+If committing Step 17G only, prefer:
+
+    git add scripts/send_weekly_application_tracker_email.py
+    git diff --cached
+    git commit -m "Add weekly application tracker email"
+    git push
+
+If committing Step 17G and the updated project state together, prefer:
+
+    git add scripts/send_weekly_application_tracker_email.py docs/CareerSignal_Project_State.md
+    git diff --cached
+    git commit -m "Add weekly application tracker email"
     git push
 
 ---
@@ -1499,6 +1840,9 @@ Before giving code:
 23. Do not change the Power BI source path unless explicitly working on that issue.
 24. Do not add Application Tracker stats to the daily email unless explicitly approved.
 25. Keep the weekly Application Tracker email separate from the daily job alert email at first.
+26. Do not schedule the weekly Application Tracker email unless explicitly approved.
+27. Do not modify Excel export during weekly email work unless explicitly approved.
+28. Do not modify Power BI during weekly email work unless explicitly approved.
 
 ---
 
@@ -1540,6 +1884,10 @@ Summary reporting script:
 
 - scripts/report_applications.py
 
+Weekly email script:
+
+- scripts/send_weekly_application_tracker_email.py
+
 Excel export script:
 
 - scripts/export_to_excel.py
@@ -1568,4 +1916,8 @@ Official reusable functions:
 
 Current next planned step:
 
-- 17G: Weekly Application Tracker email
+- 17H: Optional Power BI Application Tracker visuals
+
+Current must-do next phase:
+
+- Step 18: GitHub + Portfolio Polish
