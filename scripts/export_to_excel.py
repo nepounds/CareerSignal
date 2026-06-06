@@ -301,9 +301,9 @@ def get_aging_bucket(days_since_applied: int | None, status: str) -> str:
         return "rejection danger zone"
 
     if days_since_applied <= 60:
-        return "ghosting danger zone"
+        return "ghosting candidate"
 
-    return "ghosted candidate / should be reviewed"
+    return "ghosted"
 
 
 def build_applications_dataframe() -> pd.DataFrame:
