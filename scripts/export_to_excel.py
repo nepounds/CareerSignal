@@ -524,6 +524,9 @@ def write_application_tracker_sheets(writer: pd.ExcelWriter) -> None:
     write_sheet(writer, "Application Aging", application_aging_df)
 
 
+
+
+
 def export_to_excel(
     database_path: Path = DATABASE_PATH,
     export_path: Path = DEFAULT_EXPORT_PATH,
@@ -582,11 +585,9 @@ def export_to_excel(
         write_sheet(writer, "High Match Jobs", high_match_jobs_df)
         write_sheet(writer, "Company Summary", company_summary_df)
 
-        if not daily_runs_df.empty:
-            write_sheet(writer, "Daily Runs", daily_runs_df)
+        write_sheet(writer, "Daily Runs", daily_runs_df)
 
-        if not failed_sources_df.empty:
-            write_sheet(writer, "Failed Sources", failed_sources_df)
+        write_sheet(writer, "Failed Sources", failed_sources_df)
 
         write_application_tracker_sheets(writer)
 
