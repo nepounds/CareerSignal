@@ -2,7 +2,7 @@
 
 ## Current Project Status
 
-CareerSignal currently has a working end-to-end job alert pipeline and a manual Application Tracker layer.
+CareerSignal currently has a working end-to-end job alert pipeline, a manual Application Tracker layer, Excel export integration, a Power BI dashboard, and Application Tracker Power BI visuals.
 
 Completed steps:
 
@@ -25,18 +25,19 @@ Completed steps:
 14. Filtering Strategy completed
 15. Match Scoring Refinement completed
 16. Daily Automation runner added for Windows Task Scheduler
-17. Application Tracker started
+17. Application Tracker completed through Power BI visuals
    - 17A. Application Tracker database foundation completed
    - 17B. Application Tracker reusable module completed
    - 17C. Manual add-application script completed
    - 17D. Manual status-update script completed
    - 17E. Application Tracker summary reporting completed
    - 17F. Application Tracker Excel export integration completed
-   - 17G. Weekly Application Tracker email completed
+   - 17G. Weekly Application Tracker email script completed
+   - 17H. Power BI Application Tracker visuals completed
 
 Current next step:
 
-- 17H: Optional Power BI Application Tracker visuals
+- Step 18: GitHub + Portfolio Polish
 
 The main product loop exists:
 
@@ -61,8 +62,8 @@ Application Tracker loop:
     → manual add/update scripts
     → summary reporting
     → Excel export sheets
-    → separate weekly Application Tracker email
-    → future Power BI visuals
+    → separate weekly Application Tracker email script
+    → Power BI Application Tracker dashboard page
 
 ---
 
@@ -82,7 +83,8 @@ Preserve this structure.
     │   ├── filtering_strategy.md
     │   ├── ATS_Coverage_Audit.md or related Step 13 notes if created
     │   └── screenshots/
-    │       └── powerbi_overview_dashboard.png
+    │       ├── powerbi_overview_dashboard.png
+    │       └── application_tracker_dashboard.png
     ├── exports/
     │   └── careersignal_export.xlsx
     ├── logs/
@@ -103,7 +105,7 @@ Preserve this structure.
     │   ├── test_database.py
     │   ├── test_email_report.py
     │   ├── test_match_scoring.py
-    │   └── other preview/test scripts created during Workday, scoring, or tracker steps
+    │   └── other preview/test scripts created during Workday, scoring, tracker, or audit steps
     ├── src/
     │   └── careersignal/
     │       ├── __init__.py
@@ -155,6 +157,8 @@ Preserve the existing project structure:
 - src/careersignal/ contains reusable modules
 - data/careersignal.db is the SQLite database
 - config/company_config.csv is the company config
+- exports/careersignal_export.xlsx is the Excel export used by Power BI
+- reports/careersignal_dashboard.pbix is the Power BI dashboard
 
 Do not use:
 
@@ -170,13 +174,19 @@ Do not rename this script unless intentionally doing a cleanup/refactor step.
 
 Do not modify the daily job alert email during Application Tracker steps unless explicitly approved.
 
-Do not modify Power BI during Application Tracker steps unless explicitly working on the Power BI integration step.
-
-Do not modify Excel export during weekly email work unless explicitly approved.
+Do not modify the weekly Application Tracker email unless explicitly working on weekly email behavior.
 
 Do not schedule the weekly Application Tracker email unless explicitly approved.
 
-Keep Application Tracker steps small and separate.
+Do not create a separate Application Tracker workbook unless explicitly approved.
+
+Do not change the Power BI source path unless there is a confirmed source problem and the fix is approved.
+
+Do not use Select-String -Recurse in PowerShell instructions.
+
+Use this PowerShell pattern instead:
+
+    Get-ChildItem -Recurse -File | Select-String "search text"
 
 ---
 
@@ -197,6 +207,8 @@ Do not recreate them from scratch unless they are missing.
     data/careersignal.db
     docs/CareerSignal_Project_State.md
     docs/filtering_strategy.md
+    docs/screenshots/powerbi_overview_dashboard.png
+    docs/screenshots/application_tracker_dashboard.png
     exports/careersignal_export.xlsx
     logs/careersignal.log
     logs/scheduled_task.log
@@ -243,7 +255,12 @@ Do not use:
 
 - data/jobs.db
 
-The main database already supports job storage, new job detection, and pipeline reporting.
+The main database already supports:
+
+- job storage
+- new job detection
+- pipeline reporting
+- Application Tracker records
 
 Application Tracker also uses:
 
@@ -301,6 +318,11 @@ Workday jobs should use:
 
 Workday jobs must use the official normalized job shape.
 
+Known future issue:
+
+- Some Workday links are broken and should be fixed later.
+- This can wait unless Step 18 polish identifies it as urgent.
+
 ---
 
 ### Match Scoring
@@ -351,7 +373,7 @@ Daily job alert email is separate from the weekly Application Tracker email.
 
 Daily job alert email should not be modified during Application Tracker steps unless explicitly approved.
 
-Weekly Application Tracker email was added in Step 17G as a separate script:
+Weekly Application Tracker email script exists:
 
 - scripts/send_weekly_application_tracker_email.py
 
@@ -370,6 +392,12 @@ The weekly email does not modify:
 - Power BI
 - database schema
 - Windows Task Scheduler configuration
+
+Future update:
+
+- Schedule the weekly Application Tracker email.
+- Preferred future schedule: Friday at 4 PM.
+- Do not schedule it until explicitly working on that step.
 
 ---
 
@@ -411,7 +439,7 @@ Step 17F added Application Tracker sheets to the existing workbook.
 
 Existing job export sheets should remain intact.
 
-Application Tracker export sheets now added:
+Application Tracker export sheets:
 
 - Applications
 - Application Summary
@@ -432,21 +460,85 @@ No separate tracker workbook should exist unless intentionally approved later.
 
 Application Tracker export behavior:
 
-- Applications sheet contains row-level records from the applications table.
-- Application Summary sheet contains overall tracker totals.
-- Company Application Summary sheet contains company-level tracker totals.
-- Application Aging sheet contains waiting-period and ghosting-risk buckets.
-- Aging logic reports risk only.
-- Aging logic does not automatically change statuses in the database.
+Applications sheet:
 
-Aging rules:
+- Full row-level application tracker data from the applications table.
+- Expected fields include:
+  - application_id
+  - date_applied
+  - company_name
+  - job_title
+  - job_url
+  - source
+  - status
+  - first_response_date
+  - interview_date
+  - final_response_date
+  - notes
+  - created_at
+  - updated_at
 
-- 0-14 days with no response = active / normal waiting period
-- 15-30 days with no response = rejection danger zone
-- 31-60 days with no response = ghosting danger zone
-- 61+ days with no response = ghosted candidate / should be reviewed
+Application Summary sheet:
 
-Ghosted applications count as negative outcomes in summary reporting.
+- metric
+- value
+
+Expected metric rows include:
+
+- total applications
+- active applications
+- interviews
+- acceptances
+- formal rejections
+- ghostings
+- negative outcomes
+
+Company Application Summary sheet:
+
+- company_name
+- total applications
+- active applications
+- interviews
+- acceptances
+- formal rejections
+- ghostings
+- negative outcomes
+
+Application Aging sheet:
+
+- application_id
+- company_name
+- job_title
+- date_applied
+- status
+- days_since_applied
+- aging_bucket
+
+Current reporting/export aging rules:
+
+- Non-applied statuses = responded / closed
+- 0-14 days with status applied = active / normal waiting period
+- 15-30 days with status applied = rejection danger zone
+- 31-60 days with status applied = ghosting candidate
+- 61+ days with status applied = ghosted
+
+Important:
+
+- Application Aging reports aging only.
+- It does not mutate the database.
+- It does not automatically change statuses in the database.
+- Ghosted applications count as negative outcomes.
+
+Recent Step 17H change:
+
+- Aging label in export_to_excel.py was updated from:
+  - ghosting danger zone
+  - ghosted candidate / should be reviewed
+- To:
+  - ghosting candidate
+  - ghosted
+
+This was done for clearer reporting and better Power BI dashboard presentation.
 
 ---
 
@@ -466,11 +558,114 @@ After generating a fresh Excel export, refresh Power BI manually:
 
 Current dashboard exists and should not be treated as unstarted.
 
-Application Tracker visuals should come later.
+Step 17H added a dedicated Application Tracker page inside the existing Power BI file.
 
-Step 17F did not modify Power BI visuals or the Power BI file.
+Application Tracker Power BI page title:
 
-Step 17G also did not modify Power BI visuals or the Power BI file.
+- CareerSignal Application Tracker
+
+Application Tracker page visuals:
+
+KPI cards:
+
+- Total
+- Active
+- Interviews
+- Offers
+- Rejections
+- Ghosted
+- Negative
+
+KPI card source:
+
+- Application Summary
+
+Power BI setup note:
+
+- Application Summary is in long format with columns:
+  - metric
+  - value
+- KPI cards use:
+  - value as the card value
+  - metric as a visual-level filter
+
+KPI card metric mapping:
+
+- Total = metric: total applications
+- Active = metric: active applications
+- Interviews = metric: interviews
+- Offers = metric: acceptances
+- Rejections = metric: formal rejections
+- Ghosted = metric: ghostings
+- Negative = metric: negative outcomes
+
+Charts:
+
+Applications by Company:
+
+- Source: Company Application Summary
+- Axis: company_name
+- Value: total applications
+- Aggregation: Sum
+- Important: total applications must be treated as Whole Number in Power Query, not text.
+
+Status Mix:
+
+- Source: Applications
+- Legend: status
+- Values: application_id
+- Aggregation: Count
+
+Applications Over Time:
+
+- Source: Applications
+- X-axis: date_applied
+- Y-axis: Cumulative Applications measure
+- Current visual behaves as cumulative application growth.
+- Suggested title if renamed later: Application Growth
+
+Cumulative Applications DAX measure:
+
+    Cumulative Applications =
+    VAR CurrentDate = MAX('Applications'[date_applied])
+    RETURN
+    CALCULATE(
+        COUNTROWS('Applications'),
+        FILTER(
+            ALL('Applications'),
+            'Applications'[date_applied] <= CurrentDate
+        )
+    )
+
+Aging Watchlist table:
+
+- Source: Application Aging
+- Fields:
+  - company_name
+  - job_title
+  - date_applied
+  - status
+  - days_since_applied
+  - aging_bucket
+- Displayed column names:
+  - Company
+  - Job Title
+  - Date Applied
+  - Status
+  - Days Waiting
+  - Aging Bucket
+
+Important Power BI notes:
+
+- Each visual should generally use fields from one table/query unless relationships are intentionally configured.
+- The Aging Watchlist table should use only the Application Aging table.
+- The Applications by Company chart should use only the Company Application Summary table.
+- The KPI cards should use only the Application Summary table.
+- The job scraper dashboard currently has an issue showing demo companies and needs later cleanup/fix.
+
+Screenshot:
+
+- docs/screenshots/application_tracker_dashboard.png
 
 ---
 
@@ -545,22 +740,21 @@ Step 13 follow-up items:
 7. Review companies with redirects, proprietary systems, or confusing career portals.
 8. Add the rest of the confirmed Greenhouse companies.
 9. Circle back to Workday URL issues.
+10. Add extra connectors for ATS platforms used by more than 5 target companies. This can wait.
 
 ---
 
 ## Step 17 Application Tracker Status
 
-Step 17 is active, with 17A through 17G complete.
+Step 17 is complete through Step 17H.
 
 Goal:
 
-Add a manual application tracking system to CareerSignal that records applications submitted by the user, tracks response outcomes, calculates ghosting/rejection danger zones, summarizes application performance overall and by company, exports Application Tracker sheets to Excel, and sends a separate weekly Application Tracker email.
+Add a manual application tracking system to CareerSignal that records applications submitted by the user, tracks response outcomes, calculates ghosting/rejection danger zones, summarizes application performance overall and by company, exports Application Tracker sheets to Excel, sends a separate weekly Application Tracker email, and visualizes the tracker in Power BI.
 
 Application Tracker remains separate from the automated job collector.
 
 Do not modify the daily job alert email unless explicitly approved.
-
-Do not modify Power BI unless explicitly working on Application Tracker visuals.
 
 ---
 
@@ -634,17 +828,6 @@ Valid statuses:
 - withdrawn
 - closed
 
-Aging rules:
-
-- 0-14 days with no response = active / normal waiting period
-- 15-30 days with no response = rejection danger zone
-- 31-60 days with no response = ghosting danger zone
-- 61+ days with no response = ghosted candidate / should be reviewed
-
-Reporting rule:
-
-- Ghosted applications should count as negative outcomes/rejections in total outcome reporting.
-
 Initializer script:
 
 - scripts/init_application_tracker.py
@@ -653,7 +836,7 @@ Reusable database setup file:
 
 - src/careersignal/application_tracker_db.py
 
-17A does not include:
+17A did not include:
 
 - manual command-line scripts
 - summary reporting
@@ -699,7 +882,7 @@ Important function behavior:
 - fetch_application_by_id(...) returns one application record as a dict or None.
 - fetch_applications(...) returns a list of application record dicts.
 
-17B does not include:
+17B did not include:
 
 - manual command-line scripts
 - summary reporting
@@ -781,7 +964,7 @@ PowerShell-safe cleanup query:
     print("Deleted fake test application")
     '@ | python -
 
-17C does not include:
+17C did not include:
 
 - summary reporting
 - status updates
@@ -835,7 +1018,7 @@ Important implementation notes:
 - The script does not modify Power BI.
 - The script does not build summary reporting.
 
-17D does not include:
+17D did not include:
 
 - summary reporting
 - weekly email
@@ -884,18 +1067,16 @@ Reporting logic should use:
 - data/careersignal.db database
 - official functions from src/careersignal/application_tracker.py where practical
 
-17E does not include:
+Run command:
+
+    python scripts/report_applications.py
+
+17E did not include:
 
 - weekly email
 - Excel export changes
 - Power BI changes
 - daily job alert email changes
-
-17E is complete because the Application Tracker summary reporting script exists and reporting logic is now available for command-line review.
-
-Run command:
-
-    python scripts/report_applications.py
 
 ---
 
@@ -934,37 +1115,17 @@ Expected behavior:
 - No database schema change is made.
 - No statuses are automatically changed.
 - No daily email behavior is changed.
-- No Power BI visuals are changed.
 
 Application Tracker sheet behavior:
 
 Applications sheet:
 
 - Full row-level application tracker data from the applications table.
-- Expected fields include:
-  - application_id
-  - date_applied
-  - company_name
-  - job_title
-  - job_url
-  - source
-  - status
-  - first_response_date
-  - interview_date
-  - final_response_date
-  - notes
-  - created_at
-  - updated_at
 
 Application Summary sheet:
 
-- total applications
-- active applications
-- interviews
-- acceptances
-- formal rejections
-- ghostings
-- negative outcomes
+- metric
+- value
 
 Company Application Summary sheet:
 
@@ -987,18 +1148,19 @@ Application Aging sheet:
 - days_since_applied
 - aging_bucket
 
-Aging rules:
+Current aging rules:
 
-- 0-14 days with no response = active / normal waiting period
-- 15-30 days with no response = rejection danger zone
-- 31-60 days with no response = ghosting danger zone
-- 61+ days with no response = ghosted candidate / should be reviewed
+- Non-applied statuses = responded / closed
+- 0-14 days with status applied = active / normal waiting period
+- 15-30 days with status applied = rejection danger zone
+- 31-60 days with status applied = ghosting candidate
+- 61+ days with status applied = ghosted
 
 Important:
 
 - Application Aging reports aging only.
 - It does not mutate the database.
-- It does not automatically change statuses to ghosted.
+- It does not automatically change statuses in the database.
 - Ghosted applications count as negative outcomes.
 
 Step 17F preserved:
@@ -1051,7 +1213,7 @@ PowerShell-safe sheet confirmation command:
 
 Status:
 
-- Complete
+- Complete script, not scheduled
 
 Goal:
 
@@ -1095,8 +1257,8 @@ Expected weekly tracker email content:
 - ghostings
 - negative outcomes
 - rejection danger zone watchlist
-- ghosting danger zone watchlist
-- 61+ day ghosting candidates
+- ghosting candidate watchlist
+- ghosted items
 - company response summary
 
 Weekly email subject line:
@@ -1161,223 +1323,161 @@ Step 17G did not include:
 - database schema changes
 - automatic ghosting status updates
 
-Test insert command for fake Step 17G rows:
-
-    @'
-    import sqlite3
-    from datetime import date, timedelta
-
-    today = date.today()
-
-    fake_rows = [
-        {
-            "date_applied": today.isoformat(),
-            "company_name": "TEST COMPANY DELETE ME",
-            "job_title": "Fake Weekly Application",
-            "job_url": "https://example.com/weekly",
-            "source": "manual test",
-            "status": "applied",
-            "notes": "Step 17G test row - submitted this week",
-        },
-        {
-            "date_applied": (today - timedelta(days=18)).isoformat(),
-            "company_name": "TEST COMPANY DELETE ME",
-            "job_title": "Fake Rejection Danger Zone Application",
-            "job_url": "https://example.com/rejection-zone",
-            "source": "manual test",
-            "status": "applied",
-            "notes": "Step 17G test row - rejection danger zone",
-        },
-        {
-            "date_applied": (today - timedelta(days=40)).isoformat(),
-            "company_name": "TEST COMPANY DELETE ME",
-            "job_title": "Fake Ghosting Danger Zone Application",
-            "job_url": "https://example.com/ghosting-zone",
-            "source": "manual test",
-            "status": "applied",
-            "notes": "Step 17G test row - ghosting danger zone",
-        },
-        {
-            "date_applied": (today - timedelta(days=70)).isoformat(),
-            "company_name": "TEST COMPANY DELETE ME",
-            "job_title": "Fake 61 Plus Day Application",
-            "job_url": "https://example.com/sixty-one-plus",
-            "source": "manual test",
-            "status": "applied",
-            "notes": "Step 17G test row - 61+ day candidate",
-        },
-    ]
-
-    conn = sqlite3.connect("data/careersignal.db")
-
-    for row in fake_rows:
-        conn.execute(
-            """
-            INSERT INTO applications (
-                date_applied,
-                company_name,
-                job_title,
-                job_url,
-                source,
-                status,
-                notes,
-                created_at,
-                updated_at
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
-            """,
-            (
-                row["date_applied"],
-                row["company_name"],
-                row["job_title"],
-                row["job_url"],
-                row["source"],
-                row["status"],
-                row["notes"],
-            ),
-        )
-
-    conn.commit()
-    conn.close()
-
-    print("Inserted fake Step 17G test rows.")
-    '@ | python -
-
-Test status update command for fake Step 17G rows:
-
-    @'
-    import sqlite3
-    from datetime import date
-
-    today = date.today().isoformat()
-
-    conn = sqlite3.connect("data/careersignal.db")
-    conn.row_factory = sqlite3.Row
-
-    rows = conn.execute(
-        """
-        SELECT application_id, job_title
-        FROM applications
-        WHERE company_name = ?
-        ORDER BY application_id DESC
-        """,
-        ("TEST COMPANY DELETE ME",)
-    ).fetchall()
-
-    for row in rows:
-        job_title = row["job_title"]
-        application_id = row["application_id"]
-
-        if job_title == "Fake Weekly Application":
-            conn.execute(
-                """
-                UPDATE applications
-                SET status = ?,
-                    first_response_date = ?,
-                    interview_date = ?,
-                    updated_at = datetime('now')
-                WHERE application_id = ?
-                """,
-                ("interview", today, today, application_id),
-            )
-
-        elif job_title == "Fake Rejection Danger Zone Application":
-            conn.execute(
-                """
-                UPDATE applications
-                SET status = ?,
-                    first_response_date = ?,
-                    final_response_date = ?,
-                    updated_at = datetime('now')
-                WHERE application_id = ?
-                """,
-                ("rejected", today, today, application_id),
-            )
-
-        elif job_title == "Fake Ghosting Danger Zone Application":
-            conn.execute(
-                """
-                UPDATE applications
-                SET status = ?,
-                    final_response_date = ?,
-                    updated_at = datetime('now')
-                WHERE application_id = ?
-                """,
-                ("ghosted", today, application_id),
-            )
-
-    conn.commit()
-    conn.close()
-
-    print("Updated fake Step 17G test rows.")
-    '@ | python -
-
-PowerShell-safe cleanup command for fake Step 17G rows:
-
-    @'
-    import sqlite3
-
-    conn = sqlite3.connect("data/careersignal.db")
-
-    conn.execute(
-        "DELETE FROM applications WHERE company_name = ?",
-        ("TEST COMPANY DELETE ME",)
-    )
-
-    conn.commit()
-    conn.close()
-
-    print("Deleted fake Step 17G test rows.")
-    '@ | python -
-
-PowerShell-safe confirmation after cleanup:
-
-    @'
-    import sqlite3
-
-    conn = sqlite3.connect("data/careersignal.db")
-    conn.row_factory = sqlite3.Row
-
-    rows = conn.execute(
-        "SELECT * FROM applications WHERE company_name = ?",
-        ("TEST COMPANY DELETE ME",)
-    ).fetchall()
-
-    print(f"Remaining fake rows: {len(rows)}")
-
-    conn.close()
-    '@ | python -
-
-Expected cleanup result:
-
-    Remaining fake rows: 0
-
 ---
 
 ### Step 17H: Power BI Application Tracker Visuals
 
 Status:
 
-- Optional / later
+- Complete
 
 Goal:
 
 Add Application Tracker visuals to Power BI after Excel export sheets are stable.
 
-Possible visuals:
+Updated file:
 
-- KPI cards for total applications, interviews, rejections, ghostings, acceptances
-- bar chart for applications by company
-- bar chart for outcomes by company
-- aging table
-- status distribution chart
-- applications over time
+- reports/careersignal_dashboard.pbix
 
-Important:
+Supporting screenshot:
 
-- Do not modify the Power BI file unless explicitly working on this step.
-- Do not change the Power BI source path.
-- Use exports/careersignal_export.xlsx as the data source.
+- docs/screenshots/application_tracker_dashboard.png
+
+Updated file due to aging label change:
+
+- scripts/export_to_excel.py
+
+Power BI source preserved:
+
+- exports/careersignal_export.xlsx
+
+Dedicated page added:
+
+- Application Tracker
+
+Dashboard title:
+
+- CareerSignal Application Tracker
+
+Visuals added:
+
+KPI cards:
+
+- Total
+- Active
+- Interviews
+- Offers
+- Rejections
+- Ghosted
+- Negative
+
+Charts:
+
+- Applications by Company
+- Status Mix
+- Applications Over Time / cumulative application growth
+
+Table:
+
+- Aging Watchlist
+
+Important implementation notes:
+
+- KPI cards use the Application Summary sheet.
+- Application Summary has metric/value layout.
+- Each KPI card uses value and filters by metric.
+- Applications by Company uses Company Application Summary.
+- total applications must be Whole Number and aggregated as Sum.
+- Status Mix uses Applications.
+- Applications Over Time uses Applications and a cumulative DAX measure.
+- Aging Watchlist uses Application Aging only.
+- The new page was added to the existing reports/careersignal_dashboard.pbix file.
+- Existing job alert/dashboard visuals were intended to remain intact.
+- Power BI must be manually refreshed after running python scripts/export_to_excel.py.
+
+Step 17H did not include:
+
+- weekly email scheduling
+- automatic database status updates
+- new ATS connectors
+- Workday link fixes
+- job scraper dashboard cleanup
+- database schema changes
+
+Known Step 17H cleanup item:
+
+- Demo companies were inserted temporarily for screenshots and need to be cleaned out.
+- The job scraper dashboard is currently showing demo companies and needs to be fixed/cleaned during polish.
+- Do not leave demo data in the real project database unless intentionally keeping demo data for a local screenshot version.
+
+---
+
+## Future Updates and Fine-Tuning
+
+### Application Dashboard Future Updates
+
+1. Set up weekly emails.
+   - The script exists: scripts/send_weekly_application_tracker_email.py
+   - Preferred future schedule: Friday at 4 PM
+   - Do not modify the daily job alert email while doing this.
+   - Do not schedule until explicitly working on that step.
+
+2. Clean out demo companies.
+   - Demo companies were used for Power BI screenshots.
+   - They should be removed from the database after screenshots are captured.
+   - After cleanup, rerun:
+     python scripts/export_to_excel.py
+   - Then refresh Power BI.
+   - Decide whether the saved .pbix should retain demo screenshot data or clean real data.
+
+3. Clean up rest of files for GitHub polish.
+   - Remove temporary files.
+   - Confirm .env and secrets are not staged.
+   - Confirm logs, database, and generated exports are handled correctly by .gitignore.
+   - Polish README.
+   - Add final screenshots.
+   - Add sample outputs where appropriate.
+
+4. Figure out how to add applications to program.
+   - Current method is command line:
+     python scripts/add_application.py --company "RSM" --title "Audit Associate" --date-applied "2026-06-01"
+   - Future improvement may be a cleaner CLI workflow, CSV import, or simple Streamlit form.
+   - Keep reusable logic in src/careersignal/.
+   - Keep runnable scripts in scripts/.
+
+5. Change status updates to auto based on days since applying.
+   - This can wait.
+   - Do not silently mutate the database without an intentional step.
+   - Preferred safe approach:
+     - Add a reporting/display status first, or
+     - Add a separate script that marks 61+ day applied rows as ghosted only when intentionally run.
+   - Avoid hidden automatic status changes unless clearly documented.
+
+Current desired future logic if implemented later:
+
+- 0-14 days with status applied = active / normal waiting period
+- 15-30 days with status applied = rejection danger zone
+- 31-60 days with status applied = ghosting candidate
+- 61+ days with status applied = status can be reviewed or automatically changed to ghosted, if explicitly approved
+
+---
+
+### Job Scraper Future Updates
+
+1. Fix the existing job scraper dashboard.
+   - It is currently showing demo companies.
+   - This should be cleaned up during Step 18 GitHub + Portfolio Polish.
+   - Confirm job scraper visuals use job export tables, not Application Tracker demo data.
+
+2. Add extra connectors for ATS platforms used by more than 5 companies.
+   - This can wait.
+   - Use the ATS Coverage Audit to decide connector priority.
+   - Do not build one-off connectors unless the company is high value.
+
+3. Fix broken Workday links.
+   - This can wait.
+   - Review Workday source URL handling.
+   - Preserve normalized job shape and source_ats = workday.
 
 ---
 
@@ -1385,7 +1485,9 @@ Important:
 
 ### Step 17: Application Tracker
 
-Current active step.
+Status:
+
+- Complete through Step 17H
 
 Completed:
 
@@ -1395,15 +1497,8 @@ Completed:
 - 17D: Manual status-update script
 - 17E: Application tracker summary reporting
 - 17F: Excel export integration
-- 17G: Weekly tracker email
-
-Current next step:
-
-- 17H: Optional Power BI Application Tracker visuals
-
-Planned:
-
-- 17H: Optional Power BI visuals
+- 17G: Weekly tracker email script
+- 17H: Power BI visuals
 
 ---
 
@@ -1411,18 +1506,17 @@ Planned:
 
 Status:
 
-- Planned, not current
+- Current next major phase
 
 Purpose:
 
 Clean README, screenshots, sample outputs, final testing, resume bullets, and portfolio presentation.
 
-Required before heavily featuring the project on a resume.
-
 Step 18 should update:
 
 - README.md
 - docs/CareerSignal_Project_State.md
+- docs/screenshots/ if screenshots are added or replaced
 
 Step 18 should not:
 
@@ -1437,30 +1531,40 @@ Step 18 validation should confirm:
 
 - preview run works
 - send run works
-- email arrives
-- email only includes jobs first seen in the past 24 hours
+- daily email arrives
+- daily email only includes jobs first seen in the past 24 hours
 - match scores show correctly
 - failed sources show correctly
 - Excel export updates
 - Application Tracker sheets exist in the Excel export
 - weekly Application Tracker email previews correctly
-- weekly Application Tracker email sends correctly
+- weekly Application Tracker email sends correctly if intentionally tested
 - Power BI refresh works from exports/careersignal_export.xlsx
+- Application Tracker Power BI page works
+- screenshots exist and are clean
 - logs update
 - no data/jobs.db references
+- no stale application_tracker table SQL
 - no old function names
 - no secrets staged for Git
 
 Step 18 known action items:
 
-- Fix or confirm the Power BI data source so it pulls from exports/careersignal_export.xlsx instead of an old test file.
+- Clean out demo companies.
+- Fix the job scraper dashboard if it is showing demo companies.
+- Confirm the Power BI data source pulls from exports/careersignal_export.xlsx.
 - Check and confirm that match scoring appears correctly in sent emails.
 - Make sure sent emails include only jobs first seen in the past 24 hours.
 - Circle back to Step 13 Workday URL issues.
-- Add the rest of the confirmed Greenhouse companies.
+- Add the rest of the confirmed Greenhouse companies if ready.
 - Polish README for portfolio/resume presentation.
 - Add screenshots and sample outputs.
-- Add or update notes for the Application Tracker, Excel export sheets, and weekly tracker email.
+- Add or update notes for the Application Tracker, Excel export sheets, weekly tracker email, and Power BI dashboard.
+- Decide whether to mention future enhancements:
+  - weekly tracker scheduling
+  - automatic ghosting status update
+  - extra ATS connectors
+  - Streamlit UI
 
 ---
 
@@ -1472,6 +1576,13 @@ Status:
 
 Only if a prettier local interface is wanted later.
 
+Possible purpose:
+
+- Add applications through a form
+- Update statuses through a form
+- View tracker summaries locally
+- Avoid doing all manual application entry through PowerShell
+
 Nice-to-have, not required.
 
 ---
@@ -1480,12 +1591,29 @@ Nice-to-have, not required.
 
 Current must-do path:
 
-- 18: GitHub + Portfolio Polish
+- Step 18: GitHub + Portfolio Polish
+
+Application Dashboard future updates:
+
+- Schedule weekly emails
+- Clean out demo companies
+- Clean up files for GitHub polish
+- Improve how applications are added to the program
+- Optional later: auto status updates based on days since applying
+
+Job Scraper future updates:
+
+- Fix dashboard showing demo companies
+- Optional later: add extra ATS connectors for ATS platforms with more than 5 target companies
+- Optional later: fix broken Workday links
 
 Nice-to-have:
 
-- 17H: Power BI Application Tracker visuals
-- 19: Optional Streamlit UI
+- Step 19: Optional Streamlit UI
+- Automatic status update script
+- Additional ATS connectors
+- Cleaner application-entry workflow
+- More polished Power BI styling
 
 ---
 
@@ -1619,8 +1747,48 @@ Excel export sheet confirmation:
         print("Missing:", missing)
         raise SystemExit(1)
 
-    print("All Step 17F sheets exist.")
+    print("All Application Tracker sheets exist.")
     '@ | python -
+
+Temporary demo data cleanup command:
+
+    @'
+    import sqlite3
+
+    conn = sqlite3.connect("data/careersignal.db")
+
+    conn.execute(
+        "DELETE FROM applications WHERE source = ?",
+        ("demo data",)
+    )
+
+    conn.commit()
+    conn.close()
+
+    print("Deleted temporary demo application rows.")
+    '@ | python -
+
+Temporary demo data cleanup confirmation:
+
+    @'
+    import sqlite3
+
+    conn = sqlite3.connect("data/careersignal.db")
+    conn.row_factory = sqlite3.Row
+
+    rows = conn.execute(
+        "SELECT * FROM applications WHERE source = ?",
+        ("demo data",)
+    ).fetchall()
+
+    print(f"Remaining demo rows: {len(rows)}")
+
+    conn.close()
+    '@ | python -
+
+Expected cleanup result:
+
+    Remaining demo rows: 0
 
 ---
 
@@ -1713,6 +1881,31 @@ Expected result:
 - Weekly preview still works.
 - Weekly email remains separate from daily job alert email.
 
+Power BI / Excel export checks:
+
+    python scripts/export_to_excel.py
+
+    @'
+    from openpyxl import load_workbook
+
+    workbook = load_workbook("exports/careersignal_export.xlsx", read_only=True)
+
+    required = {
+        "Applications",
+        "Application Summary",
+        "Company Application Summary",
+        "Application Aging",
+    }
+
+    missing = required - set(workbook.sheetnames)
+
+    if missing:
+        print("Missing:", missing)
+        raise SystemExit(1)
+
+    print("All Application Tracker sheets exist.")
+    '@ | python -
+
 ---
 
 ## Git Guidance
@@ -1773,6 +1966,12 @@ Step 17G:
     git commit -m "Add weekly application tracker email"
     git push
 
+Step 17H:
+
+    git add reports/careersignal_dashboard.pbix scripts/export_to_excel.py docs/screenshots/application_tracker_dashboard.png
+    git commit -m "Add application tracker Power BI visuals"
+    git push
+
 Avoid committing:
 
 - .env
@@ -1780,6 +1979,7 @@ Avoid committing:
 - data/careersignal.db if intentionally ignored
 - exports/careersignal_export.xlsx if intentionally ignored
 - temporary test files
+- temporary backup .pbix files
 - email passwords
 - SMTP secrets
 
@@ -1788,6 +1988,11 @@ Before committing, always run:
     git status
     git diff --cached
 
+Important:
+
+- .pbix files and screenshots are binary, so git diff will not show meaningful line-by-line changes for them.
+- git diff --cached should still show text changes for scripts/export_to_excel.py and docs/CareerSignal_Project_State.md.
+
 If updating only the project state file, prefer:
 
     git add docs/CareerSignal_Project_State.md
@@ -1795,18 +2000,11 @@ If updating only the project state file, prefer:
     git commit -m "Update CareerSignal project state"
     git push
 
-If committing Step 17G only, prefer:
+If committing Step 17H and the updated project state together, prefer:
 
-    git add scripts/send_weekly_application_tracker_email.py
+    git add reports/careersignal_dashboard.pbix scripts/export_to_excel.py docs/screenshots/application_tracker_dashboard.png docs/CareerSignal_Project_State.md
     git diff --cached
-    git commit -m "Add weekly application tracker email"
-    git push
-
-If committing Step 17G and the updated project state together, prefer:
-
-    git add scripts/send_weekly_application_tracker_email.py docs/CareerSignal_Project_State.md
-    git diff --cached
-    git commit -m "Add weekly application tracker email"
+    git commit -m "Add application tracker Power BI visuals"
     git push
 
 ---
@@ -1828,21 +2026,23 @@ Before giving code:
 11. Preserve preview mode and send mode.
 12. Keep .env and secrets out of GitHub.
 13. Keep the response beginner-friendly and step-by-step.
-14. During Step 17, do not modify daily job alert behavior unless explicitly approved.
-15. During Step 17, keep Application Tracker steps small and separate.
-16. During Step 17, use the actual table name applications.
-17. During Step 17, use the actual primary key application_id.
-18. During Step 17, keep runnable scripts in scripts/.
-19. During Step 17, keep reusable logic in src/careersignal/.
+14. During Application Tracker work, do not modify daily job alert behavior unless explicitly approved.
+15. During Application Tracker work, keep steps small and separate.
+16. During Application Tracker work, use the actual table name applications.
+17. During Application Tracker work, use the actual primary key application_id.
+18. During Application Tracker work, keep runnable scripts in scripts/.
+19. During Application Tracker work, keep reusable logic in src/careersignal/.
 20. Do not use Select-String -Recurse in PowerShell instructions.
 21. Use Get-ChildItem -Recurse -File | Select-String "pattern" instead.
 22. Do not create a separate Application Tracker workbook unless explicitly approved.
 23. Do not change the Power BI source path unless explicitly working on that issue.
 24. Do not add Application Tracker stats to the daily email unless explicitly approved.
-25. Keep the weekly Application Tracker email separate from the daily job alert email at first.
+25. Keep the weekly Application Tracker email separate from the daily job alert email.
 26. Do not schedule the weekly Application Tracker email unless explicitly approved.
-27. Do not modify Excel export during weekly email work unless explicitly approved.
-28. Do not modify Power BI during weekly email work unless explicitly approved.
+27. Do not modify Excel export unless explicitly working on Excel export or reporting/dashboard output.
+28. Do not modify Power BI unless explicitly working on Power BI or dashboard polish.
+29. Treat demo data as temporary unless intentionally keeping it for screenshots.
+30. Before GitHub polish, confirm demo companies are cleaned out or clearly separated from real/demo portfolio outputs.
 
 ---
 
@@ -1896,6 +2096,14 @@ Excel export workbook:
 
 - exports/careersignal_export.xlsx
 
+Power BI file:
+
+- reports/careersignal_dashboard.pbix
+
+Application Tracker screenshot:
+
+- docs/screenshots/application_tracker_dashboard.png
+
 Application Tracker Excel sheets:
 
 - Applications
@@ -1914,10 +2122,15 @@ Official reusable functions:
 - fetch_application_by_id
 - fetch_applications
 
-Current next planned step:
+Current aging labels for reporting/export:
 
-- 17H: Optional Power BI Application Tracker visuals
+- active / normal waiting period
+- rejection danger zone
+- ghosting candidate
+- ghosted
+- responded / closed
+- missing or invalid application date
 
-Current must-do next phase:
+Current next planned phase:
 
 - Step 18: GitHub + Portfolio Polish
