@@ -37,3 +37,12 @@ data/*.sqlite3
 # Backup files
 config/*backup*.csv
 config/*_backup_*.csv
+
+# Tool caches
+.pytest_cache/
+.ruff_cache/
+
+# Power BI local/cache/temp files
+*.pbitmp
+*.tmp
+~$*
