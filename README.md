@@ -2,9 +2,9 @@
 
 [![CareerSignal Tests](https://github.com/nepounds/CareerSignal/actions/workflows/tests.yml/badge.svg)](https://github.com/nepounds/CareerSignal/actions/workflows/tests.yml)
 
-CareerSignal is a Python/SQL career intelligence pipeline that monitors target company career pages, collects job postings, stores results in SQLite, scores job fit, sends daily email reports, exports Excel reports, and supports Power BI dashboard reporting.
+CareerSignal is a local Python/SQL career intelligence pipeline that monitors target company career pages, collects job postings, stores results in SQLite, scores job fit, sends daily email reports, exports Excel reports, supports Power BI dashboard reporting, and includes a manual Application Tracker dashboard.
 
-The project was built as a portfolio project to demonstrate practical Python, SQL, automation, reporting, and business analysis skills.
+The project was built as a portfolio project to demonstrate practical Python, SQL, automation, reporting, Power BI, and business analysis skills.
 
 ## Project Purpose
 
@@ -12,12 +12,14 @@ Most job searching is manual, repetitive, and easy to miss. CareerSignal was bui
 
 CareerSignal does not try to scrape every company on the internet. Instead, it uses a controlled company configuration file and supports only career platforms that the project can handle reliably.
 
-The current version supports:
+The current job collection pipeline supports:
 
 * Greenhouse
 * Workday
 
 Other ATS platforms and manual-only career pages are tracked in an ATS audit file for future improvement.
+
+CareerSignal also includes a manual Application Tracker layer so job discovery and application follow-up can be tracked in the same reporting system.
 
 ## What CareerSignal Does
 
@@ -31,12 +33,18 @@ CareerSignal can:
 * Track first-seen and last-seen dates
 * Detect jobs first seen in the past 24 hours
 * Score jobs based on target titles, keywords, locations, and role fit
-* Send a daily email report
+* Send a daily job alert email report
 * Include failed sources in the report
 * Export job data to Excel
 * Feed a Power BI dashboard
 * Run automatically with Windows Task Scheduler
 * Separate supported companies from unsupported/manual-only companies through an ATS audit
+* Track manual job applications
+* Update application statuses
+* Report application totals, interviews, rejections, ghosting candidates, and outcomes
+* Export Application Tracker sheets to the same Excel workbook
+* Preview or send a separate weekly Application Tracker email
+* Display Application Tracker visuals in Power BI
 * Run automated tests and lint checks through GitHub Actions
 
 ## How It Works
@@ -53,6 +61,18 @@ Windows Task Scheduler
 → daily email report
 → Excel export
 → Power BI dashboard
+```
+
+Application Tracker flow:
+
+```text
+manual application entry
+→ applications table in SQLite
+→ status updates
+→ summary reporting
+→ Excel export sheets
+→ weekly Application Tracker email
+→ Power BI Application Tracker dashboard
 ```
 
 ## Pipeline Overview
@@ -120,7 +140,7 @@ This lets the rest of the pipeline process Greenhouse and Workday jobs the same 
 
 ### 4. SQLite Database
 
-CareerSignal stores collected jobs in:
+CareerSignal stores collected jobs and application records in:
 
 ```text
 data/careersignal.db
@@ -134,6 +154,8 @@ The database supports:
 * Last-seen tracking
 * New job detection
 * Match scoring support
+* Run logging
+* Application tracking
 * Excel and Power BI reporting
 
 The project does **not** use:
@@ -176,7 +198,7 @@ Suggested score bands:
 
 ### 7. Daily Email Report
 
-CareerSignal can send a daily email report containing:
+CareerSignal can send a daily job alert email containing:
 
 * Summary of the run
 * Number of companies checked
@@ -191,9 +213,67 @@ The email report is sent through SMTP using local `.env` settings.
 
 The `.env` file is not committed to GitHub.
 
-### 8. Excel Export
+### 8. Application Tracker
 
-CareerSignal exports job data to:
+CareerSignal includes a manual Application Tracker for recording jobs after applying.
+
+Application Tracker data is stored in the same SQLite database:
+
+```text
+data/careersignal.db
+```
+
+Application Tracker table:
+
+```text
+applications
+```
+
+Application Tracker scripts:
+
+```text
+scripts/init_application_tracker.py
+scripts/add_application.py
+scripts/update_application_status.py
+scripts/report_applications.py
+scripts/send_weekly_application_tracker_email.py
+```
+
+Add an application:
+
+```powershell
+python scripts/add_application.py --company "RSM" --title "Audit Associate" --date-applied "2026-06-01"
+```
+
+Update an application status:
+
+```powershell
+python scripts/update_application_status.py --id 4 --status interview
+```
+
+View Application Tracker reporting:
+
+```powershell
+python scripts/report_applications.py
+```
+
+Preview the weekly Application Tracker email:
+
+```powershell
+python scripts/send_weekly_application_tracker_email.py --preview
+```
+
+Send the weekly Application Tracker email:
+
+```powershell
+python scripts/send_weekly_application_tracker_email.py --send
+```
+
+The weekly Application Tracker email is separate from the daily job alert email.
+
+### 9. Excel Export
+
+CareerSignal exports job and Application Tracker data to:
 
 ```text
 exports/careersignal_export.xlsx
@@ -207,7 +287,14 @@ python scripts/export_to_excel.py
 
 The Excel export is used as the Power BI data source.
 
-### 9. Power BI Dashboard
+Application Tracker sheets include:
+
+* Applications
+* Application Summary
+* Company Application Summary
+* Application Aging
+
+### 10. Power BI Dashboard
 
 The Power BI dashboard is stored in:
 
@@ -221,6 +308,16 @@ The dashboard uses:
 exports/careersignal_export.xlsx
 ```
 
+The Power BI report includes:
+
+* Job discovery overview
+* Job collection/reporting visuals
+* Application Tracker dashboard page
+* Application status mix
+* Application totals
+* Application aging/watchlist reporting
+* Application trends over time
+
 Power BI Desktop requires manual refresh unless the report is published and configured for scheduled refresh separately.
 
 Manual refresh:
@@ -229,11 +326,11 @@ Manual refresh:
 Home > Refresh
 ```
 
-### 10. Daily Automation
+### 11. Daily Automation
 
 CareerSignal can run automatically through Windows Task Scheduler.
 
-The batch file is:
+The daily batch file is:
 
 ```text
 run_careersignal_daily.bat
@@ -241,13 +338,25 @@ run_careersignal_daily.bat
 
 The scheduled task runs the collection script and Excel export so the pipeline can update daily without manually running each command.
 
+There is also a weekly Application Tracker batch file:
+
+```text
+run_weekly_application_tracker_email.bat
+```
+
+That batch file can be used to send the weekly Application Tracker email. Scheduling it in Windows Task Scheduler is optional.
+
 ## Screenshots
 
 Screenshots use sample/demo output generated from the CareerSignal pipeline. Private credentials, local database files, logs, and real email settings are excluded from the repository.
 
-### Power BI Dashboard
+### Power BI Job Dashboard
 
-![Power BI dashboard](docs/screenshots/powerbi_overview_dashboard.png)
+![Power BI job dashboard](docs/screenshots/powerbi_overview_dashboard.png)
+
+### Application Tracker Dashboard
+
+![Application Tracker dashboard](docs/screenshots/application_tracker_dashboard.png)
 
 ### Daily Email Report
 
@@ -267,13 +376,20 @@ Screenshots use sample/demo output generated from the CareerSignal pipeline. Pri
 CareerSignal/
 ├── config/
 │   ├── company_config.csv
-│   └── company_ats_audit.csv
+│   ├── company_ats_audit.csv
+│   ├── match_rules.json
+│   └── workday_api_url_test_results.csv
 ├── data/
 │   └── .gitkeep
 ├── docs/
 │   ├── CareerSignal_Project_State.md
 │   ├── filtering_strategy.md
 │   └── screenshots/
+│       ├── application_tracker_dashboard.png
+│       ├── excel_export_sample.png
+│       ├── powerbi_overview_dashboard.png
+│       ├── sample_daily_email.png
+│       └── task_scheduler_setup.png
 ├── exports/
 │   └── .gitkeep
 ├── logs/
@@ -284,31 +400,56 @@ CareerSignal/
 │   └── workflows/
 │       └── tests.yml
 ├── scripts/
+│   ├── add_application.py
+│   ├── add_match_scoring_columns.py
+│   ├── check_application_tracker.py
+│   ├── check_generated_workday_api_urls.py
 │   ├── collect_greenhouse_jobs.py
+│   ├── export_ready_companies_to_config.py
 │   ├── export_to_excel.py
 │   ├── generate_company_config_from_audit.py
+│   ├── init_application_tracker.py
+│   ├── init_database.py
 │   ├── preview_workday_jobs.py
+│   ├── preview_workday_normalized_jobs.py
+│   ├── report_applications.py
+│   ├── send_weekly_application_tracker_email.py
+│   ├── show_applications.py
 │   ├── test_config_loader.py
 │   ├── test_database.py
 │   ├── test_email_report.py
+│   ├── test_job_normalizer.py
 │   ├── test_match_scoring.py
-│   └── verify_ats_audit.py
+│   ├── test_new_job_detection.py
+│   ├── update_application_status.py
+│   ├── update_match_scores.py
+│   ├── verify_ats_audit.py
+│   └── view_database.py
 ├── src/
 │   └── careersignal/
+│       ├── __init__.py
+│       ├── application_tracker.py
+│       ├── application_tracker_db.py
 │       ├── config_loader.py
 │       ├── database.py
 │       ├── email_report.py
+│       ├── job_normalizer.py
 │       ├── logging_config.py
+│       ├── main.py
 │       ├── match_scoring.py
 │       └── collectors/
+│           ├── __init__.py
 │           ├── greenhouse.py
 │           └── workday.py
 ├── tests/
+│   ├── .gitkeep
 │   ├── test_email_report.py
 │   └── test_match_scoring.py
 ├── run_careersignal_daily.bat
+├── run_weekly_application_tracker_email.bat
 ├── .env.example
 ├── .gitignore
+├── pyproject.toml
 ├── README.md
 └── requirements.txt
 ```
@@ -390,7 +531,7 @@ Preview collection without sending email:
 python scripts/collect_greenhouse_jobs.py --preview
 ```
 
-Run collection and send email:
+Run collection and send daily email:
 
 ```powershell
 python scripts/collect_greenhouse_jobs.py --send
@@ -402,10 +543,46 @@ Export to Excel:
 python scripts/export_to_excel.py
 ```
 
+Preview weekly Application Tracker email:
+
+```powershell
+python scripts/send_weekly_application_tracker_email.py --preview
+```
+
+Send weekly Application Tracker email:
+
+```powershell
+python scripts/send_weekly_application_tracker_email.py --send
+```
+
+Add an application:
+
+```powershell
+python scripts/add_application.py --company "RSM" --title "Audit Associate" --date-applied "2026-06-01"
+```
+
+Update an application status:
+
+```powershell
+python scripts/update_application_status.py --id 4 --status interview
+```
+
+Run Application Tracker report:
+
+```powershell
+python scripts/report_applications.py
+```
+
 Run the daily automation manually:
 
 ```powershell
 .\run_careersignal_daily.bat
+```
+
+Run the weekly Application Tracker batch file manually:
+
+```powershell
+.\run_weekly_application_tracker_email.bat
 ```
 
 Check logs:
@@ -413,6 +590,7 @@ Check logs:
 ```powershell
 Get-Content .\logs\careersignal.log -Tail 100
 Get-Content .\logs\scheduled_task.log -Tail 100
+Get-Content .\logs\weekly_application_tracker_email.log -Tail 100
 ```
 
 Run pytest unit tests:
@@ -537,6 +715,14 @@ The ATS audit showed that many employers use unsupported, proprietary, or manual
 
 Future connector work should be prioritized based on audit counts and target-company value, not random guessing.
 
+### Application Tracking Is Kept Separate from Job Collection
+
+The automated job collector finds and reports new job postings.
+
+The Application Tracker records applications after they have been submitted manually.
+
+Keeping these separate prevents the daily job alert pipeline from accidentally changing application statuses or mixing job discovery data with application outcome data.
+
 ### The Project Uses Local Files Intentionally
 
 CareerSignal uses local SQLite, Excel, and Power BI files because the goal is to demonstrate a practical, understandable portfolio pipeline.
@@ -545,7 +731,7 @@ The project is intentionally local-first rather than cloud-first.
 
 ## Strengths of the Project
 
-CareerSignal demonstrates more than just basic Python scripting.
+CareerSignal demonstrates more than basic Python scripting.
 
 Key strengths:
 
@@ -561,9 +747,14 @@ Key strengths:
 * Error handling and logging
 * Excel export
 * Power BI dashboard integration
+* Manual Application Tracker
+* Application status updates
+* Application outcome reporting
+* Weekly Application Tracker email
 * Windows Task Scheduler automation
 * ATS audit and source triage
 * Separation between production-ready sources and unsupported/manual sources
+* Separation between job discovery and application tracking
 * Pytest unit tests for core behavior
 * GitHub Actions CI workflow
 * Ruff linting for code quality checks
@@ -572,158 +763,36 @@ A major strength of the project is that it deals with messy real-world data inst
 
 The ATS audit became an important part of the project because it showed which companies could be automated now, which companies need future connector support, and which companies should stay manual.
 
-## Weaknesses and Current Limitations
+## Current Limitations
 
 CareerSignal is functional, but it has limitations.
 
 Current limitations:
 
-* Only Greenhouse and Workday are supported.
+* Only Greenhouse and Workday are supported for automated job collection.
 * Many target companies use unsupported ATS platforms.
 * Some companies use proprietary portals or email-only application pages.
 * Workday URLs can require manual review because Workday career sites vary by company.
 * Power BI Desktop requires manual refresh unless the report is published and configured separately.
-* The project does not currently include an application tracker.
-* The project includes basic pytest coverage, but the test suite is still small and does not yet cover every collector, database edge case, or reporting path.
 * The project is local-first and not deployed as a hosted application.
-* Some audit results still require manual verification.
+* The Application Tracker is manual and does not yet automatically change statuses based on age.
+* The test suite covers key behavior, but it does not yet cover every collector, database edge case, or reporting path.
+* Some ATS audit results still require manual verification.
 
 These limitations are expected for a portfolio version of the project and are documented so future improvements are clear.
 
-## What I Would Improve Next Time
-
-If I were rebuilding or expanding CareerSignal, I would improve the project in these areas:
-
-### 1. Plan the ATS Audit Earlier
-
-The ATS audit should happen before building too much connector logic.
-
-The project showed that bad ATS assumptions can waste time. Some companies originally looked like Workday or Greenhouse targets but turned out to use Oracle, iCIMS, ADP, UKG, Avature, proprietary portals, or email-only career pages.
-
-Next time, I would perform the ATS audit first and use it to decide which connectors are worth building.
-
-### 2. Build Connector Priority from Audit Counts
-
-Instead of adding connectors randomly, I would rank future connectors by:
-
-* Number of target companies using that ATS
-* Value of those companies
-* Technical feasibility
-* Stability of the job platform
-
-This would make future connector work more strategic.
-
-### 3. Improve Empty-State Handling
-
-Power BI and Excel reporting should handle empty result sets more clearly.
-
-A blank dashboard is technically correct when there are no matching jobs, but a better version would show clear cards like:
-
-```text
-0 new jobs found
-0 high-match jobs
-Last successful refresh: date/time
-```
-
-That would make the dashboard easier to understand.
-
-### 4. Expand Test Coverage
-
-The project now includes pytest unit tests and GitHub Actions CI, but the test suite is still intentionally small.
-
-A future version should expand tests around:
-
-* Database insert/update behavior
-* Collector normalization
-* Workday URL edge cases
-* Greenhouse collector behavior
-* Excel export output
-* Empty result handling
-* Email report formatting paths
-
-This would make future refactoring safer.
-
-### 5. Add More ATS Connectors
-
-Future versions should add support for more ATS platforms based on audit results.
-
-Potential future connectors include:
-
-* Oracle Cloud Recruiting
-* iCIMS
-* ADP
-* UKG
-* Avature
-* Lever
-* Ashby
-* SmartRecruiters
-* NEOGOV / GovernmentJobs
-* USAJobs, if useful for public-sector roles
-
-These should only be added when the audit shows enough value to justify them.
-
-### 6. Add an Application Tracker
-
-A future version should include an application tracker with statuses such as:
-
-* saved
-* applied
-* interview
-* rejected
-* offer
-* skipped
-* closed
-
-This would allow CareerSignal to track not only job discovery, but also the full application pipeline.
-
-Possible future reporting:
-
-* applications by company
-* applications by status
-* response rate
-* interview rate
-* offer rate
-* time from discovery to application
-* time from application to response
-
-### 7. Improve Dashboard Pages
-
-The current Power BI dashboard proves the reporting concept.
-
-Future dashboard improvements could include:
-
-* Overview page
-* Company-level summary
-* Match score breakdown
-* New jobs by day
-* Failed source tracking
-* ATS coverage summary
-* Application tracker reporting, once added
-
-## Known Limitations
-
-* CareerSignal currently supports only Greenhouse and Workday.
-* Unsupported ATS platforms are tracked in the audit but excluded from the live config.
-* Some career pages require manual review.
-* Some companies use proprietary or email-only application processes.
-* Power BI Desktop requires manual refresh unless configured separately.
-* Local files such as the database, logs, exports, and `.env` are excluded from GitHub.
-* Screenshots may use sample/demo data for presentation.
-
 ## Future Improvements
 
-Planned or possible future improvements:
+Planned future improvements are intentionally limited to the next useful upgrades.
 
-* Add support for more ATS platforms based on audit priority.
-* Add an application tracker.
-* Improve Power BI dashboard pages.
-* Add stronger empty-state reporting.
-* Expand pytest coverage for database insert/update behavior, collector normalization, and edge cases.
-* Add stricter linting or formatting rules as the project grows.
-* Add more detailed run history reporting.
-* Improve Workday endpoint validation.
-* Add connector-specific diagnostics.
-* Add optional local UI later if useful.
+### Application Dashboard
+
+* Change application status updates to auto-update based on days since applying.
+
+### Job Scraper
+
+* Add extra ATS connectors for ATS platforms used by more than five target companies.
+* Fix broken Workday links.
 
 ## GitHub Safety
 
@@ -739,6 +808,7 @@ email passwords
 SMTP credentials
 private exports
 temporary backup files
+local cache files
 ```
 
 The repository can safely include:
@@ -748,9 +818,12 @@ README.md
 requirements.txt
 .env.example
 .gitignore
+pyproject.toml
 run_careersignal_daily.bat
+run_weekly_application_tracker_email.bat
 config/company_config.csv
 config/company_ats_audit.csv
+config/match_rules.json
 docs/
 reports/careersignal_dashboard.pbix
 .github/workflows/tests.yml
@@ -761,8 +834,8 @@ tests/
 
 ## Final Project Summary
 
-CareerSignal is a local Python/SQL pipeline for automated job discovery and reporting.
+CareerSignal is a local Python/SQL pipeline for automated job discovery, application tracking, and reporting.
 
-The project’s strongest value is not just that it collects jobs. It also shows how to deal with messy real-world source systems, separate reliable automation from unreliable inputs, and turn raw job postings into useful reporting.
+The project’s strongest value is not just that it collects jobs. It also shows how to deal with messy real-world source systems, separate reliable automation from unreliable inputs, track follow-up after applying, and turn raw job/application data into useful reporting.
 
-The current version is intentionally scoped to Greenhouse and Workday, with a documented path for future ATS connectors and application tracking.
+The current version is intentionally scoped to Greenhouse and Workday for job collection, with a documented path for future ATS connectors and Workday link cleanup.
