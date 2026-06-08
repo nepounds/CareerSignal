@@ -33,6 +33,7 @@ from careersignal.collectors.greenhouse import (
 from careersignal.collectors.workday import fetch_and_normalize_workday_jobs
 from careersignal.database import (
     get_jobs_first_seen_in_last_24_hours,
+    initialize_database,
     insert_or_update_jobs,
 )
 from careersignal.email_report import build_and_send_daily_report
@@ -634,6 +635,14 @@ def main() -> None:
 
     print_jobs_table(normalized_jobs)
     save_jobs_to_csv(normalized_jobs, OUTPUT_PATH)
+
+    try:
+        initialize_database()
+    except Exception:
+        logger.error("Database initialization failed.")
+        logger.error(traceback.format_exc())
+        print("ERROR: Database initialization failed. Check logs/careersignal.log")
+        return
 
     try:
         summary = insert_or_update_jobs(normalized_jobs)

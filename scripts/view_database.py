@@ -1,7 +1,8 @@
-from careersignal.database import get_all_jobs
+from careersignal.database import get_all_jobs, initialize_database
 
 
 def main():
+    initialize_database()
     jobs = get_all_jobs()
 
     print("Stored jobs:")

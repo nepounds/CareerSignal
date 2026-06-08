@@ -4,8 +4,16 @@ version = "0.1.0"
 description = "CareerSignal job alert and ATS data collection project"
 requires-python = ">=3.10"
 dependencies = [
-    "requests",
+    "openpyxl",
     "pandas",
+    "python-dotenv",
+    "requests",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.8.0",
 ]
 
 [tool.setuptools.packages.find]

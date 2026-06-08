@@ -133,8 +133,6 @@ def insert_or_update_jobs(jobs, db_path=DATABASE_PATH):
     - inserted with match_notes
     """
 
-    initialize_database(db_path)
-
     now = get_current_timestamp()
 
     jobs_found = len(jobs)
@@ -280,8 +278,6 @@ def insert_run_log(
     Inserts a run log row.
     """
 
-    initialize_database(db_path)
-
     run_timestamp = get_current_timestamp()
 
     with get_connection(db_path) as connection:
@@ -322,8 +318,6 @@ def get_jobs_first_seen_in_last_24_hours(db_path=DATABASE_PATH):
     Results are sorted by match score first.
     """
 
-    initialize_database(db_path)
-
     cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
     cutoff_string = cutoff.replace(microsecond=0).isoformat()
 
@@ -363,8 +357,6 @@ def get_all_jobs(db_path=DATABASE_PATH):
     Returns all stored jobs, sorted by match score.
     Useful for testing and DB checks.
     """
-
-    initialize_database(db_path)
 
     with get_connection(db_path) as connection:
         cursor = connection.cursor()
