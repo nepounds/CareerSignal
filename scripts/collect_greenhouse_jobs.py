@@ -19,15 +19,17 @@ from __future__ import annotations
 import argparse
 import csv
 import logging
-import time
 import traceback
 from dataclasses import dataclass
-from datetime import date
 from pathlib import Path
-from urllib.parse import urlparse
 
 import requests
 
+from careersignal.collectors.greenhouse import (
+    GreenhouseJobPosting,
+    fetch_greenhouse_jobs,
+    normalize_greenhouse_jobs,
+)
 from careersignal.collectors.workday import fetch_and_normalize_workday_jobs
 from careersignal.database import (
     get_jobs_first_seen_in_last_24_hours,
@@ -55,16 +57,6 @@ class CompanyConfig:
     job_title_keywords: list[str]
     excluded_keywords: list[str]
     is_active: bool
-
-
-@dataclass
-class JobPosting:
-    company: str
-    title: str
-    location: str
-    job_url: str
-    external_job_id: str
-    ats_type: str
 
 
 def is_truthy(value: str | None) -> bool:
@@ -126,117 +118,12 @@ def load_company_config(config_path: Path) -> list[CompanyConfig]:
     return companies
 
 
-def get_greenhouse_board_token(career_url: str) -> str:
-    """
-    Example:
-        https://boards.greenhouse.io/gitlab
-
-    Becomes:
-        gitlab
-    """
-
-    parsed_url = urlparse(career_url)
-    path_parts = parsed_url.path.strip("/").split("/")
-
-    if not path_parts or not path_parts[0]:
-        raise ValueError(f"Could not find board token in URL: {career_url}")
-
-    return path_parts[0]
-
-
-def get_with_retries(
-    url: str,
-    timeout: int = 20,
-    max_retries: int = 3,
-    retry_delay: int = 2,
-) -> requests.Response:
-    """
-    Makes a GET request with timeout and retry handling.
-
-    This helps with temporary failures like:
-    - slow websites
-    - temporary network issues
-    - temporary 500/502/503/504 errors
-    """
-
-    logger = logging.getLogger("careersignal")
-    last_error: Exception | None = None
-
-    for attempt in range(1, max_retries + 1):
-        try:
-            logger.info(f"Request attempt {attempt}/{max_retries}: {url}")
-
-            response = requests.get(url, timeout=timeout)
-
-            if response.status_code in {500, 502, 503, 504}:
-                raise requests.exceptions.HTTPError(
-                    f"Temporary server error: {response.status_code}"
-                )
-
-            response.raise_for_status()
-            return response
-
-        except requests.exceptions.RequestException as error:
-            last_error = error
-
-            logger.warning(
-                f"Request failed on attempt {attempt}/{max_retries}: {url} | {error}"
-            )
-
-            if attempt < max_retries:
-                time.sleep(retry_delay)
-
-    raise last_error
-
-
-def fetch_greenhouse_jobs(company_config: CompanyConfig) -> list[JobPosting]:
-    """
-    Pulls jobs from the Greenhouse public job board API.
-    """
-
-    board_token = get_greenhouse_board_token(company_config.career_url)
-    api_url = f"https://boards-api.greenhouse.io/v1/boards/{board_token}/jobs"
-
-    response = get_with_retries(api_url)
-
-    data = response.json()
-    raw_jobs = data.get("jobs", [])
-
-    jobs: list[JobPosting] = []
-
-    for raw_job in raw_jobs:
-        location_data = raw_job.get("location") or {}
-
-        job = JobPosting(
-            company=company_config.company,
-            title=raw_job.get("title", ""),
-            location=location_data.get("name", ""),
-            job_url=raw_job.get("absolute_url", ""),
-            external_job_id=str(raw_job.get("id", "")),
-            ats_type="greenhouse",
-        )
-
-        jobs.append(job)
-
-    return jobs
-
-
-def text_contains_any_keyword(text: str, keywords: list[str]) -> bool:
-    """
-    Checks whether any keyword appears in a text field.
-    """
-
-    text_lower = text.lower()
-
-    return any(keyword in text_lower for keyword in keywords)
-
-
 def greenhouse_job_matches_filters(
-    job: JobPosting,
+    job: GreenhouseJobPosting,
     company_config: CompanyConfig,
 ) -> bool:
     """
-    Applies title/location/exclusion filters to a Greenhouse JobPosting.
+    Applies title/location/exclusion filters to a Greenhouse job.
     """
 
     title_lower = job.title.lower()
@@ -323,7 +210,7 @@ def normalized_job_matches_filters(
 
 def collect_greenhouse_jobs(
     companies: list[CompanyConfig],
-) -> tuple[list[JobPosting], list[dict]]:
+) -> tuple[list[GreenhouseJobPosting], list[dict]]:
     """
     Collects matching Greenhouse jobs from all active Greenhouse companies.
 
@@ -334,7 +221,7 @@ def collect_greenhouse_jobs(
 
     logger = logging.getLogger("careersignal")
 
-    matching_jobs: list[JobPosting] = []
+    matching_jobs: list[GreenhouseJobPosting] = []
     failed_sources: list[dict] = []
 
     for company_config in companies:
@@ -348,7 +235,10 @@ def collect_greenhouse_jobs(
         logger.info(f"Collecting Greenhouse jobs for {company_config.company}")
 
         try:
-            all_jobs = fetch_greenhouse_jobs(company_config)
+            all_jobs = fetch_greenhouse_jobs(
+                career_url=company_config.career_url,
+                company_name=company_config.company,
+            )
 
             filtered_jobs = [
                 job
@@ -549,36 +439,6 @@ def log_collection_error(
     logger.error(traceback.format_exc())
 
 
-def normalize_job_posting(job: JobPosting) -> dict:
-    """
-    Converts a Greenhouse JobPosting object into the normalized dictionary format
-    expected by database.py.
-    """
-
-    return {
-        "company_name": job.company,
-        "source_ats": job.ats_type,
-        "external_job_id": job.external_job_id,
-        "title": job.title,
-        "location": job.location,
-        "department": "",
-        "job_url": job.job_url,
-        "posted_date": "",
-        "date_collected": date.today().isoformat(),
-    }
-
-
-def normalize_job_postings(jobs: list[JobPosting]) -> list[dict]:
-    """
-    Converts all collected Greenhouse JobPosting objects into normalized dictionaries.
-    """
-
-    return [
-        normalize_job_posting(job)
-        for job in jobs
-    ]
-
-
 def score_normalized_jobs(jobs: list[dict]) -> None:
     """
     Runs match scoring for every normalized job.
@@ -763,7 +623,7 @@ def main() -> None:
         return
 
     greenhouse_jobs, greenhouse_failed_sources = collect_greenhouse_jobs(companies)
-    normalized_greenhouse_jobs = normalize_job_postings(greenhouse_jobs)
+    normalized_greenhouse_jobs = normalize_greenhouse_jobs(greenhouse_jobs)
 
     workday_jobs, workday_failed_sources = collect_workday_jobs(companies)
 
