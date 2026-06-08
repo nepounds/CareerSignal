@@ -415,12 +415,6 @@ CareerSignal/
 │   ├── report_applications.py
 │   ├── send_weekly_application_tracker_email.py
 │   ├── show_applications.py
-│   ├── test_config_loader.py
-│   ├── test_database.py
-│   ├── test_email_report.py
-│   ├── test_job_normalizer.py
-│   ├── test_match_scoring.py
-│   ├── test_new_job_detection.py
 │   ├── update_application_status.py
 │   ├── update_match_scores.py
 │   ├── verify_ats_audit.py
@@ -500,30 +494,6 @@ $env:PYTHONPATH="src"
 ```
 
 ## Common Commands
-
-Run config loader test:
-
-```powershell
-python scripts/test_config_loader.py
-```
-
-Run database test:
-
-```powershell
-python scripts/test_database.py
-```
-
-Run match scoring test:
-
-```powershell
-python scripts/test_match_scoring.py
-```
-
-Run email report test:
-
-```powershell
-python scripts/test_email_report.py
-```
 
 Preview collection without sending email:
 

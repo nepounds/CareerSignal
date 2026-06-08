@@ -138,9 +138,6 @@ CareerSignal/
 │   ├── report_applications.py
 │   ├── send_weekly_application_tracker_email.py
 │   ├── show_applications.py
-│   ├── test_config_loader.py
-│   ├── test_database.py
-│   ├── test_email_report.py
 │   ├── test_job_normalizer.py
 │   ├── test_match_scoring.py
 │   ├── test_new_job_detection.py
@@ -284,11 +281,7 @@ scripts/preview_workday_normalized_jobs.py
 scripts/report_applications.py
 scripts/send_weekly_application_tracker_email.py
 scripts/show_applications.py
-scripts/test_config_loader.py
-scripts/test_database.py
-scripts/test_email_report.py
 scripts/test_job_normalizer.py
-scripts/test_match_scoring.py
 scripts/test_new_job_detection.py
 scripts/update_application_status.py
 scripts/update_match_scores.py
@@ -1671,10 +1664,6 @@ Only future updates:
 Useful commands:
 
 ```
-PYTHONPATH=src python scripts/test_config_loader.py
-PYTHONPATH=src python scripts/test_database.py
-PYTHONPATH=src python scripts/test_match_scoring.py
-PYTHONPATH=src python scripts/test_email_report.py
 python scripts/collect_greenhouse_jobs.py --preview
 python scripts/export_to_excel.py
 python scripts/send_weekly_application_tracker_email.py --preview
@@ -1684,10 +1673,6 @@ Windows PowerShell:
 
 ```
 $env:PYTHONPATH="src"
-python scripts/test_config_loader.py
-python scripts/test_database.py
-python scripts/test_match_scoring.py
-python scripts/test_email_report.py
 python scripts/collect_greenhouse_jobs.py --preview
 python scripts/export_to_excel.py
 python scripts/send_weekly_application_tracker_email.py --preview
